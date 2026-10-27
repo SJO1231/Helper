@@ -77,8 +77,11 @@ claude
 
 같은 번호는 동시에 돌린다. 브리프 위에는 3절의 두 줄을 붙인다.
 
-### ① S0 가능성 시험 — 끝남 (PR #1)
-목록 화면 3종 확인 완료. 결과는 `docs/feasibility.md`, 재현 스크립트는 `scripts/probe-public.mjs`. 안 됨 0, 조건부 4(사전규격 구분, 자동 순회, 탭 전환, 두 줄 셀 행 높이), 모름 1(로그인 화면). PR #1을 보고 합친다.
+### ① S0 가능성 시험 — 데스크톱 앱, Opus high, 반나절
+스킬: 끝에 `/superpowers:verification-before-completion`.
+> 목표: https://www.g2b.go.kr 공개 화면 3종(발주계획 목록, 사전규격공개 목록, 입찰공고목록)에서 PLAN.md 2절 0단계 1~9번을 확인해 docs/feasibility.md에 적는다. 입찰공고목록에서 이미 확인한 것은 PLAN.md 0단계 표에 있으니 나머지 두 화면과 미확인 항목(입력폼 label↔ref 연결률, 테마 선택자, 직링크 호출 함수 위치, 탭을 눌러야 조회되는 화면)에 집중한다. 같은 확인을 Playwright 스크립트 scripts/probe-public.mjs로도 돌 수 있게 하나 만든다. "안 됨"이 나온 항목은 docs/DECISIONS.md에 "나중: ○○, 이유: S0에서 안 됨"으로 적어라. 끝 기준: 항목마다 됨/안 됨/조건부, API 이름, 개수. 화면별 scrnNo·menuNo·그리드 수·라벨 비율 표. 하지 말 것: 제품 코드 작성, 공고번호·금액·업체명 같은 값 기록, 로그인, 서버에 1초 1회 넘는 요청. 가지 s0/feasibility, PR 하나.
+
+끝나면 내가 볼 것: "안 됨"이 있으면 그 항목이 필요한 기능은 1단계에 넣지 않고, S1이 SPEC.md 9절 "하지 않는 것"에 옮겨 적는다.
 
 ### ①-2 S0-b 상세 화면 확인 — 데스크톱 앱, Opus high, 반나절
 스킬: 끝에 `/superpowers:verification-before-completion`.
