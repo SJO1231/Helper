@@ -116,6 +116,50 @@ claude.ai/code → 클라우드 세션 시작 → 저장소 목록에 `SJO1231/h
 | CI 파일 | 없음(의도) | S2·S5가 검증 명령을 만든 뒤 S5 끝 기준에 "ci.yml 초안" 포함 |
 | 리뷰 봇 비밀값 | 없음 | 사용자가 GitHub → Settings → Secrets에 `ANTHROPIC_API_KEY` 등록 |
 
+### 1-11. 남은 일을 하는 법 (사용자가 직접, 순서대로)
+
+**(가) 클라우드 세션에서 Helper 저장소가 보이게 하기 — S2 전까지**
+1. 브라우저에서 claude.ai/code 를 연다.
+2. "클라우드 세션 시작"을 누른다. 저장소를 고르는 목록이 뜬다.
+3. 목록에 `SJO1231/Helper`가 있으면 끝. 아직 아무것도 시작하지 말고 창을 닫는다.
+4. 없으면 같은 창의 GitHub 줄에 있는 "관리"를 누른다. GitHub 페이지로 넘어가 Claude 앱의 저장소 접근 설정이 나온다.
+5. "Only select repositories"에서 `Helper`를 추가하고 저장한다. 다시 2번을 하면 보인다.
+왜: 클라우드 세션은 GitHub에서 코드를 받아 일한다. 새 저장소는 Claude 앱에 허용돼 있지 않을 수 있다.
+
+**(나) 터미널 세션이 조직 크레딧으로 과금되는지 확인 — S1 전에 한 번**
+1. platform.claude.com → API Keys → 키를 만든다(이름 helper). 키는 한 번만 보이니 복사해 둔다.
+2. PowerShell을 새로 연다(기존 창 말고).
+3. 아래 두 줄을 한 줄씩 넣는다.
+   ```
+   $env:ANTHROPIC_API_KEY = "sk-ant-복사한키"
+   claude
+   ```
+4. 처음에 "API 키를 쓸까" 물으면 예.
+5. 창 안에서 `/status`를 친다. 로그인 방식(Auth)이 API 키로 나오면 조직 크레딧이다. 구독(claude.ai)으로 나오면 환경 변수가 안 들어간 것이니 창을 닫고 2번부터 다시.
+6. 확인이 끝나면 그 창에서 바로 S1을 시작해도 된다(GUIDE 4절 ②).
+왜: 데스크톱 앱은 구독만 쓴다. 조직 크레딧은 이 창에서만 나간다.
+
+**(다) 리뷰 봇용 비밀값 넣기 — S5 전에**
+1. GitHub에서 `SJO1231/Helper` 저장소를 연다.
+2. Settings → Secrets and variables → Actions → "New repository secret".
+3. Name에 `ANTHROPIC_API_KEY`, Secret에 (나)에서 만든 키. Add secret.
+왜: 리뷰 봇은 GitHub Actions가 Claude를 부르는 것이라 키가 GitHub에 있어야 한다. 이 키로 돌면 조직 크레딧에서 나간다. 워크플로 파일은 S5가 만들며, 비밀값이 먼저 있어야 첫 실행이 실패로 뜨지 않는다.
+
+**(라) CI 파일은 지금 만들지 않는다**
+돌릴 검사(`npm run verify`, `pytest core/tests`)가 아직 없다. 지금 빈 CI를 만들면 녹색만 뜨는 가짜 통과가 되고, 옛 저장소가 그 상태였다. S5 브리프 끝 기준에 "`.github/workflows/ci.yml` 초안: 위 두 명령을 그대로 실행"이 들어 있다.
+
+**(마) `scripts/probe-public.mjs`는 S0가 만든다**
+지금 열면 "없음"이 정상이다. S0 브리프에 "같은 확인을 Playwright 스크립트로도 돌 수 있게 하나 만든다"가 들어 있다.
+
+**(바) carryover를 지울 때(1단계 끝난 뒤)**
+`.claude/settings.json`의 `permissions.deny` 두 줄(`Edit(carryover/**)`, `Write(carryover/**)`)을 먼저 지우고 저장한 뒤 폴더를 지운다. 그 전에는 어떤 세션도 carryover를 고치지 못한다. 의도된 보호다.
+
+**(사) Playwright 플러그인**
+켜져 있어도 해가 없다. S0는 내장 브라우저, S4와 probe 스크립트는 npm 패키지 Playwright를 써서 플러그인과 무관하다.
+
+**(아) 처음 세션을 열 때 플러그인 확인**
+데스크톱 앱에서 이 폴더로 새 세션을 열고 스킬 목록을 본다. `oh-my-claudecode:`로 시작하는 것이 없으면 설정이 먹은 것이다. 있으면 앱의 플러그인 화면에서 oh-my-claudecode를 끈다. 터미널에서는 이미 꺼진 것을 확인했다.
+
 ## 2. 모든 세션에 똑같이 하는 것
 
 **시작할 때** 브리프 맨 위에 이 두 줄을 항상 붙인다.
@@ -167,7 +211,7 @@ S4 그리드 비교
 > 목표: spikes/grid/에 AG Grid Community, RevoGrid, Tabulator를 같은 합성 자료(1,000×100, 10,000×100)로 올려 PLAN 1단계 "표 속도 끝 기준" 숫자를 Playwright로 잰다. 추가 비교: 기본 셀 편집기, 우클릭 메뉴, 열 타입별 표시, 라이선스, 번들 KB. 끝 기준: 표 하나와 권고 한 줄. 하지 말 것: 자체 편집기, 제품 폴더 수정.
 
 S5 shared + 사전 모듈
-> 목표: shared/에 메시지·사전·캡처 JSON 스키마(SPEC 4·6절)와 TS 타입, extension/common/dictionary.ts에 "K → 표준키(alias) → 라벨(user>screen>site>system) → 타입" 해석 함수와 "미등록 키 목록" 함수. shared/seed/에 seed 파일 형식. vitest. 끝 기준: 스키마 검증·우선순위 테스트 통과. 하지 말 것: UI, DOM 접근.
+> 목표: shared/에 메시지·사전·캡처 JSON 스키마(SPEC 4·6절)와 TS 타입, extension/common/dictionary.ts에 "K → 표준키(alias) → 라벨(user>screen>site>system) → 타입" 해석 함수와 "미등록 키 목록" 함수. shared/seed/에 seed 파일 형식. vitest. 루트 package.json의 `npm run verify`(tsc·vitest)와 `.github/workflows/ci.yml` 초안(`npm run verify`, `pytest core/tests`를 그대로 실행, PR 리뷰 봇 1회는 `anthropics/claude-code-action@v1` + `ANTHROPIC_API_KEY` 비밀값 + `--max-turns 5`). 끝 기준: 스키마 검증·우선순위 테스트 통과, CI가 PR에서 실제로 돈 기록. 하지 말 것: UI, DOM 접근.
 
 ### ④ 사전 seed 배치 — 터미널(조직 크레딧), Sonnet, 밤에
 > 목표: `claude -p`로 돌린다. 입력: E:/Prodev/G2B_Helper/참고자료의 data_map 31개(값 출력 금지), carryover/reference/의 옛 사전, pclm의 docs/erp/fields.md(github rfastball/contract-list-manager). 출력: shared/seed/dict_key.json, dict_alias.json, dict_label.json, dict_screen.json, dict_child.json. 규칙: 같은 화면 코드는 하나로 합치고 키 합집합, 사용자 범위(접수 01001/01114·01117, 입찰 01173/01174/01179, 계약 01570/01571/01579) 밖 화면은 "참고" 표시, pclm 뜻은 근거 "pclm"으로. 끝 기준: 출력 파일에 공고번호·금액·업체명·기관명이 한 글자도 없음(검사 스크립트로 확인). 하지 말 것: 값 출력, 저장소 밖 파일 수정.
