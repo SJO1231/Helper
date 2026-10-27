@@ -1,0 +1,1 @@
+javascript:(function(){if(window.$p&&$p.getPopupList){$p.getPopupList().forEach(id=>{try{$p.closePopup(id);}catch(e){}});}document.querySelectorAll("input[value='닫기'],.btn_cm.close,[id*='poup'][id*='btnClose']").forEach(b=>{try{b.click();}catch(e){}});document.querySelectorAll('.w2modal').forEach(m=>m.remove());})();

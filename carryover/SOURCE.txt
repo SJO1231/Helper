@@ -1,0 +1,1 @@
+source: E:/Prodev/G2B_Helper @ dbd7bc9 (branch claude/issue-101-editable-virtual), origin/main 284eb45, copied 2026-10-26
