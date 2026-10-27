@@ -103,7 +103,7 @@ git push -u origin main
 기록: Claude가 실수로 `helper-v2`라는 저장소를 따로 만들어 올렸었다. 사용자 저장소로 옮긴 뒤 helper-v2는 지운다(GitHub → helper-v2 → Settings → Delete).
 
 ### 1-9. 클라우드 세션에서 이 저장소가 보이게 하기 (사용자가 할 것)
-claude.ai/code → 클라우드 세션 시작 → 저장소 목록에 `SJO1231/helper-v2`가 보여야 한다. 안 보이면 GitHub 연결 "관리"에서 Claude GitHub App에 이 저장소 접근을 허용한다.
+claude.ai/code → 클라우드 세션 시작 → 저장소 목록에 `SJO1231/Helper`가 보여야 한다. 안 보이면 GitHub 연결 "관리"에서 Claude GitHub App에 이 저장소 접근을 허용한다.
 
 ### 1-10. 점검 결과 (2026-10-28)
 | 항목 | 상태 | 근거 |
