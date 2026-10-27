@@ -105,10 +105,16 @@ git push -u origin main
 ### 1-9. 클라우드 세션에서 이 저장소가 보이게 하기 (사용자가 할 것)
 claude.ai/code → 클라우드 세션 시작 → 저장소 목록에 `SJO1231/helper-v2`가 보여야 한다. 안 보이면 GitHub 연결 "관리"에서 Claude GitHub App에 이 저장소 접근을 허용한다.
 
-### 1-10. 아직 안 한 것
-- `.claude/settings.json`의 플러그인 설정이 실제로 먹는지 새 세션에서 확인.
-- 클라우드 세션 저장소 목록 확인(1-9).
-- 첫 터미널 세션 열기(0절의 API 키 방법)와 `/status` 확인.
+### 1-10. 점검 결과 (2026-10-28)
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 로컬 → GitHub Helper push | 완료 | `git branch -vv`에 `[origin/main]`, GitHub에 커밋 3개(f6519dc, 47668d8, ca1fc82) |
+| helper-v2 삭제 | 완료(사용자) | `gh repo view SJO1231/helper-v2` → 없음 |
+| 프로젝트 플러그인 설정 적용 | 적용됨 | 이 폴더에서 `claude plugin list` → oh-my-claudecode·ponytail "disabled", superpowers·mattpocock "enabled" |
+| 클라우드 세션 저장소 목록 | 미확인 | claude.ai/code에서 사용자가 볼 것 |
+| 터미널 첫 세션 `/status` | 미확인 | 사용자가 API 키 넣고 열어 볼 것 |
+| CI 파일 | 없음(의도) | S2·S5가 검증 명령을 만든 뒤 S5 끝 기준에 "ci.yml 초안" 포함 |
+| 리뷰 봇 비밀값 | 없음 | 사용자가 GitHub → Settings → Secrets에 `ANTHROPIC_API_KEY` 등록 |
 
 ## 2. 모든 세션에 똑같이 하는 것
 

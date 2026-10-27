@@ -243,7 +243,7 @@ core는 처음부터 **라이브러리(gateway.py) + 얼굴 둘**로 만든다.
 ## 6. 세션에서 일하는 법 (상세)
 
 ### 6.0 한 번만 하는 준비 (30분, 사람이 직접)
-1. 새 저장소는 **이 폴더 `E:/Prodev/Helper`** 다. 루트의 옛 북마클릿 8개(g2b-toolbox-v4.2.js, g2b_*.txt)는 `carryover/reference/bookmarklet/`로 옮겨 루트를 비운다. 그 뒤 `git init` → `.gitignore`(node_modules, .venv, *.sqlite3, dist/, docs/feasibility-values/).
+1. 새 저장소는 **이 폴더 `E:/Prodev/Helper`** 다. 루트의 옛 북마클릿 8개(g2b-toolbox-v4.2.js, g2b_*.txt)는 `carryover/reference/`로 옮겨 루트를 비운다(완료). 그 뒤 `git init` → `.gitignore`(node_modules, .venv, *.sqlite3, dist/, docs/feasibility-values/).
 2. `carryover/`와 `PLAN.md`는 이미 여기 있다. `carryover/`는 1단계 끝나면 지운다.
 3. 아래 6.6의 CLAUDE.md를 새 폴더 루트에 저장.
 4. `docs/` 폴더에 빈 `SPEC.md`, `DECISIONS.md` 만들기. DECISIONS.md 첫 줄: `2026-10-26 새 저장소 시작. 옛 G2B_Helper는 참고용 동결.`
