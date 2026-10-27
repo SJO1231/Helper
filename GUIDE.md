@@ -19,14 +19,93 @@ claude
 창이 뜨면 `/status`를 쳐서 로그인 방식이 API 키인지 본다. 아니면 구독으로 과금되는 중이다. 이 창을 닫으면 다른 창에 영향이 없다.
 클라우드는 저장소가 GitHub에 있어야 한다(비공개 저장소로). 잔액은 claude.ai → Settings → Usage.
 
-## 1. 딱 한 번 하는 준비 (30분)
+## 1. 딱 한 번 하는 준비 — 2026-10-28에 실제로 한 대로
 
-1. `E:/Prodev/Helper` 루트의 옛 북마클릿 8개(`g2b-toolbox-v4.2.js`, `g2b_*.txt`)를 `carryover/reference/bookmarklet/`로 옮긴다.
-2. 루트에 `AGENTS.md`를 만든다. 내용은 `PLAN.md` 6.7절을 그대로 복사. `CLAUDE.md`는 한 줄 `@AGENTS.md`.
-3. `docs/` 폴더에 빈 `SPEC.md`, 한 줄짜리 `DECISIONS.md`(`2026-10-28 새 저장소 시작. 옛 G2B_Helper는 참고용 동결.`), 그리고 `PROCESS.md`(이미 `docs/PROCESS.md`로 만들어 둠. 2절을 에이전트에게 말하는 꼴로 바꾼 것).
-4. `.gitignore`에 `node_modules/`, `.venv/`, `*.sqlite3`, `dist/`, `docs/feasibility-values/`.
-5. `git init` → 첫 커밋 → GitHub 비공개 저장소 만들어 push.
-6. Claude Code 설정에서 이 폴더는 **superpowers** 스킬만 켠다. mattpocock은 grilling 하나만 수동으로 쓴다. OMC는 끈다.
+아래는 이미 **끝난 일**이다. 다시 할 필요는 없고, 다른 PC나 새 프로젝트에서 같은 준비를 할 때 그대로 따라 하면 된다. 모든 명령은 PowerShell에서 `E:\Prodev\Helper` 안에서 실행한다.
+
+### 1-1. 옛 북마클릿을 치운다 (사용자가 함)
+루트에 있던 `g2b-toolbox-v4.2.js`와 `g2b_*.txt` 7개를 `carryover/reference/`로 옮겼다. 루트에 코드처럼 보이는 파일이 없어야 새 세션이 그것을 제품 코드로 착각하지 않는다.
+확인: `ls carryover/reference` 에 8개 파일이 보이면 된다.
+
+### 1-2. 규칙 파일 두 개 (사용자가 함)
+- `AGENTS.md`: PLAN.md 6.7절 내용을 그대로 복사해 루트에 저장. 28줄.
+- `CLAUDE.md`: 내용은 `@AGENTS.md` 한 줄. Claude Code는 CLAUDE.md를 읽고, 그 한 줄이 AGENTS.md를 불러온다. Codex는 AGENTS.md를 바로 읽는다.
+확인: `Get-Content CLAUDE.md` 가 `@AGENTS.md` 한 줄이면 된다.
+
+### 1-3. docs 폴더 세 파일 (사용자가 만들고, PROCESS.md는 Claude가 채움)
+- `docs/SPEC.md`: 빈 파일. 설계 세션 S1이 채운다.
+- `docs/DECISIONS.md`: 첫 줄 `2026-10-28 새 저장소 시작. 옛 G2B_Helper는 참고용 동결.`
+- `docs/PROCESS.md`: 이 문서 2절을 **에이전트에게 말하는 꼴**로 바꾼 것. 시작할 때·일하는 중·끝낼 때·가지와 PR·검증 명령 다섯 절.
+
+### 1-4. .gitignore (Claude가 함)
+Git에 올리지 않을 것을 적는 파일. 루트에 `.gitignore`라는 이름으로 아래 12줄을 넣었다.
+```
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+dist/
+docs/feasibility-values/
+.omc/
+.DS_Store
+Thumbs.db
+```
+뜻: 설치되는 라이브러리(node_modules, .venv), 파이썬 캐시, SQLite 자료 파일, 빌드 결과(dist), 실제 값이 들어갈 수 있는 폴더(feasibility-values), 도구 상태 폴더(.omc)는 저장소에 넣지 않는다.
+
+### 1-5. README.md (Claude가 함)
+저장소를 처음 여는 사람(클라우드 세션 포함)이 어느 파일부터 볼지 적은 짧은 안내. 규칙·절차·사양·결정·방향·운영·주의·carryover의 위치만 적었다.
+
+### 1-6. 이 폴더의 Claude Code 설정 (Claude가 함)
+`.claude/settings.json`을 만들었다. 두 가지를 정한다.
+```
+{
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true,
+    "oh-my-claudecode@omc": false,
+    "ponytail@ponytail": false
+  },
+  "permissions": {
+    "deny": [ "Edit(carryover/**)", "Write(carryover/**)" ]
+  }
+}
+```
+- `enabledPlugins`: 이 폴더에서 superpowers와 mattpocock-skills는 켜고, oh-my-claudecode와 ponytail은 끈다. 플러그인 ID는 터미널에서 `claude plugin list`로 확인한 실제 이름이다. mattpocock은 켜 두되 grilling만 S1에서 수동으로 부른다.
+- `permissions.deny`: carryover 폴더는 어떤 세션도 고치지 못한다. 가져온 원본을 보존하기 위해서다.
+- 이 파일은 저장소에 함께 올라가므로 클라우드 세션에도 같은 설정이 적용된다. **적용 확인은 새 세션을 열어 `/plugins` 또는 스킬 목록에 OMC가 없는지 보는 것**이다(아직 확인하지 않음).
+
+### 1-7. git 저장소 만들기와 첫 커밋 (Claude가 함)
+```
+git init -b main
+git config user.name "1231"
+git config user.email "slomae77@gmail.com"
+git add .
+git commit -m "chore: 새 시작, carryover와 계획 문서"
+```
+- `git init -b main`: 이 폴더를 저장소로 만들고 기본 가지 이름을 main으로.
+- `git config user.name/email`(--global 없이): **이 저장소에서만** 쓰는 이름과 메일. 옛 저장소와 같은 값을 썼다. 전역 설정은 건드리지 않았다.
+- `git add .` → `git commit`: 45개 파일이 첫 커밋 `f6519dc`가 됐다.
+- "LF will be replaced by CRLF" 경고는 Windows 줄바꿈 변환 안내일 뿐 오류가 아니다.
+확인: `git log --oneline` 에 커밋 한 줄이 보이면 된다.
+
+### 1-8. GitHub 비공개 저장소 만들고 올리기 (Claude가 함)
+```
+gh repo create helper-v2 --private --source=. --remote=origin --push
+```
+- 계정에 `Helper`라는 저장소가 이미 있어서(2026-10-25에 push된 별개 저장소) 이름을 **helper-v2**로 했다. 주소: https://github.com/SJO1231/helper-v2 (비공개). 이름을 바꾸고 싶으면 GitHub 저장소 Settings → Rename 뒤, 로컬에서 `git remote set-url origin <새 주소>`.
+- `--private`: 비공개. `--source=.`: 이 폴더를 올린다. `--remote=origin --push`: origin이라는 이름으로 연결하고 바로 push.
+확인: `git remote -v` 에 helper-v2 주소, `git branch -vv` 에 `[origin/main]` 이 보이면 된다.
+
+### 1-9. 클라우드 세션에서 이 저장소가 보이게 하기 (사용자가 할 것)
+claude.ai/code → 클라우드 세션 시작 → 저장소 목록에 `SJO1231/helper-v2`가 보여야 한다. 안 보이면 GitHub 연결 "관리"에서 Claude GitHub App에 이 저장소 접근을 허용한다.
+
+### 1-10. 아직 안 한 것
+- `.claude/settings.json`의 플러그인 설정이 실제로 먹는지 새 세션에서 확인.
+- 클라우드 세션 저장소 목록 확인(1-9).
+- 첫 터미널 세션 열기(0절의 API 키 방법)와 `/status` 확인.
 
 ## 2. 모든 세션에 똑같이 하는 것
 
