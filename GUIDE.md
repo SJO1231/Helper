@@ -91,13 +91,16 @@ git commit -m "chore: 새 시작, carryover와 계획 문서"
 - "LF will be replaced by CRLF" 경고는 Windows 줄바꿈 변환 안내일 뿐 오류가 아니다.
 확인: `git log --oneline` 에 커밋 한 줄이 보이면 된다.
 
-### 1-8. GitHub 비공개 저장소 만들고 올리기 (Claude가 함)
+### 1-8. GitHub 비공개 저장소에 올리기
+사용자가 GitHub에서 비공개 저장소 **SJO1231/Helper**(빈 저장소)를 직접 만들었다. 로컬 저장소를 그 주소에 연결해 올린다.
 ```
-gh repo create helper-v2 --private --source=. --remote=origin --push
+git remote set-url origin https://github.com/SJO1231/Helper.git
+git push -u origin main
 ```
-- 계정에 `Helper`라는 저장소가 이미 있어서(2026-10-25에 push된 별개 저장소) 이름을 **helper-v2**로 했다. 주소: https://github.com/SJO1231/helper-v2 (비공개). 이름을 바꾸고 싶으면 GitHub 저장소 Settings → Rename 뒤, 로컬에서 `git remote set-url origin <새 주소>`.
-- `--private`: 비공개. `--source=.`: 이 폴더를 올린다. `--remote=origin --push`: origin이라는 이름으로 연결하고 바로 push.
-확인: `git remote -v` 에 helper-v2 주소, `git branch -vv` 에 `[origin/main]` 이 보이면 된다.
+- `git remote set-url origin <주소>`: 올릴 곳(origin)을 이 주소로 정한다. 처음 연결이면 `git remote add origin <주소>`.
+- `git push -u origin main`: main 가지를 올리고, 앞으로 `git push`만 쳐도 여기로 가게 기억시킨다.
+확인: `git remote -v` 에 Helper 주소, `git branch -vv` 에 `[origin/main]`.
+기록: Claude가 실수로 `helper-v2`라는 저장소를 따로 만들어 올렸었다. 사용자 저장소로 옮긴 뒤 helper-v2는 지운다(GitHub → helper-v2 → Settings → Delete).
 
 ### 1-9. 클라우드 세션에서 이 저장소가 보이게 하기 (사용자가 할 것)
 claude.ai/code → 클라우드 세션 시작 → 저장소 목록에 `SJO1231/helper-v2`가 보여야 한다. 안 보이면 GitHub 연결 "관리"에서 Claude GitHub App에 이 저장소 접근을 허용한다.
