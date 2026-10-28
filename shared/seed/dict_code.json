@@ -1,0 +1,250 @@
+{
+  "rows": [
+    {
+      "std_key": "prcmBsneSeCd",
+      "code": "조070001",
+      "meaning": "물품",
+      "scope": "system"
+    },
+    {
+      "std_key": "prcmBsneSeCd",
+      "code": "조070002",
+      "meaning": "건설",
+      "scope": "system"
+    },
+    {
+      "std_key": "prcmBsneSeCd",
+      "code": "조070003",
+      "meaning": "용역",
+      "scope": "system"
+    },
+    {
+      "std_key": "prcmBsneSeCd",
+      "code": "조070004",
+      "meaning": "외자",
+      "scope": "system"
+    },
+    {
+      "std_key": "slCprcmBsneSeCd",
+      "code": "조070001",
+      "meaning": "물품",
+      "scope": "system"
+    },
+    {
+      "std_key": "slCprcmBsneSeCd",
+      "code": "조070002",
+      "meaning": "건설",
+      "scope": "system"
+    },
+    {
+      "std_key": "slCprcmBsneSeCd",
+      "code": "조070003",
+      "meaning": "용역",
+      "scope": "system"
+    },
+    {
+      "std_key": "slCprcmBsneSeCd",
+      "code": "조070004",
+      "meaning": "외자",
+      "scope": "system"
+    },
+    {
+      "std_key": "stdCtrtMthdCd",
+      "code": "계030001",
+      "meaning": "일반경쟁",
+      "scope": "system"
+    },
+    {
+      "std_key": "stdCtrtMthdCd",
+      "code": "계030003",
+      "meaning": "제한경쟁",
+      "scope": "system"
+    },
+    {
+      "std_key": "stdCtrtMthdCd",
+      "code": "계030004",
+      "meaning": "수의계약",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtMthdCd",
+      "code": "계030001",
+      "meaning": "일반경쟁",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtMthdCd",
+      "code": "계030003",
+      "meaning": "제한경쟁",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtMthdCd",
+      "code": "계030004",
+      "meaning": "수의계약",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtTyCd",
+      "code": "계120001",
+      "meaning": "총액계약",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtTyCd",
+      "code": "계120002",
+      "meaning": "단가계약",
+      "scope": "system"
+    },
+    {
+      "std_key": "scsbdMthdCd",
+      "code": "낙030001",
+      "meaning": "적격심사",
+      "scope": "system"
+    },
+    {
+      "std_key": "scsbdMthdCd",
+      "code": "낙030002",
+      "meaning": "규격가격동시입찰",
+      "scope": "system"
+    },
+    {
+      "std_key": "scsbdMthdCd",
+      "code": "낙030003",
+      "meaning": "협상에의한계약",
+      "scope": "system"
+    },
+    {
+      "std_key": "scsbdMthdCd",
+      "code": "낙030009",
+      "meaning": "수의(총액)",
+      "scope": "system"
+    },
+    {
+      "std_key": "pbancKndCd",
+      "code": "공440002",
+      "meaning": "실공고",
+      "scope": "system"
+    },
+    {
+      "std_key": "pbancSttsCd",
+      "code": "공400001",
+      "meaning": "등록공고",
+      "scope": "system"
+    },
+    {
+      "std_key": "pbancSttsCd",
+      "code": "공400002",
+      "meaning": "변경공고",
+      "scope": "system"
+    },
+    {
+      "std_key": "pbancSttsCd",
+      "code": "공400003",
+      "meaning": "취소공고",
+      "scope": "system"
+    },
+    {
+      "std_key": "atrzSttsCd",
+      "code": "결020003",
+      "meaning": "결재완료",
+      "scope": "system"
+    },
+    {
+      "std_key": "devyCndtCd",
+      "code": "인010001",
+      "meaning": "공장인도",
+      "scope": "system"
+    },
+    {
+      "std_key": "devyCndtCd",
+      "code": "인010003",
+      "meaning": "납품장소하차도",
+      "scope": "system"
+    },
+    {
+      "std_key": "devyCndtCd",
+      "code": "인010004",
+      "meaning": "납품장소차상도",
+      "scope": "system"
+    },
+    {
+      "std_key": "devyCndtCd",
+      "code": "인010005",
+      "meaning": "현장설치도",
+      "scope": "system"
+    },
+    {
+      "std_key": "jintSyddCmnMthoCd",
+      "code": "공500004",
+      "meaning": "단독계약",
+      "scope": "system"
+    },
+    {
+      "std_key": "drpmSbpySeCd",
+      "code": "직130001",
+      "meaning": "직접지급",
+      "scope": "system"
+    },
+    {
+      "std_key": "drpmSbpySeCd",
+      "code": "직130002",
+      "meaning": "대지급",
+      "scope": "system"
+    },
+    {
+      "std_key": "newLotmSeCd",
+      "code": "신120001",
+      "meaning": "신규(단기)",
+      "scope": "system"
+    },
+    {
+      "std_key": "bgtImplSeCd",
+      "code": "예060001",
+      "meaning": "자체예산",
+      "scope": "system"
+    },
+    {
+      "std_key": "bidMthdCd",
+      "code": "입180002",
+      "meaning": "전자입찰",
+      "scope": "system"
+    },
+    {
+      "std_key": "lcrtTyCd",
+      "code": "계040001",
+      "meaning": "일반공고",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtPgstCd",
+      "code": "계020011",
+      "meaning": "송신완료",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtPgstCd",
+      "code": "계020013",
+      "meaning": "응답작성중",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtPgstCd",
+      "code": "계020014",
+      "meaning": "응답완료",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtPgstCd",
+      "code": "계020018",
+      "meaning": "체결통보서접수",
+      "scope": "system"
+    },
+    {
+      "std_key": "ctrtPgstCd",
+      "code": "계020021",
+      "meaning": "미작성",
+      "scope": "system"
+    }
+  ]
+}
