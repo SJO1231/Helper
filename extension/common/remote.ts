@@ -86,6 +86,7 @@ export function createRemote(deps: RemoteDeps) {
     row(button('year-minus', '−1년'), button('year-plus', '+1년')),
     rowSelect,
     row(rowInput, button('row-count-apply', '적용')),
+    button('open-viewer', '뷰어'),
     toast,
     diagnostics,
   );
@@ -197,6 +198,10 @@ export function createRemote(deps: RemoteDeps) {
     say(ok ? `조회건수 ${n}` : (reason ?? '조회건수를 바꾸지 못함'));
   }
 
+  root.querySelector('[data-action="open-viewer"]')!.addEventListener('click', async () => {
+    const reply = await send({ kind: 'open-viewer' });
+    if (!reply.ok) noteFailure(reply);
+  });
   root.querySelector('[data-action="year-minus"]')!.addEventListener('click', () => void shiftYear(-1));
   root.querySelector('[data-action="year-plus"]')!.addEventListener('click', () => void shiftYear(1));
   rowSelect.addEventListener('change', () => void applyRowCount(Number(rowSelect.value)));

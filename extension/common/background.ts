@@ -93,6 +93,7 @@ export interface BackgroundDeps {
   connection: Connection;
   runInPage: PageRunner;
   extensionOrigin: string;
+  openViewer: (table: string) => Promise<void>;
 }
 
 export function createHandlers(deps: BackgroundDeps) {
@@ -170,6 +171,7 @@ export function createHandlers(deps: BackgroundDeps) {
       case 'screen.changed': return registerScreen(message);
       case 'shift-year': return { ok: true, data: await inPage(tabId, 'shiftYear', [message.delta]) };
       case 'row-count': return { ok: true, data: await inPage(tabId, 'applyRowCount', [message.n]) };
+      case 'open-viewer': return { ok: true, data: await deps.openViewer(String(message.table ?? '')) };
       default: return failure('unknown', `알 수 없는 요청: ${message.kind}`);
     }
   }
@@ -225,6 +227,10 @@ function startWorker(): void {
     connection,
     runInPage: runInPageWithChrome,
     extensionOrigin: `chrome-extension://${chrome.runtime.id}/`,
+    async openViewer(table: string) {
+      const query = table ? `?table=${encodeURIComponent(table)}` : '';
+      await chrome.tabs.create({ url: chrome.runtime.getURL(`viewer.html${query}`) });
+    },
   });
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     handle(message, sender).then(sendResponse);

@@ -83,6 +83,13 @@ describe('remote controls', () => {
     expect(t.sent.filter((m) => m.kind === 'snapshot' || m.kind === 'collect').map((m) => m.mode))
       .toEqual(['hidden', 'hidden']);
   });
+  test('viewer button asks the background to open the viewer', async () => {
+    const t = mount(routing(null));
+    expect(t.q('[data-action="open-viewer"]').textContent).toBe('뷰어');
+    t.q('[data-action="open-viewer"]').click();
+    await settle();
+    expect(t.sent.map((m) => m.kind)).toEqual(['open-viewer']);
+  });
   test('year buttons send -1 and +1', async () => {
     const t = mount(routing('bid'));
     t.q('[data-action="year-minus"]').click();
