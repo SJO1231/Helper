@@ -1,4 +1,5 @@
 import { CoreOfflineError, createCoreClient } from '../shared/core-client';
+import { loadCodeMeanings } from './code-labels';
 import { getConnectionFromBackground } from './connection';
 import { mountGrid } from './grid-adapter';
 import { createPagedSource } from './paged-source';
@@ -37,11 +38,12 @@ async function start() {
   fillTableSelect(choices, table);
 
   const columns = await client.listColumns(table);
+  const codeMeanings = await loadCodeMeanings(client, columns);
   const source = createPagedSource(client, table);
   const grid = mountGrid(document.getElementById('grid') as HTMLElement, columns, source, {
     onTotal: (total) => showStatus(`${total.toLocaleString()}행`),
     onError: (error) => showStatus(describeFailure(error), true),
-  }, { table, storage: columnStorage() });
+  }, { columnMemory: { table, storage: columnStorage() }, codeMeanings });
   wireToolbar({ client, table, columns, grid, currentQuery: () => source.currentQuery(), showStatus });
 
   // bench가 열 타입 변경 시간을 재려고 쓴다. 평소 화면에는 내놓지 않는다.

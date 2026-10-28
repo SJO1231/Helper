@@ -11,6 +11,7 @@ import {
   type IGetRowsParams,
 } from 'ag-grid-community';
 import type { ColumnInfo, KeyType } from '../shared/types';
+import type { CodeMeanings } from './code-labels';
 import { createColumnMemory, layoutOf } from './column-state';
 import type { ColumnStorage } from './column-state';
 import { formatCell } from './format';
@@ -39,7 +40,10 @@ export interface GridHooks {
   onTotal?(total: number): void;
 }
 
-export interface ColumnMemoryOptions { table: string; storage?: ColumnStorage }
+export interface GridExtras {
+  columnMemory?: { table: string; storage?: ColumnStorage };
+  codeMeanings?: CodeMeanings;
+}
 
 interface SortItem { colId: string; sort: string }
 type FilterModel = Record<string, { filterType?: string; type?: string; filter?: string } | undefined>;
@@ -76,7 +80,11 @@ export function createDatasource(source: PagedSource, hooks: GridHooks = {}): ID
   };
 }
 
-export function buildColumnDefs(columns: ColumnInfo[], types: Record<string, KeyType>): ColDef[] {
+export function buildColumnDefs(
+  columns: ColumnInfo[],
+  types: Record<string, KeyType>,
+  codeMeanings: CodeMeanings = {},
+): ColDef[] {
   return columns.map((column) => ({
     field: column.id,
     headerName: column.fields.label,
@@ -85,7 +93,7 @@ export function buildColumnDefs(columns: ColumnInfo[], types: Record<string, Key
     filter: 'agTextColumnFilter',
     floatingFilter: true,
     filterParams: { filterOptions: ['equals'], maxNumConditions: 1, buttons: ['apply'], closeOnApply: true },
-    valueFormatter: (params) => formatCell(params.value ?? '', types[column.id]),
+    valueFormatter: (params) => formatCell(params.value ?? '', types[column.id], codeMeanings[column.id]),
   }));
 }
 
@@ -94,7 +102,7 @@ export function mountGrid(
   columns: ColumnInfo[],
   source: PagedSource,
   hooks: GridHooks = {},
-  memoryOptions?: ColumnMemoryOptions,
+  extras: GridExtras = {},
 ): GridHandle {
   const types: Record<string, KeyType> = Object.fromEntries(columns.map((c) => [c.id, c.fields.type]));
   let memory: ReturnType<typeof createColumnMemory> | undefined;
@@ -103,7 +111,7 @@ export function mountGrid(
     if (event.source !== 'api' && event.finished !== false) memory?.save();
   };
   const api = createGrid(element, {
-    columnDefs: buildColumnDefs(columns, types),
+    columnDefs: buildColumnDefs(columns, types, extras.codeMeanings),
     theme: themeQuartz,
     rowHeight: ROW_HEIGHT,
     rowModelType: 'infinite',
@@ -115,8 +123,8 @@ export function mountGrid(
     onColumnMoved: remember,
     onColumnVisible: remember,
   });
-  if (memoryOptions) {
-    memory = createColumnMemory(api, memoryOptions.table, memoryOptions.storage);
+  if (extras.columnMemory) {
+    memory = createColumnMemory(api, extras.columnMemory.table, extras.columnMemory.storage);
     memory.restore();
   }
   return {
@@ -125,7 +133,7 @@ export function mountGrid(
       // 같은 목록 객체로 열 정의만 갈아 끼운다. 자료 공급(코어)은 다시 부르지 않는다.
       // 열 정의를 갈아 끼워도 폭·순서·숨김은 그대로 둔다.
       const layout = layoutOf(api.getColumnState());
-      api.setGridOption('columnDefs', buildColumnDefs(columns, types));
+      api.setGridOption('columnDefs', buildColumnDefs(columns, types, extras.codeMeanings));
       api.applyColumnState({ state: layout, applyOrder: true });
     },
     columnCount: () => api.getColumns()?.length ?? 0,
