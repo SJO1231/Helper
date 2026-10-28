@@ -55,11 +55,13 @@ def _store(db, fields, digest):
     flat = flatten(fields["raw"], menu_no, aliases, std_keys)
     stage = screen["stage"] if screen else None
 
-    def result(status, record_id, changed=(), reason=None):
+    def result(status, record_id, changed=(), reason=None, restored=False):
         body = {"status": status, "record_id": record_id, "stage": stage, "changed": list(changed),
                 "unknown_keys": flat.unknown_keys}
         if reason:
             body["reason"] = reason
+        if restored:
+            body["restored"] = True  # 휴지통에 있던 건을 다시 수집해 되살렸다
         return body
 
     if screen is None:
@@ -76,7 +78,8 @@ def _store(db, fields, digest):
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     if db.rows("SELECT 1 FROM g2b_capture WHERE raw_hash = ?", (digest,)):
         db.run(f"UPDATE {quote_ident(main)} SET captured_at = ? WHERE record_id = ?", (now, record_id))
-        return result("same", record_id), False
+        restored = _restore_from_trash(db, main, record_id)
+        return result("same", record_id, restored=restored), restored
 
     capture_id = db.run(*insert_statement("g2b_capture", {
         "record_id": record_id, "screen_code": menu_no, "url": fields.get("url", ""), "captured_at": now,
@@ -94,9 +97,15 @@ def _store(db, fields, digest):
     db.run(f"UPDATE {quote_ident(main)} SET store_version = store_version + 1 WHERE record_id = ?", (record_id,))
     _store_tables(db, stage, record_id, menu_no, flat.tables, (dict_read.children(db, site), aliases, std_keys))
     _trim_captures(db, record_id, menu_no)
+    restored = _restore_from_trash(db, main, record_id)
     if existing is None:
-        return result("new", record_id), True
-    return result("changed", record_id, changed), True
+        return result("new", record_id, restored=restored), True
+    return result("changed", record_id, changed, restored=restored), True
+
+
+def _restore_from_trash(db, main, record_id):
+    sql = f"UPDATE {quote_ident(main)} SET deleted_at = NULL WHERE record_id = ? AND deleted_at IS NOT NULL"
+    return db.run(sql, (record_id,)).rowcount == 1
 
 
 def _existing_values(db, main, record_id, columns):

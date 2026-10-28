@@ -186,3 +186,29 @@ def test_capture_row_stores_canonical_raw_and_screen(seeded):
     row = seeded.rows("SELECT * FROM g2b_capture")[0]
     assert row["record_id"] == "V1" and row["screen_code"] == MENU_NO and row["raw_hash"]
     assert json.loads(row["raw"])["pointInfo"][0]["k"] == "dmA.keyA"
+
+
+def test_recapture_of_trashed_record_restores_it_and_says_so(seeded):
+    w(seeded, capture_fields(key_b="V1"), "r1")
+    assert "restored" not in w(seeded, capture_fields(key_b="V2"), "r2")
+    seeded.trash_record("g2b_bid", "V1")
+    res = w(seeded, capture_fields(key_b="V3"), "r3")
+    assert res["status"] == "changed" and res["restored"] is True
+    assert main_row(seeded)["deleted_at"] is None
+    assert seeded.list_records("g2b_bid")[1] == 1
+
+
+def test_same_raw_recapture_of_trashed_record_also_restores(seeded):
+    cap = capture_fields()
+    w(seeded, cap, "r1")
+    seeded.trash_record("g2b_bid", "V1")
+    res = w(seeded, cap, "r2")
+    assert res["status"] == "same" and res["restored"] is True
+    assert main_row(seeded)["deleted_at"] is None and count(seeded, "g2b_capture") == 1
+
+
+def test_restored_response_is_replayed_for_same_request_id(seeded):
+    w(seeded, capture_fields(key_b="V1"), "r1")
+    seeded.trash_record("g2b_bid", "V1")
+    first = w(seeded, capture_fields(key_b="V2"), "r2")
+    assert w(seeded, capture_fields(key_b="V2"), "r2") == first and first["restored"] is True
