@@ -202,6 +202,27 @@ describe('clickSearch', () => {
     clickSearch(win);
     expect(clicks).toEqual(['a1']);
   });
+  test('a bare span or div with the text is not a button', () => {
+    const win = setup('<span id="s1">조회</span><div id="d1">검색</div><input id="in1">');
+    const clicks = watchClicks(win, 's1');
+    const divClicks = watchClicks(win, 'd1');
+    const keys: string[] = [];
+    win.document.getElementById('in1')!.addEventListener('keydown', (e: any) => keys.push(e.key));
+    clickSearch(win);
+    expect(clicks).toEqual([]);
+    expect(divClicks).toEqual([]);
+    expect(keys).toEqual(['Enter']);
+  });
+  test('accepts a submit input and a role=button element with its inner text', () => {
+    const submit = setup('<input id="b1" type="submit" value="조회">');
+    const submitClicks = watchClicks(submit, 'b1');
+    clickSearch(submit);
+    expect(submitClicks).toEqual(['b1']);
+    const role = setup('<div id="r1" role="button"><span id="s1">검색</span></div>');
+    const roleClicks = watchClicks(role, 'r1');
+    clickSearch(role);
+    expect(roleClicks).toEqual(['r1']);
+  });
   test('without a button, presses Enter in the first visible input', () => {
     const win = setup('<input id="hid"><input id="in1"><input id="in2">', ['hid']);
     const keys: string[] = [];
@@ -241,7 +262,7 @@ describe('clickExcel', () => {
     const linkClicks = watch(link, 'a1');
     clickExcel(link);
     expect(linkClicks).toEqual(['a1']);
-    const image = setup('<input id="i1" type="image" alt="엑셀"><img id="i2" title="다운로드">');
+    const image = setup('<input id="i1" type="image" alt="엑셀"><img id="i2" title="엑셀">');
     const imageClicks = watch(image, 'i1', 'i2');
     clickExcel(image);
     expect(imageClicks).toEqual(['i1']);
@@ -252,17 +273,25 @@ describe('clickExcel', () => {
     clickExcel(win);
     expect(clicks).toEqual(['a1']);
   });
-  test('prefers 엑셀 over a plain 다운로드 even when 다운로드 comes first', () => {
+  test('a plain 다운로드 button is not an excel button', () => {
     const win = setup('<button id="d1">다운로드</button><button id="e1">엑셀</button>');
     const clicks = watch(win, 'd1', 'e1');
     clickExcel(win);
     expect(clicks).toEqual(['e1']);
+    const alone = setup('<button id="d1">다운로드</button>');
+    const aloneClicks = watch(alone, 'd1');
+    expect(clickExcel(alone).ok).toBe(false);
+    expect(aloneClicks).toEqual([]);
   });
-  test('falls back to 다운로드 when no excel button exists', () => {
-    const win = setup('<button id="d1">다운로드</button>');
-    const clicks = watch(win, 'd1');
-    expect(clickExcel(win).ok).toBe(true);
-    expect(clicks).toEqual(['d1']);
+  test('upload and form-template buttons are never clicked even with 엑셀 in the text', () => {
+    const win = setup(
+      '<button id="u1">엑셀업로드</button><a id="f1">엑셀 양식 받기</a><button id="e1">엑셀저장</button>',
+    );
+    const clicks = watch(win, 'u1', 'f1', 'e1');
+    clickExcel(win);
+    expect(clicks).toEqual(['e1']);
+    const only = setup('<button id="u1">엑셀업로드</button>');
+    expect(clickExcel(only).ok).toBe(false);
   });
   test('skips hidden buttons and anything outside the body', () => {
     const win = setup('<button id="hid">엑셀</button>', ['hid']);

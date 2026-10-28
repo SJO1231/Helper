@@ -56,7 +56,9 @@ export function shiftYear(win: Window, delta: -1 | 1): ActionResult & { year?: n
 }
 
 const SEARCH_LABELS = ['조회', '검색'];
-const CLICKABLE = 'a,button,input[type="button"],span,div';
+const INPUT_BUTTONS = 'input[type="button"],input[type="submit"]';
+const WRAPPERS = 'a,button,[role="button"]';
+const CLICKABLE = `${WRAPPERS},${INPUT_BUTTONS},span,div`;
 
 function visibleBodyElements(win: Window, selector: string): Element[] {
   return Array.from(win.document.querySelectorAll(selector)).filter(
@@ -64,18 +66,22 @@ function visibleBodyElements(win: Window, selector: string): Element[] {
   );
 }
 
+// 글자만 든 span·div는 감싼 a·button·role=button이 실제 누르는 대상이다. 감싼 것이 없으면 버튼이 아니다.
+function clickTargetOf(el: Element): Element | null {
+  return el.matches(INPUT_BUTTONS) ? el : el.closest(WRAPPERS);
+}
+
 function findSearchButton(win: Window): Element | null {
-  const labeled = visibleBodyElements(win, CLICKABLE).find((el) => {
+  for (const el of visibleBodyElements(win, CLICKABLE)) {
     // 글자를 감싼 큰 div(본문 자신 포함)가 먼저 걸리지 않도록 span·div는 끝 요소만 본다.
     const isBox = el.tagName === 'SPAN' || el.tagName === 'DIV';
-    if (isBox && el.children.length > 0) return false;
+    if (isBox && el.children.length > 0) continue;
     const text = (el as HTMLElement).innerText ?? el.textContent ?? '';
-    return SEARCH_LABELS.includes((text || (el as HTMLInputElement).value || '').trim());
-  });
-  if (!labeled) return null;
-  // 글자만 든 span·div는 감싼 a·button이 실제 누르는 대상이다(v4.2 방식).
-  const isPlainBox = labeled.tagName === 'SPAN' || labeled.tagName === 'DIV';
-  return (isPlainBox && (labeled.closest('a') ?? labeled.closest('button'))) || labeled;
+    if (!SEARCH_LABELS.includes((text || (el as HTMLInputElement).value || '').trim())) continue;
+    const target = clickTargetOf(el);
+    if (target) return target;
+  }
+  return null;
 }
 
 // 조회 버튼을 찾아 누른다. 없으면 보이는 첫 입력 칸에 Enter를 보낸다(v4.2 doSearch).
@@ -92,8 +98,9 @@ export function clickSearch(win: Window): ActionResult {
   return { ok: true };
 }
 
-// 엑셀 글자를 먼저 찾고, 없을 때만 그냥 다운로드 글자를 쓴다(첨부 내려받기보다 엑셀 저장이 먼저).
-const EXCEL_WORDS = [['엑셀', 'excel'], ['다운로드']];
+// 그냥 "다운로드"는 첨부 내려받기일 수 있어 후보가 아니다. 업로드·양식은 엑셀 글자가 있어도 뺀다.
+const EXCEL_WORDS = ['엑셀', 'excel'];
+const NOT_EXCEL_WORDS = ['업로드', '양식'];
 const EXCEL_TARGETS = 'a,button,input[type="button"],input[type="submit"],input[type="image"],img,span';
 
 function excelText(el: Element): string {
@@ -109,16 +116,15 @@ function findExcelButton(win: Window): Element | null {
     target: el.tagName === 'SPAN' ? el.closest('a,button') : el,
     text: excelText(el),
   }));
-  for (const words of EXCEL_WORDS) {
-    const hit = candidates.find((c) => c.target && words.some((word) => c.text.includes(word)));
-    if (hit) return hit.target;
-  }
-  return null;
+  const hit = candidates.find(
+    (c) => c.target && EXCEL_WORDS.some((w) => c.text.includes(w)) && !NOT_EXCEL_WORDS.some((w) => c.text.includes(w)),
+  );
+  return hit?.target ?? null;
 }
 
 export function clickExcel(win: Window): ActionResult {
   const button = findExcelButton(win);
-  if (!button) return { ok: false, reason: '보이는 엑셀·다운로드 버튼을 찾지 못함' };
+  if (!button) return { ok: false, reason: '보이는 엑셀 버튼을 찾지 못함' };
   (button as HTMLElement).click();
   return { ok: true };
 }
