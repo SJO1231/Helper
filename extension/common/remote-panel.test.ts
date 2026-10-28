@@ -251,6 +251,32 @@ describe('remote panel shortcuts', () => {
     expect(press(t, altG, input).defaultPrevented).toBe(true);
     expect(t.q('.bar').hidden).toBe(true);
   });
+  test('Alt+G is received in the capture phase even if the page stops propagation', async () => {
+    const t = await mount();
+    t.win.document.body.addEventListener('keydown', (e: any) => e.stopPropagation());
+    press(t, altG);
+    expect(t.q('.bar').hidden).toBe(true);
+  });
+  test('a held Alt+G (repeat) toggles and saves only once', async () => {
+    const t = await mount();
+    press(t, altG);
+    const count = t.saved.length;
+    press(t, { ...altG, repeat: true });
+    expect(t.q('.bar').hidden).toBe(true);
+    expect(t.saved.length).toBe(count);
+  });
+  test('the close button tells how to bring the panel back', async () => {
+    const t = await mount();
+    expect(t.q('[data-action="close"]').title).toBe('종료 (Alt+G로 다시 열기)');
+  });
+  test('folding blurs a focused element inside the panel', async () => {
+    const t = await mount();
+    const button = t.q('[data-action="collapse"]');
+    button.focus();
+    expect(t.remote.root.activeElement).toBe(button);
+    press(t, altG);
+    expect(t.remote.root.activeElement).toBeNull();
+  });
   test('keys other than Alt+G are left alone', async () => {
     const t = await mount();
     const others = [{ key: 'g', code: 'KeyG' }, { ...altG, ctrlKey: true }, { key: 'h', code: 'KeyH', altKey: true }];

@@ -80,7 +80,7 @@ export function createRemote(deps: RemoteDeps) {
   const collapseButton = button('collapse', '—');
   collapseButton.title = '접기';
   const closeButton = button('close', '×');
-  closeButton.title = '종료';
+  closeButton.title = '종료 (Alt+G로 다시 열기)';
   const actions = el('div', { class: 'actions' });
   actions.append(collapseButton, closeButton);
   title.append(el('span', {}, 'Helper'), actions);

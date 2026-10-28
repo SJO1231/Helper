@@ -24,6 +24,18 @@ describe('viewer window layout', () => {
     expect(rule('#grid')).toMatch(/flex:\s*1/);
     expect(rule('#grid')).toMatch(/min-height:\s*0/);
   });
+  test('every line of the page stays within 120 characters', () => {
+    const long = html.split(/\r?\n/).filter((line) => line.length > 120);
+    expect(long).toEqual([]);
+  });
+  test('the column list fits the window height minus the toolbar', () => {
+    expect(rule('#column-list')).toMatch(/max-height:\s*calc\(100vh - 120px\)/);
+  });
+  test('status height is one variable shared by the status bar and the grid margin', () => {
+    expect(rule(':root')).toMatch(/--status-h:\s*26px/);
+    expect(rule('#status')).toMatch(/height:\s*var\(--status-h\)/);
+    expect(rule('#grid')).toMatch(/margin:[^;]*var\(--status-h\)/);
+  });
   test('the column list floats over the grid', () => {
     expect(rule('#column-picker')).toMatch(/position:\s*relative/);
     expect(rule('#column-list')).toMatch(/position:\s*absolute/);

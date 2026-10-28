@@ -124,6 +124,8 @@ export function attachPanelMotion(parts: Parts) {
 
   function setCollapsed(collapsed: boolean): void {
     userActed = true;
+    // 접힌 칸에 포커스가 남으면 보이지 않는 요소가 키 입력을 받는다.
+    if (collapsed) ((bar.getRootNode() as ShadowRoot).activeElement as HTMLElement | null)?.blur();
     state.collapsed = collapsed;
     apply();
     save();
@@ -161,7 +163,9 @@ export function attachPanelMotion(parts: Parts) {
   }
 
   // 문서 하나에 한 번만 붙인다. 패널을 다시 붙여도 이 함수는 다시 불리지 않는다.
+  // 캡처 단계: 사이트가 stopPropagation 해도 받는다.
   doc.addEventListener('keydown', (event) => {
+    if (event.repeat) return;
     const isG = event.code === 'KeyG' || event.key?.toLowerCase() === 'g';
     if (!event.altKey || event.ctrlKey || event.metaKey || !isG) return;
     event.preventDefault();
@@ -173,7 +177,7 @@ export function attachPanelMotion(parts: Parts) {
       return;
     }
     setCollapsed(!state.collapsed);
-  });
+  }, true);
 
   void store?.load().then((saved) => {
     // 불러오는 사이 사용자가 만졌으면 사용자의 것이 우선이다.
