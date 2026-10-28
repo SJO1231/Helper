@@ -1,0 +1,30 @@
+{
+  "rows": [
+    {
+      "site": "V1",
+      "menu_no": "0001",
+      "scrn_no": "0001",
+      "menu_cang_val": "V1",
+      "name": "V1",
+      "stage": "receipt",
+      "source_route": "V1",
+      "key_fields": [
+        "keyA"
+      ],
+      "link": null,
+      "options": {}
+    },
+    {
+      "site": "V1",
+      "menu_no": "0002",
+      "scrn_no": "0001",
+      "menu_cang_val": "V1",
+      "name": "V1",
+      "stage": null,
+      "source_route": "V1",
+      "key_fields": [],
+      "link": null,
+      "options": {}
+    }
+  ]
+}

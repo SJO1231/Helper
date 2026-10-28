@@ -1,4 +1,4 @@
-// 시험용 확장: 뷰어 번들 + background 대역. 실제 확장은 S3가 만들고 여기서는 core.connection 계약만 흉내 낸다.
+// 시험용 확장: 뷰어 번들 + background 대역. 실제 확장은 S3가 만들고 여기서는 core.connection 답({ok,data})만 흉내 낸다.
 import { build } from 'esbuild';
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -28,6 +28,6 @@ export function writeBenchExtension(extensionDir, bundleDir, connection) {
   writeFileSync(join(extensionDir, 'manifest.json'), JSON.stringify(manifest));
   const answer = JSON.stringify(connection);
   writeFileSync(join(extensionDir, 'background.js'), `chrome.runtime.onMessage.addListener((message, _s, reply) => {
-  if (message?.kind === 'core.connection') reply(${answer});
+  if (message?.kind === 'core.connection') reply({ ok: true, data: ${answer} });
 });\n`);
 }
