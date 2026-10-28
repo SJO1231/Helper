@@ -3,12 +3,15 @@ import type { Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
 import type { CaptureReply, Reply } from './background';
 import { formatCaptureResult, formatDiagnostics, formatFailure } from './diagnostics';
+import { attachPanelMotion, chromePanelStore } from './remote-panel';
+import type { PanelStore } from './remote-panel';
 import { renderSnapshot } from './snapshot-view';
 import type { SnapshotData } from './snapshot-view';
 
 export interface RemoteDeps {
   doc: Document;
   send: (message: Record<string, unknown>) => Promise<Reply<any>>;
+  panelStore?: PanelStore;
 }
 export interface ScreenChange { menuNo: string; scrnNo: string; menuCangVal: string; menuNm: string }
 
@@ -26,12 +29,19 @@ const STYLE = `
   background: #fff; border: 1px solid #e3e7ec; border-radius: 10px; box-shadow: 0 6px 20px rgba(15, 23, 42, .12); }
 .bar > * { margin: 0 0 8px; }
 .bar > :last-child { margin-bottom: 0; }
-.title { padding-bottom: 6px; border-bottom: 1px solid #eef0f3; font-size: 13px; font-weight: 600; }
+[hidden] { display: none !important; }
+.title { display: flex; align-items: center; justify-content: space-between; cursor: move; touch-action: none;
+  user-select: none; padding-bottom: 6px; border-bottom: 1px solid #eef0f3; font-size: 13px; font-weight: 600; }
 .row { display: flex; gap: 6px; align-items: center; }
 .row > * { flex: 1; min-width: 0; }
 button, select, input { box-sizing: border-box; height: 28px; padding: 0 8px; font: inherit; color: inherit;
   background: #fff; border: 1px solid #cfd6de; border-radius: 6px; }
 button { cursor: pointer; }
+.title button { width: 28px; flex: none; padding: 0; cursor: pointer; }
+.bubble { position: fixed; top: 80px; right: 12px; z-index: 2147483646; width: 46px; height: 46px; padding: 0;
+  border-radius: 50%; color: #fff; font-weight: 700; font-size: 11px; background: #2f6fed; border: 0;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, .25); cursor: move; touch-action: none; user-select: none; }
+.bubble:hover:not(:disabled) { background: #2760d4; }
 button:hover:not(:disabled) { background: #f3f5f8; }
 button:disabled { color: #9aa5b1; cursor: default; }
 button[data-action="search"], button[data-action="collect"] { color: #fff; background: #2f6fed; border-color: #2f6fed; }
@@ -50,7 +60,7 @@ th { background: #f3f5f8; position: sticky; top: 0; }
 `;
 
 export function createRemote(deps: RemoteDeps) {
-  const { doc, send } = deps;
+  const { doc, send, panelStore } = deps;
   const state = {
     screen: null as DictScreen | null,
     menuNo: null as string | null,
@@ -67,8 +77,11 @@ export function createRemote(deps: RemoteDeps) {
   const root = host.attachShadow({ mode: 'open' });
   // 나라장터는 처음 뜬 뒤 body를 비우고 다시 그린다. 같은 host를 다시 붙여 상태와 버튼을 잃지 않는다.
   const Observer = doc.defaultView!.MutationObserver;
+  let motion: ReturnType<typeof attachPanelMotion> | undefined;
   new Observer(() => {
-    if (!host.isConnected && doc.body) doc.body.appendChild(host);
+    if (host.isConnected || !doc.body) return;
+    doc.body.appendChild(host);
+    motion?.reapply();
   }).observe(doc.documentElement, { childList: true, subtree: true });
 
   function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, text = '') {
@@ -99,8 +112,13 @@ export function createRemote(deps: RemoteDeps) {
     line.append(...children);
     return line;
   };
+  const title = el('div', { class: 'title' });
+  const collapseButton = button('collapse', '—');
+  collapseButton.title = '접기';
+  title.append(el('span', {}, 'Helper'), collapseButton);
+  const bubble = el('button', { class: 'bubble', type: 'button', title: '펼치기' }, 'G2B');
   bar.append(
-    el('div', { class: 'title' }, 'Helper'),
+    title,
     row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회')),
     row(rowSelect, rowInput, button('row-count-apply', '적용')),
     modeSelect,
@@ -108,7 +126,8 @@ export function createRemote(deps: RemoteDeps) {
     toast,
     diagnostics,
   );
-  root.append(el('style', {}, STYLE), bar);
+  root.append(el('style', {}, STYLE), bar, bubble);
+  motion = attachPanelMotion({ doc, bar, bubble, handle: title, collapseButton, store: panelStore });
 
   function render(): void {
     const stageMissing = state.screenKnown && !state.screen?.stage;
@@ -248,7 +267,7 @@ function mountInPage(): void {
     chrome.runtime.sendMessage(message).catch(() => ({
       ok: false as const, code: 'extension', error: '확장 연결이 끊김. 화면을 새로 고치세요.',
     }));
-  const remote = createRemote({ doc: document, send });
+  const remote = createRemote({ doc: document, send, panelStore: chromePanelStore() });
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (event.source === window && data?.source === 'helper-page' && data.type === 'screen.changed') {
