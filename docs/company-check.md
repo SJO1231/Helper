@@ -4,10 +4,11 @@
 막히면 리모컨 진단 줄의 숫자만 적어 둔다.
 
 ## 설치
+0. 준비: Node 20 이상, Python 3.11 이상(명령창에서 `python --version`이 되어야 코어가 뜬다).
 1. 저장소 폴더에서 `npm ci` 뒤 `node scripts/build.mjs`를 돌린다. `dist/extension` 폴더가 생긴다.
 2. 크롬 `chrome://extensions`에서 개발자 모드를 켜고 "압축해제된 확장 프로그램을 로드"로 `dist/extension`을 고른다.
 3. 확장 ID가 `igmgbdicnjmipkncpmojbkioialdjkog`인지 본다.
-4. PowerShell에서 `pwsh -File scripts/install-host.ps1`을 돌린다. "Registered com.helper.core"가 나오면 된다.
+4. `pwsh -File scripts/install-host.ps1`을 돌린다(PowerShell 7이 없으면 `powershell -File`). "Registered com.helper.core"가 나오면 된다.
 5. 크롬을 모두 닫았다가 다시 연다.
 
 ## 화면 열기

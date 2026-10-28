@@ -1,6 +1,7 @@
 // SPEC 8절: 상세 3개를 각각 10번 수집하면 g2b_receipt·g2b_bid·g2b_contract가 각 1행, g2b_capture가 3행이다.
-// 목록 셀을 실제로 눌러 상세로 가고, 리모컨 "수집"을 사람처럼 누른다. 판정은 코어 행 수로 한다.
+// 목록 셀을 실제로 눌러 상세로 가고, 리모컨 "수집"을 사람처럼 누른다. 판정은 코어 행 수와 누를 때마다의 결과로 한다.
 import { clickRadio, clickSearch, openDetail, waitVisibleGridRows } from '../probe/browser-steps.mjs';
+import { judgeCollect } from './collect-judge.mjs';
 import { BID_LIST, ORDER_LIST, openList } from './check-screen-register.mjs';
 import { readMenuNo } from './page-reads.mjs';
 import { pressRemote, readShadowText, waitCollectEnabled } from './remote-ui.mjs';
@@ -70,6 +71,5 @@ export async function checkCollect(s, core) {
     contract: await core.total('g2b_contract'),
     capture: await core.total('g2b_capture'),
   };
-  const pass = totals.receipt === 1 && totals.bid === 1 && totals.contract === 1 && totals.capture === 3;
-  return { pass, ...totals, ...(pass ? {} : { 상태분포: perScreen }) };
+  return { pass: judgeCollect(totals, perScreen), ...totals, 상태분포: perScreen };
 }

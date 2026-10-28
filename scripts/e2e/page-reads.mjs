@@ -79,6 +79,21 @@ export function readPageSizeValue(rootId) {
   return (after ?? before)?.value ?? null;
 }
 
+// 보이는 첫 그리드 뒤(없으면 앞)의 가장 가까운 쪽 목록(pageList) 컴포넌트가 가진 쪽 크기.
+// select 값만 보면 쪽 목록이 그대로인 실패를 놓친다(DECISIONS 2026-10-29 S3 실측).
+export function readPageListSize(rootId) {
+  const visible = [...document.getElementById(rootId).querySelectorAll('[id]')].filter((el) => {
+    const c = window[el.id];
+    return c && typeof c.getPluginName === 'function' && el.getClientRects().length > 0;
+  });
+  const grid = visible.find((el) => window[el.id].getPluginName() === 'gridView');
+  const lists = visible.filter((el) => window[el.id].getPluginName() === 'pageList');
+  if (!grid || lists.length === 0) return null;
+  const after = lists.find((el) => grid.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+  const list = after ?? lists.filter((el) => grid.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING).pop();
+  return Number(window[list.id].getPageSize());
+}
+
 export function readMenuNo() {
   return String(history.state?.data?.menuNo ?? '');
 }
