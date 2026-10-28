@@ -83,3 +83,12 @@ def test_capture_list_is_not_writable_except_by_collecting(seeded, method):
 def test_post_to_capture_is_still_the_collect_path(seeded):
     status, body = handle(seeded, "POST", CAPTURE_PATH, HEADERS, {"records": [{"fields": capture_fields()}]})
     assert status == 200 and body["records"][0]["fields"]["status"] in ("new", "rejected")
+
+
+def test_capture_sort_and_filter_only_accept_the_six_columns(seeded):
+    add_captures(seeded, ["2026-01-01"])
+    for query in ("sort=raw", 'filter={"raw":["{}"]}'):
+        status, body = handle(seeded, "GET", f"{CAPTURE_PATH}?{query}", HEADERS, None)
+        assert status == 400 and set(body) == {"error"}
+    status, _ = handle(seeded, "GET", f"{CAPTURE_PATH}?sort=-captured_at", HEADERS, None)
+    assert status == 200
