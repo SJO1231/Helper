@@ -51,6 +51,21 @@ describe('collectScreen modes', () => {
   });
 });
 
+describe('collectScreen determinism', () => {
+  // 같은 화면 10번 수집이 capture 3건 안에 드는 것은 raw_hash가 같아서다. raw에 시각·무작위가 없어야 한다.
+  test('ten collections of the same screen give the same raw', async () => {
+    const cols = [{ id: 'colA', label: 'L1' }];
+    const win = makeWindow({
+      state: STATE,
+      forms: [{ id: 'f', ref: 'd.f', value: 'V' }],
+      grids: [{ id: 'g', dataList: 'dl', columns: cols, rows: [{ colA: 'V' }] }],
+    });
+    const runs = [];
+    for (let i = 0; i < 10; i++) runs.push(JSON.stringify((await collectScreen(win, 'visible')).raw));
+    expect(new Set(runs).size).toBe(1);
+  });
+});
+
 describe('collectScreen frames', () => {
   const field = (win: any, id: string) => win[id].getValue();
   test('frames merge; on the same K the visible one wins', async () => {

@@ -14,10 +14,10 @@ function setup(bodyHtml: string, hidden: string[] = []) {
   return win;
 }
 
-function calendar(win: FakeWindow, id: string, value: string) {
+function calendar(win: FakeWindow, id: string, value: string, plugin = 'inputCalendar') {
   const state = { value };
   win[id] = {
-    getPluginName: () => 'inputCalendar',
+    getPluginName: () => plugin,
     getValue: () => state.value,
     setValue: (v: string) => {
       state.value = v;
@@ -86,6 +86,22 @@ describe('shiftYear', () => {
     expect(r.ok).toBe(false);
     expect(r.reason).toBeTruthy();
   });
+  test('real screens use input components that hold a YYYYMMDD value', () => {
+    const win = setup(PAIR);
+    const start = calendar(win, 'start', '20260315', 'input');
+    const end = calendar(win, 'end', '20260630', 'input');
+    expect(shiftYear(win, 1)).toEqual({ ok: true, year: 2027 });
+    expect([start.value, end.value]).toEqual(['20270101', '20271231']);
+  });
+  test('input components without a date value are not taken as the period', () => {
+    const win = setup('<input id="a"><input id="b">' + PAIR);
+    calendar(win, 'a', 'free text', 'input');
+    calendar(win, 'b', '12345', 'input');
+    const start = calendar(win, 'start', '20260315', 'input');
+    calendar(win, 'end', '20260630', 'input');
+    expect(shiftYear(win, -1).year).toBe(2025);
+    expect(start.value).toBe('20250101');
+  });
   test('start value without a year returns ok false', () => {
     const win = setup(PAIR);
     calendar(win, 'start', '');
@@ -94,17 +110,24 @@ describe('shiftYear', () => {
   });
 });
 
-function rowCountWindow(options: number[]) {
+function rowCountWindow(options: number[], withPager = true) {
   const html = '<div id="grid"></div><select id="size">' +
-    options.map((n) => `<option value="${n}">${n}</option>`).join('') + '</select>';
+    options.map((n) => `<option value="${n}">${n}</option>`).join('') + '</select><div id="pager"></div>';
   const win = setup(html);
   const calls: Call[] = [];
   win.grid = { getPluginName: () => 'gridView' };
+  // 실제 선택 상자는 글자 값만 받는다. 숫자를 넘기면 값이 바뀌지 않는다.
   win.size = {
     getPluginName: () => 'selectbox',
-    setValue: (v: number) => calls.push(['setValue', v]),
-    addItem: (v: number, label: number) => calls.push(['addItem', v, label]),
+    setValue: (v: unknown) => calls.push(['setValue', v as string]),
+    addItem: (v: unknown, label: unknown) => calls.push(['addItem', v as string, label as string]),
   };
+  if (withPager) {
+    win.pager = {
+      getPluginName: () => 'pageList',
+      setPageSize: (n: number) => calls.push(['setPageSize', n]),
+    };
+  }
   return { win, calls };
 }
 
@@ -112,17 +135,22 @@ describe('applyRowCount', () => {
   test('choices are the seven listed sizes', () => {
     expect(ROW_COUNT_CHOICES).toEqual([10, 30, 50, 100, 250, 500, 1000]);
   });
-  test('row count already listed only calls setValue', () => {
+  test('row count already listed only sets the value as text, then the page size', () => {
     const { win, calls } = rowCountWindow([10, 30, 50, 100]);
     expect(applyRowCount(win, 100)).toEqual({ ok: true });
-    expect(calls).toEqual([['setValue', 100]]);
+    expect(calls).toEqual([['setValue', '100'], ['setPageSize', 100]]);
   });
-  test('row count 250 adds option, addItem, then setValue', () => {
+  test('row count 250 adds option, addItem, then setValue, then the page size', () => {
     const { win, calls } = rowCountWindow([10, 30, 50, 100]);
     expect(applyRowCount(win, 250).ok).toBe(true);
-    expect(calls).toEqual([['addItem', 250, 250], ['setValue', 250]]);
+    expect(calls).toEqual([['addItem', '250', '250'], ['setValue', '250'], ['setPageSize', 250]]);
     const values = Array.from(win.document.querySelectorAll('#size option')).map((o) => (o as any).value);
     expect(values).toContain('250');
+  });
+  test('a screen without a visible page list still gets the select value', () => {
+    const { win, calls } = rowCountWindow([10, 100], false);
+    expect(applyRowCount(win, 100).ok).toBe(true);
+    expect(calls).toEqual([['setValue', '100']]);
   });
   test('no visible grid returns ok false', () => {
     const win = setup('<select id="size"><option value="10">10</option></select>');

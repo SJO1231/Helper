@@ -8,19 +8,31 @@ export const ROW_COUNT_CHOICES = [10, 30, 50, 100, 250, 500, 1000];
 
 export interface ActionResult { ok: boolean; reason?: string }
 
-function visibleBodyComponents(win: Window, pluginName: string): { el: Element; component: any }[] {
+function visibleBodyComponents(
+  win: Window,
+  wanted: (component: any) => boolean,
+): { el: Element; component: any }[] {
   const found: { el: Element; component: any }[] = [];
   for (const el of Array.from(win.document.querySelectorAll('[id]'))) {
     const component = componentOf(win, el);
-    const wanted = component && component.getPluginName() === pluginName;
-    if (wanted && inBody(el, win.document) && isVisible(el)) found.push({ el, component });
+    if (component && wanted(component) && inBody(el, win.document) && isVisible(el)) found.push({ el, component });
   }
   return found;
 }
 
+const pluginIs = (name: string) => (component: any) => component.getPluginName() === name;
+
+// 실제 화면의 기간 칸은 inputCalendar가 아니라 YYYYMMDD 값을 든 input이다(공개 화면 실측).
+const DATE_VALUE = /^(19|20)\d{6}$/;
+function isDateField(component: any): boolean {
+  const plugin = component.getPluginName();
+  if (!['inputCalendar', 'calendar', 'input'].includes(plugin)) return false;
+  return typeof component.setValue === 'function' && DATE_VALUE.test(String(component.getValue?.() ?? ''));
+}
+
 // 시작·끝 칸은 같은 표 행의 첫 둘, 없으면 문서 순서로 이웃한 둘.
 function findDatePair(win: Window): any[] | null {
-  const calendars = visibleBodyComponents(win, 'inputCalendar');
+  const calendars = visibleBodyComponents(win, isDateField);
   const rows = new Map<Element, any[]>();
   for (const { el, component } of calendars) {
     const row = el.closest('tr');
@@ -67,24 +79,35 @@ function componentAround(win: Window, el: Element): any | null {
   return null;
 }
 
+// 가장 가까운 쪽 목록(pageList). 그리드 뒤에 있는 것을 먼저, 없으면 앞에 있는 것.
+function findPageList(win: Window, grid: Element): any | null {
+  const lists = visibleBodyComponents(win, pluginIs('pageList'));
+  const after = lists.find((l) => grid.compareDocumentPosition(l.el) & POSITION_FOLLOWING);
+  const before = lists.filter((l) => grid.compareDocumentPosition(l.el) & POSITION_PRECEDING).pop();
+  return (after ?? before)?.component ?? null;
+}
+
+// 실측: setValue·addItem은 글자 값만 받고(숫자는 무시됨), 쪽 크기는 pageList.setPageSize로 바로 바뀐다(요청 0건).
 export function applyRowCount(win: Window, n: number): ActionResult {
   if (!Number.isInteger(n) || n < 1) return { ok: false, reason: '쪽 크기는 1 이상의 정수여야 함' };
-  const grid = visibleBodyComponents(win, 'gridView')[0];
+  const grid = visibleBodyComponents(win, pluginIs('gridView'))[0];
   if (!grid) return { ok: false, reason: '보이는 그리드가 없음' };
   const select = findPageSizeSelect(win, grid.el);
   if (!select) return { ok: false, reason: '쪽 크기 선택 상자를 찾지 못함' };
   const component = componentAround(win, select);
   if (!component) return { ok: false, reason: '쪽 크기 컴포넌트를 찾지 못함' };
 
-  const listed = Array.from(select.options).some((o) => o.value === String(n));
+  const text = String(n);
+  const listed = Array.from(select.options).some((o) => o.value === text);
   if (!listed) {
     const option = win.document.createElement('option');
-    option.value = String(n);
-    option.textContent = String(n);
+    option.value = text;
+    option.textContent = text;
     select.appendChild(option);
     // 컴포넌트가 옵션을 모르면 setValue가 무시된다(v4.2 applyRowCount 방식).
-    component.addItem?.(n, n);
+    component.addItem?.(text, text);
   }
-  component.setValue(n);
+  component.setValue(text);
+  findPageList(win, grid.el)?.setPageSize(n);
   return { ok: true };
 }

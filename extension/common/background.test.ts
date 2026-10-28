@@ -100,6 +100,16 @@ describe('screen auto-registration', () => {
     const message = { kind: 'screen.changed', menuNo: 'M0009', scrnNo: 'S9', menuCangVal: 'C9', menuNm: 'N9' };
     expect(((await t.handlers.handle(message, TAB)) as any).data.registered).toBe(false);
   });
+  test('opening the same screen again sends the same require, so the core keeps one row', async () => {
+    const t = setup();
+    const message = { kind: 'screen.changed', menuNo: 'M0009', scrnNo: 'S9', menuCangVal: 'C9', menuNm: 'N9' };
+    await t.handlers.handle(message, TAB);
+    await t.handlers.handle(message, TAB);
+    const puts = t.sent.filter((s) => s.method === 'PUT');
+    expect(puts).toHaveLength(2);
+    expect(new Set(puts.map((p) => JSON.stringify(p.body.records[0].require))).size).toBe(1);
+    expect(puts.every((p) => p.path.endsWith('noupdate=true'))).toBe(true);
+  });
   test('screen change failure is not retried later', async () => {
     const t = setup({ offline: true });
     const first = { kind: 'screen.changed', menuNo: 'M0001', scrnNo: '', menuCangVal: '', menuNm: '' };
@@ -129,6 +139,13 @@ describe('collect', () => {
     expect(reply.data.result).toMatchObject({ status: 'changed', restored: true });
     expect(reply.data.diag.unknownKeys).toBe(1);
     expect(reply.data.diag.core).toBe('ok');
+  });
+  test('ten collections send the same body each time with a new request id', async () => {
+    const t = setup();
+    for (let i = 0; i < 10; i++) await t.handlers.handle({ kind: 'collect', mode: 'visible' }, TAB);
+    const posts = t.sent.filter((s) => s.path.endsWith('g2b_capture/records'));
+    expect(posts).toHaveLength(10);
+    expect(new Set(posts.map((p) => JSON.stringify(p.body))).size).toBe(1);
   });
   test('401 triggers one new hello and one retry', async () => {
     const t = setup({ fetchStatus: (call, n) => (n === 1 ? 401 : 200) });
