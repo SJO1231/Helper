@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      has_core_tests: ${{ steps.detect.outputs.has_core_tests }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      # core/tests가 없으면 pytest 작업을 건너뜀(skipped)으로 두어 "통과"로 보이지 않게 한다.
+      - id: detect
+        run: |
+          if [ -d core/tests ]; then
+            echo "has_core_tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_core_tests=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  pytest:
+    needs: verify
+    if: needs.verify.outputs.has_core_tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest jsonschema
+      - run: pytest core/tests
+
+  # PR당 한 번: 연 때만 돈다. 키가 없으면 실패로 드러난다.
+  review:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            이 PR을 AGENTS.md 규칙(폴더 경계, 300줄·120자, 실제 값 금지)과 docs/SPEC.md 기준으로 검토해 주요 문제만 댓글로 남겨라.
+          claude_args: --max-turns 5
