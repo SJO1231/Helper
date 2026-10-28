@@ -26,7 +26,7 @@ function formatDateTime(value: string): string {
   return value;
 }
 
-export function formatCell(value: string, type: KeyType): string {
+export function formatCell(value: string, type: KeyType, codeMeanings?: Record<string, string>): string {
   if (value === null || value === undefined) return '';
   switch (type) {
     case 'money':
@@ -39,6 +39,8 @@ export function formatCell(value: string, type: KeyType): string {
       return /^\d{8}$/.test(value) ? formatDate(value) : value;
     case 'datetime':
       return formatDateTime(value);
+    case 'code':
+      return codeMeanings?.[value] ?? value;
     default:
       return value;
   }

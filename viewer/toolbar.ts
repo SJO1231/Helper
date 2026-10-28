@@ -1,6 +1,7 @@
 import type { CoreClient } from '../shared/core-client';
 import type { ColumnInfo, KeyType } from '../shared/types';
 import { exportCsv, exportFileName, exportXlsx, type ExportQuery } from './export';
+import { renderColumnPicker } from './column-picker';
 import type { GridHandle } from './grid-adapter';
 
 const KEY_TYPES: KeyType[] = ['text', 'number', 'money', 'percent', 'date', 'datetime', 'bool', 'code'];
@@ -51,6 +52,12 @@ export function wireToolbar(context: ToolbarContext) {
 
   byId('type-apply').addEventListener('click', () => {
     void grid.setColumnType(columnSelect.value, typeSelect.value as KeyType);
+  });
+
+  const picker = renderColumnPicker(byId('column-list'), columns, grid);
+  byId('columns-reset').addEventListener('click', () => {
+    grid.resetColumns();
+    picker.sync();
   });
 
   const exportWith = (build: typeof exportCsv, extension: 'csv' | 'xlsx') => async () => {

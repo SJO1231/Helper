@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ROW_COUNT_CHOICES, applyRowCount, clickSearch, shiftYear } from './remote-actions';
+import { ROW_COUNT_CHOICES, applyRowCount, clickExcel, clickSearch, shiftYear } from './remote-actions';
 import { makeWindow } from './test-fixtures';
 import type { FakeWindow } from './test-fixtures';
 
@@ -215,5 +215,64 @@ describe('clickSearch', () => {
     const result = clickSearch(setup('<div id="d">내용</div>'));
     expect(result.ok).toBe(false);
     expect(result.reason).toBeTruthy();
+  });
+});
+
+describe('clickExcel', () => {
+  function watch(win: FakeWindow, ...ids: string[]) {
+    const clicks: string[] = [];
+    for (const id of ids) win.document.getElementById(id)!.addEventListener('click', () => clicks.push(id));
+    return clicks;
+  }
+  test('clicks a visible button whose text has 엑셀', () => {
+    const win = setup('<button id="b1">엑셀다운로드</button><button id="b2">저장</button>');
+    const clicks = watch(win, 'b1', 'b2');
+    expect(clickExcel(win)).toEqual({ ok: true });
+    expect(clicks).toEqual(['b1']);
+  });
+  test('matches excel in any case on an input button value', () => {
+    const win = setup('<input id="b1" type="button" value="Excel Down">');
+    const clicks = watch(win, 'b1');
+    expect(clickExcel(win).ok).toBe(true);
+    expect(clicks).toEqual(['b1']);
+  });
+  test('finds a link and an image button by alt or title', () => {
+    const link = setup('<a id="a1" href="#">엑셀저장</a>');
+    const linkClicks = watch(link, 'a1');
+    clickExcel(link);
+    expect(linkClicks).toEqual(['a1']);
+    const image = setup('<input id="i1" type="image" alt="엑셀"><img id="i2" title="다운로드">');
+    const imageClicks = watch(image, 'i1', 'i2');
+    clickExcel(image);
+    expect(imageClicks).toEqual(['i1']);
+  });
+  test('clicks the wrapping link when only an inner span has the text', () => {
+    const win = setup('<a id="a1"><span id="s1">엑셀</span></a>');
+    const clicks = watch(win, 'a1', 's1');
+    clickExcel(win);
+    expect(clicks).toEqual(['a1']);
+  });
+  test('prefers 엑셀 over a plain 다운로드 even when 다운로드 comes first', () => {
+    const win = setup('<button id="d1">다운로드</button><button id="e1">엑셀</button>');
+    const clicks = watch(win, 'd1', 'e1');
+    clickExcel(win);
+    expect(clicks).toEqual(['e1']);
+  });
+  test('falls back to 다운로드 when no excel button exists', () => {
+    const win = setup('<button id="d1">다운로드</button>');
+    const clicks = watch(win, 'd1');
+    expect(clickExcel(win).ok).toBe(true);
+    expect(clicks).toEqual(['d1']);
+  });
+  test('skips hidden buttons and anything outside the body', () => {
+    const win = setup('<button id="hid">엑셀</button>', ['hid']);
+    win.document.body.insertAdjacentHTML('beforeend', '<button id="out">엑셀</button>');
+    (win.document.getElementById('out') as any).getClientRects = () => [{}];
+    const result = clickExcel(win);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBeTruthy();
+  });
+  test('no matching button returns ok false', () => {
+    expect(clickExcel(setup('<button id="b1">조회</button>')).ok).toBe(false);
   });
 });

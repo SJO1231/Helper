@@ -237,8 +237,9 @@ describe('other messages', () => {
     await t.handlers.handle({ kind: 'shift-year', delta: -1 }, TAB);
     await t.handlers.handle({ kind: 'click-search' }, TAB);
     await t.handlers.handle({ kind: 'row-count', n: 250 }, TAB);
+    await t.handlers.handle({ kind: 'click-excel' }, TAB);
     expect(t.pageCalls).toEqual([
-      [7, 'shiftYear', [-1]], [7, 'clickSearch', []], [7, 'applyRowCount', [250]],
+      [7, 'shiftYear', [-1]], [7, 'clickSearch', []], [7, 'applyRowCount', [250]], [7, 'clickExcel', []],
     ]);
   });
   test('open-viewer opens the viewer page without calling the core', async () => {

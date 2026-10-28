@@ -113,6 +113,20 @@ describe('remote controls', () => {
     expect(t.sent.map((m) => m.kind)).toEqual(['click-search']);
     expect(t.q('[data-role="toast"]').textContent).toBe('못 찾음');
   });
+  test('excel button sits next to search, sends click-excel and reports the result', async () => {
+    const reply = (data: object) => (m: any) => ({ ok: true, data: m.kind === 'click-excel' ? data : null });
+    const missing = mount(reply({ ok: false, reason: '못 찾음' }));
+    const search = missing.q('[data-action="search"]');
+    expect(search.nextElementSibling).toBe(missing.q('[data-action="excel"]'));
+    missing.q('[data-action="excel"]').click();
+    await settle();
+    expect(missing.sent.map((m) => m.kind)).toEqual(['click-excel']);
+    expect(missing.q('[data-role="toast"]').textContent).toBe('못 찾음');
+    const found = mount(reply({ ok: true }));
+    found.q('[data-action="excel"]').click();
+    await settle();
+    expect(found.q('[data-role="toast"]').textContent).toBe('엑셀을 눌렀음');
+  });
   test('row count select and typed value both send row-count', async () => {
     const t = mount(routing('bid'));
     const select = t.q('[data-role="row-count"]');
