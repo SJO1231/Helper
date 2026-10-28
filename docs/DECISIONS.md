@@ -73,3 +73,4 @@ DB 구조 3안 비교. A를 승인했다.
 2026-10-29 실측(S3, 공개 입찰공고목록): 조회건수 250은 먹는다. select에 option을 더하고 addItem·setValue를 **글자 값**('250')으로 부르면 값이 바뀐다(숫자를 넘기면 무시됨). 보이는 그리드의 쪽 크기는 pageList.setPageSize(n)로 바로 바뀌고 요청은 0건이다(select만으로는 pageList가 그대로).
 2026-10-29 실측(S3): 기간 칸은 inputCalendar가 아니라 `input` 컴포넌트이고 값은 YYYYMMDD 글자다. 그래서 "보이는 YYYYMMDD 값 input 첫 쌍"으로 찾는다(−1년·+1년 모두 요청 0건).
 2026-10-29 결정(S3): core 수집 응답에 restored:true가 올 수 있다(휴지통 건 재수집). 진단 줄에 "되살림 n건"으로 센다. shared 타입·스키마는 S5 몫이라 확장은 지역 타입으로만 읽는다.
+2026-10-29 seed: Ű 942, ȭ�� 4, alias 1, �ڵ� 41, �� 598, reference 5(Agent SDK ��ġ, Sonnet).
