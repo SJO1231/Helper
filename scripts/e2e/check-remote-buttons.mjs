@@ -1,6 +1,7 @@
 // SPEC 8절: 입찰공고목록에서 리모컨 「조회」「엑셀」이 화면의 실제 버튼을 누르는지 본다.
 // 화면 값은 읽지 않는다. 토스트 문구(확장이 정한 안내 글자)와 요청·다운로드 수만 남긴다.
 import { closePopups } from '../probe/browser-steps.mjs';
+import { observeExcelPress } from './excel-observe.mjs';
 import { report } from './report.mjs';
 import { pressRemote, readShadowText, waitFor } from './remote-ui.mjs';
 
@@ -63,7 +64,8 @@ async function pressExcelExpectDownload(s) {
 export async function checkExcelButton(s) {
   try {
     const searched = await searchAndWaitRedraw(s);
-    const started = await pressExcelExpectDownload(s);
+    const { pressResult: started, observed } = await observeExcelPress(s, () => pressExcelExpectDownload(s));
+    console.log(JSON.stringify({ 진단: '엑셀 관측', ...observed }));
     const toast = (await readToast(s)) || '(없음)';
     const alertText = await readSiteAlert(s.page);
     await closePopups(s.page);
