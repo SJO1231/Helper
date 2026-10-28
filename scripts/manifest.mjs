@@ -1,5 +1,9 @@
+import { ICON_SIZES } from './icons.mjs';
+
 const G2B = 'https://www.g2b.go.kr/*';
 const LOOPBACK = 'http://127.0.0.1/*';
+
+const ICON_FILES = Object.fromEntries(ICON_SIZES.map((size) => [size, `icons/icon-${size}.png`]));
 
 export function buildManifest({ key, hasViewer }) {
   const manifest = {
@@ -11,6 +15,8 @@ export function buildManifest({ key, hasViewer }) {
     key,
     description: '업무 화면을 읽어 로컬에 모으고 엑셀처럼 본다',
     permissions: ['nativeMessaging', 'scripting', 'storage'],
+    icons: ICON_FILES,
+    action: { default_icon: ICON_FILES },
     host_permissions: [G2B, LOOPBACK],
     background: { service_worker: 'background.js', type: 'module' },
     content_scripts: [

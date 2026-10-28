@@ -4,6 +4,7 @@ import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { writeIcons } from './icons.mjs';
 import { buildManifest } from './manifest.mjs';
 import { viewerBuildOptions } from './viewer-build.mjs';
 
@@ -48,6 +49,7 @@ if (hasViewer) {
   await build(viewerBuildOptions(root, output));
   await copyFile(viewerHtml, path.join(output, 'viewer.html'));
 }
+await writeIcons(path.join(output, 'icons'));
 const manifest = buildManifest({ key: identity.key, hasViewer });
 await writeFile(path.join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n', 'utf8');
 console.log(`Built extension: dist/extension (viewer: ${hasViewer})`);

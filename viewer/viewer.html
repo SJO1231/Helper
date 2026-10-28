@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <title>Helper 뷰어</title>
   <style>
-    html, body { height: 100%; margin: 0; font: 13px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933; }
+    html, body { height: 100%; margin: 0; overflow: hidden; font: 13px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933; }
     body { display: flex; flex-direction: column; background: #f6f7f9; }
     #toolbar {
-      display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center;
+      flex: none; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center;
       padding: 8px 12px; background: #fff; border-bottom: 1px solid #e3e7ec;
     }
     #toolbar .spacer { flex: 1; }
@@ -26,10 +26,14 @@
       max-height: 60vh; overflow: auto; padding: 8px 10px; white-space: nowrap;
       background: #fff; border: 1px solid #cfd6de; border-radius: 6px; box-shadow: 0 6px 20px rgba(15, 23, 42, .12);
     }
-    #status { font-size: 12px; color: #7b8794; }
+    #status {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; box-sizing: border-box; height: 26px;
+      padding: 0 12px; line-height: 26px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      font-size: 12px; color: #7b8794; background: #fff; border-top: 1px solid #e3e7ec;
+    }
     #status.error { color: #b00020; }
     #grid {
-      flex: 1; min-height: 0; margin: 8px 12px 12px;
+      flex: 1; min-height: 0; margin: 8px 12px 34px;
       background: #fff; border: 1px solid #e3e7ec; border-radius: 6px;
     }
   </style>
