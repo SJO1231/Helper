@@ -51,7 +51,8 @@ def list_records(db, table, sort=None, filters=None, limit=DEFAULT_LIMIT, offset
     if not isinstance(limit, int) or not isinstance(offset, int) or limit < 0 or offset < 0:
         raise BadRequest("limit·offset은 0 이상의 정수여야 한다")
     limit = min(limit, MAX_LIMIT)
-    columns = db.table_columns(table)
+    # raw는 크고 목록에 내지 않는 열이라 정렬·필터 대상에서도 뺀다
+    columns = [name for name, _ in CAPTURE_COLUMNS] if kind == "capture" else db.table_columns(table)
     types = {}
     if kind in ("main", "item", "typed"):
         types = {k["std_key"]: k["type"] for k in dict_read.column_keys(db, key_stage_name(stage, alias))}
