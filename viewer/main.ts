@@ -16,6 +16,15 @@ function describeFailure(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+// 막힌 저장소는 접근만 해도 던진다. 그럴 땐 저장 없이 뜬다.
+function columnStorage(): Storage | undefined {
+  try {
+    return window.localStorage;
+  } catch {
+    return undefined;
+  }
+}
+
 async function start() {
   const connection = await getConnectionFromBackground();
   const client = createCoreClient(connection);
@@ -32,7 +41,7 @@ async function start() {
   const grid = mountGrid(document.getElementById('grid') as HTMLElement, columns, source, {
     onTotal: (total) => showStatus(`${total.toLocaleString()}행`),
     onError: (error) => showStatus(describeFailure(error), true),
-  });
+  }, { table, storage: columnStorage() });
   wireToolbar({ client, table, columns, grid, currentQuery: () => source.currentQuery(), showStatus });
 
   // bench가 열 타입 변경 시간을 재려고 쓴다. 평소 화면에는 내놓지 않는다.
