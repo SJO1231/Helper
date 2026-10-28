@@ -51,6 +51,11 @@ export function createRemote(deps: RemoteDeps) {
   host.id = 'helper-remote';
   doc.body.appendChild(host);
   const root = host.attachShadow({ mode: 'open' });
+  // 나라장터는 처음 뜬 뒤 body를 비우고 다시 그린다. 같은 host를 다시 붙여 상태와 버튼을 잃지 않는다.
+  const Observer = doc.defaultView!.MutationObserver;
+  new Observer(() => {
+    if (!host.isConnected && doc.body) doc.body.appendChild(host);
+  }).observe(doc.documentElement, { childList: true, subtree: true });
 
   function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, text = '') {
     const node = doc.createElement(tag);

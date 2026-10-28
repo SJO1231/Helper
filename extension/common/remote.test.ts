@@ -83,6 +83,14 @@ describe('remote controls', () => {
     expect(t.sent.filter((m) => m.kind === 'snapshot' || m.kind === 'collect').map((m) => m.mode))
       .toEqual(['hidden', 'hidden']);
   });
+  test('the remote comes back when the page clears its body', async () => {
+    const t = mount(routing('bid'));
+    t.win.document.body.innerHTML = '<div id="page-content"></div>';
+    await settle();
+    const host = t.win.document.getElementById('helper-remote');
+    expect(host).not.toBeNull();
+    expect(host.shadowRoot).toBe(t.remote.root);
+  });
   test('viewer button asks the background to open the viewer', async () => {
     const t = mount(routing(null));
     expect(t.q('[data-action="open-viewer"]').textContent).toBe('뷰어');
