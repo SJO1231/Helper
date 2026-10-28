@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Helper 뷰어</title>
+  <style>
+    html, body { height: 100%; margin: 0; font: 13px/1.4 system-ui, sans-serif; }
+    body { display: flex; flex-direction: column; }
+    #toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      padding: 6px 8px; border-bottom: 1px solid #ccc;
+    }
+    #toolbar .spacer { flex: 1; }
+    #status { color: #555; }
+    #status.error { color: #b00020; }
+    #grid { flex: 1; min-height: 0; }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <label>테이블 <select id="table-select"></select></label>
+    <span id="status">불러오는 중</span>
+    <span class="spacer"></span>
+    <label>열 <select id="type-column"></select></label>
+    <label>타입 <select id="type-choice"></select></label>
+    <button id="type-apply" type="button">타입 적용</button>
+    <button id="export-csv" type="button">CSV</button>
+    <button id="export-xlsx" type="button">Excel</button>
+  </div>
+  <div id="grid"></div>
+  <script type="module" src="viewer.js"></script>
+</body>
+</html>

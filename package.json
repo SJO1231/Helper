@@ -3,11 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "tsc --noEmit && vitest run"
+    "verify": "tsc --noEmit && vitest run",
+    "bench:viewer": "node scripts/bench-viewer.mjs"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
+    "esbuild": "^0.28.2",
+    "playwright": "^1.63.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "ag-grid-community": "^36.2.0",
+    "exceljs": "^4.4.0"
   }
 }
