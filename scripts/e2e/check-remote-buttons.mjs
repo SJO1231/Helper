@@ -30,46 +30,50 @@ const readSiteAlert = (page) => page.evaluate(() => {
 
 const SEARCH_WAIT_MS = 10000;
 const REDRAW_MS = 1000;
-const NAME = '엑셀 버튼: 조회 뒤 다운로드 시작';
+const NAME = '엑셀 버튼: 확인창 수락 뒤 다운로드';
 
 // 조회를 누르고 조회 응답이 와서 그리드가 다시 그려질 때까지 기다린다. 응답이 없으면 false.
 async function searchAndWaitRedraw(s) {
+  const paths = [];
+  const onRequest = (r) => {
+    if (r.resourceType() === 'xhr' || r.resourceType() === 'fetch') paths.push(new URL(r.url()).pathname.split('/').pop());
+  };
+  s.page.on('request', onRequest);
   const answered = s.page.waitForResponse((r) => /\.do$/.test(new URL(r.url()).pathname), { timeout: SEARCH_WAIT_MS })
     .then(() => true, () => false);
   await pressRemote(s, 'search');
-  if (!(await answered)) return false;
+  const ok = await answered;
+  s.page.off('request', onRequest);
+  console.log(JSON.stringify({ 진단: '엑셀 앞 조회', 응답: ok, 요청_파일명: paths.slice(0, 8), 안내창: await readSiteAlert(s.page) }));
+  if (!ok) return false;
   await s.page.waitForLoadState('networkidle', { timeout: SEARCH_WAIT_MS }).catch(() => {});
   await s.page.waitForTimeout(REDRAW_MS);
   return true;
 }
 
 // 조회가 끝나기 전에 엑셀을 누르면 사이트가 재검색 안내창으로 막는다(화면 규칙). 그래서 조회 뒤에 누른다.
-// pressRemote가 누르기 전에 pace로 쉬므로, 2초는 누른 때(s.lastAction)부터 잰다.
-async function pressExcelExpectDownload(s) {
-  let startedAt = null;
-  const onDownload = (file) => {
-    startedAt ??= Date.now();
-    file.cancel().catch(() => {});
-  };
-  s.page.on('download', onDownload);
-  try {
-    await pressRemote(s, 'excel');
-    await waitFor(() => startedAt, REACT_MS, 100);
-  } finally {
-    s.page.off('download', onDownload);
-  }
-  return startedAt !== null && startedAt - s.lastAction <= REACT_MS + 500;
+// 기준: 확인창이 뜨고, 수락 뒤 15초(관측 시간) 안에 download 또는 파일 응답이 있다.
+function judgeExcel(observed) {
+  const confirmed = observed.dialogs.length > 0;
+  const received = observed.downloads > 0 || observed.files.length > 0;
+  return confirmed && received;
 }
 
 export async function checkExcelButton(s) {
   try {
     const searched = await searchAndWaitRedraw(s);
-    const { pressResult: started, observed } = await observeExcelPress(s, () => pressExcelExpectDownload(s));
+    const { observed } = await observeExcelPress(s, () => pressRemote(s, 'excel'));
     console.log(JSON.stringify({ 진단: '엑셀 관측', ...observed }));
     const toast = (await readToast(s)) || '(없음)';
     const alertText = await readSiteAlert(s.page);
     await closePopups(s.page);
-    report(NAME, searched && started, { 조회_응답: searched, 토스트: toast, 사이트_안내창: alertText });
+    report(NAME, searched && judgeExcel(observed), {
+      조회_응답: searched,
+      확인창: observed.dialogs.map((d) => `${d.종류}: ${d.문구}`),
+      다운로드_초: observed.downloadAt === null ? '(없음)' : observed.downloadAt / 1000,
+      토스트: toast,
+      사이트_안내창: alertText,
+    });
   } catch (error) {
     report(NAME, false, { 오류: String(error.message).split('\n')[0] });
   }

@@ -26,6 +26,41 @@ const installClickRecorder = (page) => page.evaluate(() => {
   }, true);
 });
 
+// 확장이 WebSquare trigger로 눌렀는지 보려고 모든 프레임의 컴포넌트 trigger/fireEvent 호출을 센다(id 앞 12자만).
+const installTriggerSpy = async (page) => {
+  for (const frame of page.frames()) {
+    await frame.evaluate(() => {
+      const util = window.WebSquare?.util;
+      if (!util || util.__spied) return;
+      const original = util.getComponentById.bind(util);
+      util.__spied = true;
+      window.__excelTriggers = [];
+      util.getComponentById = (id) => {
+        const component = original(id);
+        for (const name of ['trigger', 'fireEvent']) {
+          if (component && typeof component[name] === 'function' && !component[name].__spied) {
+            const fn = component[name].bind(component);
+            component[name] = (...args) => {
+              window.__excelTriggers.push({ 방법: name, idPrefix: String(id).slice(0, 12), 이벤트: String(args[0]) });
+              return fn(...args);
+            };
+            component[name].__spied = true;
+          }
+        }
+        return component;
+      };
+    }).catch(() => {});
+  }
+};
+
+const readTriggers = async (page) => {
+  const found = [];
+  for (const frame of page.frames()) {
+    found.push(...(await frame.evaluate(() => window.__excelTriggers ?? []).catch(() => [])));
+  }
+  return found;
+};
+
 const visibleLayerTitles = (page) => page.evaluate((source) => {
   const re = new RegExp(source, 'i');
   const found = {};
@@ -51,12 +86,12 @@ export async function observeExcelPress(s, press) {
     if (pressedAt === null) return;
     const h = r.headers();
     if (FILE_TYPE.test(h['content-type'] ?? '') || h['content-disposition']) {
-      seen.files.push({ 경로: pathOf(r.url()), 형식: (h['content-type'] ?? '').split(';')[0] });
+      seen.files.push({ 초: Number(((Date.now() - pressedAt) / 1000).toFixed(1)), 경로: pathOf(r.url()), 형식: (h['content-type'] ?? '').split(';')[0] });
     }
   };
   const onDownload = (file) => {
     seen.downloads += 1;
-    seen.downloadAt ??= Date.now() - pressedAt;
+    seen.downloadAt ??= Date.now() - pressedAt; // 밀리초
     file.cancel().catch(() => {});
   };
   page.on('dialog', onDialog);
@@ -65,6 +100,7 @@ export async function observeExcelPress(s, press) {
   page.on('download', onDownload);
   try {
     await installClickRecorder(page);
+    await installTriggerSpy(page);
     const layersBefore = await visibleLayerTitles(page);
     pressedAt = Date.now();
     const pressResult = await press();
@@ -72,7 +108,8 @@ export async function observeExcelPress(s, press) {
     const layersAfter = await visibleLayerTitles(page);
     const newLayers = Object.entries(layersAfter).filter(([id]) => !(id in layersBefore)).map(([, t]) => t);
     const clicks = await page.evaluate(() => window.__excelClicks ?? []);
-    return { pressResult, observed: { ...seen, clicks, newLayers } };
+    const triggers = await readTriggers(page);
+    return { pressResult, observed: { ...seen, clicks, triggers, newLayers } };
   } finally {
     page.off('dialog', onDialog);
     page.context().off('page', onPopup);
