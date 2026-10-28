@@ -164,3 +164,121 @@ describe('remote panel motion', () => {
     expect((remote.root.querySelector('.bubble') as any).hidden).toBe(false);
   });
 });
+
+const paneHidden = (t: any, name: string) => t.q(`[data-pane="${name}"]`).hidden;
+
+describe('remote panel tabs', () => {
+  test('the work tab is shown first and the other panes are hidden', async () => {
+    const t = await mount();
+    expect(paneHidden(t, 'work')).toBe(false);
+    expect(paneHidden(t, 'collect')).toBe(true);
+    expect(paneHidden(t, 'viewer')).toBe(true);
+    expect(t.q('[data-tab="work"]').getAttribute('aria-selected')).toBe('true');
+  });
+  test('groups the buttons into the three tabs', async () => {
+    const t = await mount();
+    const inPane = (pane: string, action: string) => t.q(`[data-pane="${pane}"] [data-action="${action}"]`);
+    for (const action of ['year-minus', 'year-plus', 'search', 'excel', 'row-count-apply']) {
+      expect(inPane('work', action)).not.toBeNull();
+    }
+    for (const action of ['collect', 'snapshot']) expect(inPane('collect', action)).not.toBeNull();
+    expect(t.q('[data-pane="collect"] [data-role="mode"]')).not.toBeNull();
+    expect(inPane('viewer', 'open-viewer')).not.toBeNull();
+    expect(t.q('[data-pane="viewer"] [data-role="core-status"]')).not.toBeNull();
+    expect(t.q('.bar > [data-role="diagnostics"]')).not.toBeNull();
+    expect(t.q('.bar > [data-role="toast"]')).not.toBeNull();
+  });
+  test('clicking a tab switches the pane and saves it in the same object', async () => {
+    const t = await mount({ left: 5, top: 6, collapsed: false });
+    t.q('[data-tab="collect"]').click();
+    expect(paneHidden(t, 'collect')).toBe(false);
+    expect(paneHidden(t, 'work')).toBe(true);
+    expect(t.saved.at(-1)).toEqual({ left: 5, top: 6, collapsed: false, tab: 'collect' });
+  });
+  test('the saved tab comes back, and a bad one is ignored', async () => {
+    const t = await mount({ tab: 'viewer' });
+    expect(paneHidden(t, 'viewer')).toBe(false);
+    const bad = await mount({ tab: 'nope' as any });
+    expect(paneHidden(bad, 'work')).toBe(false);
+  });
+});
+
+describe('remote panel close', () => {
+  const hostOf = (t: any) => t.win.document.getElementById('helper-remote');
+  test('the close button detaches the panel and keeps the saved position', async () => {
+    const t = await mount({ left: 5, top: 6, collapsed: true });
+    t.q('[data-action="close"]').click();
+    expect(hostOf(t)).toBeNull();
+    expect(t.saved).toEqual([]);
+  });
+  test('the panel is not attached again when the page redraws', async () => {
+    const t = await mount();
+    t.q('[data-action="close"]').click();
+    t.win.document.body.appendChild(t.win.document.createElement('div'));
+    await settle();
+    expect(hostOf(t)).toBeNull();
+  });
+  test('without closing, a redraw still attaches the panel again', async () => {
+    const t = await mount();
+    hostOf(t).remove();
+    t.win.document.body.appendChild(t.win.document.createElement('div'));
+    await settle();
+    expect(hostOf(t)).not.toBeNull();
+  });
+});
+
+describe('remote panel shortcuts', () => {
+  const press = (t: any, init: Record<string, unknown>, target?: any) => {
+    const event = new t.win.KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
+    (target ?? t.win.document.body).dispatchEvent(event);
+    return event;
+  };
+  const altG = { key: 'g', code: 'KeyG', altKey: true };
+
+  test('Alt+G folds and unfolds the panel', async () => {
+    const t = await mount();
+    expect(press(t, altG).defaultPrevented).toBe(true);
+    expect(t.q('.bar').hidden).toBe(true);
+    expect(t.saved.at(-1)).toMatchObject({ collapsed: true });
+    press(t, altG);
+    expect(t.q('.bar').hidden).toBe(false);
+  });
+  test('Alt+G works while an input has focus', async () => {
+    const t = await mount();
+    const input = t.win.document.createElement('input');
+    t.win.document.body.appendChild(input);
+    input.focus();
+    expect(press(t, altG, input).defaultPrevented).toBe(true);
+    expect(t.q('.bar').hidden).toBe(true);
+  });
+  test('keys other than Alt+G are left alone', async () => {
+    const t = await mount();
+    const others = [{ key: 'g', code: 'KeyG' }, { ...altG, ctrlKey: true }, { key: 'h', code: 'KeyH', altKey: true }];
+    for (const init of others) {
+      expect(press(t, init).defaultPrevented).toBe(false);
+    }
+    expect(t.q('.bar').hidden).toBe(false);
+  });
+  test('Alt+G after closing attaches the panel again, and only one handler runs', async () => {
+    const t = await mount();
+    t.q('[data-action="close"]').click();
+    press(t, altG);
+    expect(t.win.document.getElementById('helper-remote')).not.toBeNull();
+    expect(t.q('.bar').hidden).toBe(false);
+    press(t, altG);
+    expect(t.q('.bar').hidden).toBe(true);
+  });
+  test('Alt+Shift+G puts the panel back to the default place and saves it', async () => {
+    const t = await mount();
+    t.fire(t.q('.title'), 'pointerdown', 10, 10);
+    t.fire(t.win.document, 'pointermove', 110, 60);
+    t.fire(t.win.document, 'pointerup', 110, 60);
+    expect(press(t, { ...altG, shiftKey: true, key: 'G' }).defaultPrevented).toBe(true);
+    for (const node of [t.q('.bar'), t.q('.bubble')]) {
+      expect(node.style.left).toBe('');
+      expect(node.style.top).toBe('');
+    }
+    expect(t.saved.at(-1)).toEqual({ collapsed: false });
+    expect(t.q('.bar').hidden).toBe(false);
+  });
+});
