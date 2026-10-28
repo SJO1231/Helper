@@ -8,8 +8,10 @@
 1. 저장소 폴더에서 `npm ci` 뒤 `node scripts/build.mjs`를 돌린다. `dist/extension` 폴더가 생긴다.
 2. 크롬 `chrome://extensions`에서 개발자 모드를 켜고 "압축해제된 확장 프로그램을 로드"로 `dist/extension`을 고른다.
 3. 확장 ID가 `igmgbdicnjmipkncpmojbkioialdjkog`인지 본다.
-4. `pwsh -File scripts/install-host.ps1`을 돌린다(PowerShell 7이 없으면 `powershell -File`). "Registered com.helper.core"가 나오면 된다.
-5. 크롬을 모두 닫았다가 다시 연다.
+4. `pwsh -File scripts/install-host.ps1`을 돌린다(PowerShell 7이 없으면 `powershell -File`).
+   "Registered com.helper.core"가 나오면 된다.
+5. 저장소 폴더에서 `python -m core.seed_load`를 돌린다. 사전 표마다 더한 행 수가 나오고, 다시 돌리면 모두 0이 정상이다.
+6. 크롬을 모두 닫았다가 다시 연다.
 
 ## 화면 열기
 1. 평소 쓰는 업무 화면을 연다. 오른쪽 위에 리모컨(수집·스냅샷·−1년·+1년·조회건수·뷰어)이 보이는지.
