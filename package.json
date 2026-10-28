@@ -3,10 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "tsc --noEmit && vitest run"
+    "verify": "tsc --noEmit && vitest run",
+    "seed:check": "tsx scripts/seed/check-seed.ts shared/seed"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
   }
