@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'vitest';
 import type { ColumnInfo, KeyType } from '../shared/types';
-import { buildColumnDefs, createDatasource, filterModelToFilter, sortModelToString } from './grid-adapter';
+import { createColumnMemory, layoutOf } from './column-state';
+import type { SavedColumn } from './column-state';
+import {
+  buildColumnDefs,
+  createDatasource,
+  filterModelToFilter,
+  shouldSaveColumnChange,
+  sortModelToString,
+} from './grid-adapter';
 import type { PagedSource, RowFilter } from './paged-source';
 
 const cols: ColumnInfo[] = [
@@ -109,5 +117,48 @@ describe('buildColumnDefs', () => {
 
   test('columns are never editable', () => {
     expect(buildColumnDefs(cols, {}).every((d) => d.editable === false)).toBe(true);
+  });
+});
+
+describe('column change saving', () => {
+  test('user changes are saved, code-made ones are not', () => {
+    expect(shouldSaveColumnChange({ source: 'uiColumnResized', finished: true })).toBe(true);
+    expect(shouldSaveColumnChange({ source: 'uiColumnMoved' })).toBe(true);
+    expect(shouldSaveColumnChange({ source: 'uiColumnResized', finished: false })).toBe(false);
+    expect(shouldSaveColumnChange({ source: 'api' })).toBe(false);
+    expect(shouldSaveColumnChange({ source: 'gridOptionsChanged' })).toBe(false);
+  });
+
+  test('a type change keeps the saved layout even though the grid fires default-valued events', () => {
+    const stored: Record<string, string> = {};
+    const storage = {
+      getItem: (k: string) => stored[k] ?? null,
+      setItem: (k: string, v: string) => void (stored[k] = v),
+      removeItem: (k: string) => void delete stored[k],
+    };
+    const defaults: SavedColumn[] = [{ colId: 'keyA', width: 120, hide: false }, { colId: 'keyB', width: 120, hide: false }];
+    let state: SavedColumn[] = defaults.map((c) => ({ ...c }));
+    let memory: ReturnType<typeof createColumnMemory>;
+    const fire = (source: string) => shouldSaveColumnChange({ source }) && memory.save();
+    const api = {
+      getColumnState: () => state.map((c) => ({ ...c })),
+      applyColumnState: ({ state: next }: { state: SavedColumn[] }) => {
+        state = next.map((c) => ({ ...c }));
+        fire('api');
+      },
+    };
+    memory = createColumnMemory(api, 'tbl', storage);
+    state = [{ colId: 'keyB', width: 300, hide: false }, { colId: 'keyA', width: 80, hide: true }];
+    memory.save();
+    const saved = stored['viewer.columns.tbl'];
+
+    // setColumnType와 같은 순서: 배치를 읽고, 열 정의를 기본값으로 갈아 끼우고(이벤트), 복원한다.
+    const layout = layoutOf(api.getColumnState());
+    state = defaults.map((c) => ({ ...c }));
+    fire('gridOptionsChanged');
+    api.applyColumnState({ state: layout });
+
+    expect(stored['viewer.columns.tbl']).toBe(saved);
+    expect(api.getColumnState().map((c) => c.colId)).toEqual(['keyB', 'keyA']);
   });
 });
