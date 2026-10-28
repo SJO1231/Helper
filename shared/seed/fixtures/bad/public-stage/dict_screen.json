@@ -1,0 +1,18 @@
+{
+  "rows": [
+    {
+      "site": "V1",
+      "menu_no": "13713",
+      "scrn_no": "0001",
+      "menu_cang_val": "V1",
+      "name": "V-SECRET",
+      "stage": "receipt",
+      "source_route": "V1",
+      "key_fields": [
+        "keyA"
+      ],
+      "link": null,
+      "options": {}
+    }
+  ]
+}

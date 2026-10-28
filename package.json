@@ -3,13 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "tsc --noEmit && vitest run && node scripts/build.mjs"
+    "verify": "tsc --noEmit && vitest run && node scripts/build.mjs",
+    "seed:check": "tsx scripts/seed/check-seed.ts shared/seed"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.7",
     "ajv": "^8.20.0",
     "esbuild": "^0.28.2",
     "happy-dom": "^21.0.4",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
   }

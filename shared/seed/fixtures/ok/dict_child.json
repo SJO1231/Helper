@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "site": "V1",
+      "table_code": "V1",
+      "alias": "item",
+      "stage": "bid",
+      "typed": 0,
+      "key_fields": [
+        "keyA"
+      ]
+    }
+  ]
+}
