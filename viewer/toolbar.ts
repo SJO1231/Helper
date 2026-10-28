@@ -55,6 +55,8 @@ export function wireToolbar(context: ToolbarContext) {
   });
 
   const picker = renderColumnPicker(byId('column-list'), columns, grid);
+  // 열을 다른 경로(복원·초기화)로 바꾼 뒤 목록을 열어도 실제 상태가 보이게 한다.
+  byId('column-picker').addEventListener('toggle', () => picker.sync());
   byId('columns-reset').addEventListener('click', () => {
     grid.resetColumns();
     picker.sync();
