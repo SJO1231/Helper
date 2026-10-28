@@ -10,13 +10,14 @@ type ReadScreen = (win: Window) => ScreenChange | null;
 
 export function installScreenWatch(win: Window, readScreen: ReadScreen, onChange: (change: ScreenChange) => void) {
   let lastMenuNo: string | null = null;
-  const check = () => {
+  const report = (force: boolean) => {
     const screen = readScreen(win);
-    if (!screen || screen.menuNo === lastMenuNo) return;
+    if (!screen || (!force && screen.menuNo === lastMenuNo)) return;
     lastMenuNo = screen.menuNo;
     const { menuNo, scrnNo, menuCangVal, menuNm } = screen;
     onChange({ menuNo, scrnNo, menuCangVal, menuNm });
   };
+  const check = () => report(false);
   for (const method of ['pushState', 'replaceState'] as const) {
     const original = win.history[method].bind(win.history);
     win.history[method] = (...args: Parameters<History['pushState']>) => {
@@ -27,4 +28,6 @@ export function installScreenWatch(win: Window, readScreen: ReadScreen, onChange
   win.addEventListener('popstate', check);
   win.addEventListener('load', check);
   check();
+  // 리모컨이 늦게 떠서 첫 알림을 놓쳤을 때 현재 화면을 다시 알린다.
+  return { announce: () => report(true) };
 }

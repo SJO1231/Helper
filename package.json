@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "tsc --noEmit && vitest run"
+    "verify": "tsc --noEmit && vitest run && node scripts/build.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.7",
