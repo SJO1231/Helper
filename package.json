@@ -5,7 +5,8 @@
   "scripts": {
     "verify": "tsc --noEmit && vitest run && node scripts/build.mjs",
     "seed:check": "tsx scripts/seed/check-seed.ts shared/seed",
-    "bench:viewer": "node scripts/bench-viewer.mjs"
+    "bench:viewer": "node scripts/bench-viewer.mjs",
+    "e2e:public": "node scripts/e2e-public.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.7",
