@@ -62,6 +62,7 @@
 - 정렬은 `dict_key.type`대로: number·money·percent는 쉼표 등을 뗀 수, date·datetime은 숫자만 남긴 글자로 비교한다.
 - 1단계에 쓰기가 되는 곳: `g2b_capture`에 POST(수집), `dict_*`에 POST·PATCH·PUT. 나머지 쓰기는 405.
 - `{t}`의 `columns` 라벨은 `dict_label` 우선순위(6절)를 적용한 결과다.
+- `g2b_capture`는 읽기 전용 목록이다(라벨 수집 이력, raw 제외, sort가 없으면 최신 먼저). 쓰기는 수집 POST뿐이다.
 
 ### 4.3 수집
 `POST /api/tables/g2b_capture/records`, 레코드 하나 = 수집 1회.
