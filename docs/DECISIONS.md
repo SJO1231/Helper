@@ -62,3 +62,4 @@ DB 구조 3안 비교. A를 승인했다.
 2026-10-28 고침: record_id는 그 화면 key_fields의 키 값만 `|`로 잇는다. 키가 하나면 빈 꼬리 없이 `번호`.
 2026-10-28 결정: 조회건수가 select에 없으면 option 추가 + addItem 뒤 setValue(v4.2 applyRowCount). 실측은 S3.
 2026-10-28 결정(계획 중): 해석 순서에 "alias가 없으면 K 또는 K의 마지막 . 뒤 이름이 std_key면 그것"을 더함. 이유: std_key가 필드 ID라 dataMap 앞머리만 다름.
+2026-10-28 결정: 그리드는 AG Grid Community. 이유: 속도 기준을 넘고 바깥 쪽 공급이 MIT 본판에 있다. 근거 docs/grid-choice.md. 16ms 기준 문구는 60Hz에서 못 넘는 값이라 사용자 결정 필요.

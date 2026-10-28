@@ -1,0 +1,17 @@
+{
+  "name": "helper-grid-spike",
+  "private": true,
+  "type": "module",
+  "description": "S4 그리드 라이브러리 비교 측정. 제품 코드가 아니다.",
+  "scripts": {
+    "build": "node build.mjs",
+    "measure": "node measure.mjs"
+  },
+  "dependencies": {
+    "@revolist/revogrid": "4.29.1",
+    "@stencil/core": "4.45.2",
+    "ag-grid-community": "36.2.0",
+    "esbuild": "0.28.2",
+    "tabulator-tables": "6.7.1"
+  }
+}
