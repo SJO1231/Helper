@@ -61,7 +61,7 @@ export function makeWindow(spec: WindowSpec = {}): FakeWindow {
   const body = win.document.getElementById('mf_wfm_container')!;
   const outside = win.document.getElementById('outside')!;
   if (spec.withWebSquare !== false) win.$p = {};
-  (win as any).frames = spec.frames ?? [];
+  Object.defineProperty(win, 'frames', { value: spec.frames ?? [], configurable: true });
 
   for (const f of spec.forms ?? []) {
     const parent = f.outside ? outside : body;
@@ -80,11 +80,17 @@ export function makeWindow(spec: WindowSpec = {}): FakeWindow {
     win[g.id] = makeGridComponent(g);
   }
   if (spec.state !== undefined) {
-    (win as any).history = { state: spec.state === null ? null : { data: spec.state } };
+    setState(win, spec.state);
   }
   if (spec.processBarVisible !== undefined) {
     const html = '<div id="__processbarIFrame"></div>';
     placeElement(win, win.document.body, '__processbarIFrame', html, spec.processBarVisible);
   }
   return win;
+}
+
+// happy-dom의 history·frames는 읽기 전용이라 defineProperty로 바꾼다.
+export function setState(win: FakeWindow, data: Record<string, unknown> | null): void {
+  const history = { state: data === null ? null : { data } };
+  Object.defineProperty(win, 'history', { value: history, configurable: true });
 }
