@@ -119,7 +119,8 @@ export function createRemote(deps: RemoteDeps) {
   const bubble = el('button', { class: 'bubble', type: 'button', title: '펼치기' }, 'G2B');
   bar.append(
     title,
-    row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회')),
+    row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회'),
+      button('excel', '엑셀')),
     row(rowSelect, rowInput, button('row-count-apply', '적용')),
     modeSelect,
     row(collectButton, snapshotButton, button('open-viewer', '뷰어')),
@@ -234,6 +235,12 @@ export function createRemote(deps: RemoteDeps) {
     const { ok, reason } = reply.data as { ok: boolean; reason?: string };
     say(ok ? '조회를 눌렀음' : (reason ?? '조회를 누르지 못함'));
   }
+  async function clickExcel(): Promise<void> {
+    const reply = await send({ kind: 'click-excel' });
+    if (!reply.ok) return noteFailure(reply);
+    const { ok, reason } = reply.data as { ok: boolean; reason?: string };
+    say(ok ? '엑셀을 눌렀음' : (reason ?? '엑셀을 누르지 못함'));
+  }
   async function applyRowCount(n: number): Promise<void> {
     const reply = await send({ kind: 'row-count', n });
     if (!reply.ok) return noteFailure(reply);
@@ -248,6 +255,7 @@ export function createRemote(deps: RemoteDeps) {
   root.querySelector('[data-action="year-minus"]')!.addEventListener('click', () => void shiftYear(-1));
   root.querySelector('[data-action="year-plus"]')!.addEventListener('click', () => void shiftYear(1));
   root.querySelector('[data-action="search"]')!.addEventListener('click', () => void search());
+  root.querySelector('[data-action="excel"]')!.addEventListener('click', () => void clickExcel());
   rowSelect.addEventListener('change', () => void applyRowCount(Number(rowSelect.value)));
   root.querySelector('[data-action="row-count-apply"]')!.addEventListener('click', () => {
     void applyRowCount(Number(rowInput.value));

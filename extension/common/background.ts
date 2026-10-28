@@ -171,6 +171,7 @@ export function createHandlers(deps: BackgroundDeps) {
       case 'screen.changed': return registerScreen(message);
       case 'shift-year': return { ok: true, data: await inPage(tabId, 'shiftYear', [message.delta]) };
       case 'click-search': return { ok: true, data: await inPage(tabId, 'clickSearch', []) };
+      case 'click-excel': return { ok: true, data: await inPage(tabId, 'clickExcel', []) };
       case 'row-count': return { ok: true, data: await inPage(tabId, 'applyRowCount', [message.n]) };
       case 'open-viewer': return { ok: true, data: await deps.openViewer(String(message.table ?? '')) };
       default: return failure('unknown', `알 수 없는 요청: ${message.kind}`);

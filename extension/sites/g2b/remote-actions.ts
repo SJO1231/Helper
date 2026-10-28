@@ -92,6 +92,37 @@ export function clickSearch(win: Window): ActionResult {
   return { ok: true };
 }
 
+// 엑셀 글자를 먼저 찾고, 없을 때만 그냥 다운로드 글자를 쓴다(첨부 내려받기보다 엑셀 저장이 먼저).
+const EXCEL_WORDS = [['엑셀', 'excel'], ['다운로드']];
+const EXCEL_TARGETS = 'a,button,input[type="button"],input[type="submit"],input[type="image"],img,span';
+
+function excelText(el: Element): string {
+  const input = el as HTMLInputElement;
+  // 큰 span이 본문 전체 글자를 품고 걸리지 않도록 span은 끝 요소만 본다.
+  const own = el.tagName === 'SPAN' && el.children.length > 0 ? '' : (el.textContent ?? '');
+  return [own, input.value, el.getAttribute('alt'), el.getAttribute('title')].filter(Boolean).join(' ').toLowerCase();
+}
+
+function findExcelButton(win: Window): Element | null {
+  const candidates = visibleBodyElements(win, EXCEL_TARGETS).map((el) => ({
+    // 글자만 든 span은 감싼 a·button이 실제 누르는 대상이다. 감싼 것이 없으면 span은 버튼이 아니다.
+    target: el.tagName === 'SPAN' ? el.closest('a,button') : el,
+    text: excelText(el),
+  }));
+  for (const words of EXCEL_WORDS) {
+    const hit = candidates.find((c) => c.target && words.some((word) => c.text.includes(word)));
+    if (hit) return hit.target;
+  }
+  return null;
+}
+
+export function clickExcel(win: Window): ActionResult {
+  const button = findExcelButton(win);
+  if (!button) return { ok: false, reason: '보이는 엑셀·다운로드 버튼을 찾지 못함' };
+  (button as HTMLElement).click();
+  return { ok: true };
+}
+
 const isNumericSelect = (el: Element): boolean => {
   const options = Array.from((el as HTMLSelectElement).options);
   return options.length > 0 && options.every((o) => /^\d+$/.test(o.value));
