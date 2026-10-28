@@ -63,6 +63,13 @@ DB 구조 3안 비교. A를 승인했다.
 2026-10-28 결정: 조회건수가 select에 없으면 option 추가 + addItem 뒤 setValue(v4.2 applyRowCount). 실측은 S3.
 2026-10-28 결정(계획 중): 해석 순서에 "alias가 없으면 K 또는 K의 마지막 . 뒤 이름이 std_key면 그것"을 더함. 이유: std_key가 필드 ID라 dataMap 앞머리만 다름.
 2026-10-28 결정: 그리드는 AG Grid Community. 이유: 속도 기준을 넘고 바깥 쪽 공급이 MIT 본판에 있다. 근거 docs/grid-choice.md. SPEC 191줄 프레임 기준은 60Hz에서 못 넘는 16ms라 16.7ms로 고침. 우클릭 메뉴 없음, 열 타입 변경은 뷰어 자체 버튼으로.
+2026-10-28 결정(S6): 뷰어 필터는 열마다 "같음" 한 값(Enter로 적용). 이유: 코어 filter가 값 목록과 같음뿐이다.
+2026-10-28 결정(S6): 휠 훑기 프레임 기준은 간격 17ms 이하 비율로 잰다(S4와 같음). 이유: 프레임 시각이 0.1ms 단위로 16.5~16.8을 흔들려 빈 페이지도 글자 그대로의 16.7을 못 넘는다. bench는 엄격한 16.7 비율도 같이 낸다. 사용자 승인으로 SPEC 191줄을 17ms로 고침.
+2026-10-28 결정(S6): AG 행 강조를 끄고 rowBuffer를 3으로 둔다. 이유: 10,000행 세로 훑기가 기본값에서 0.92 안팎으로 기준 0.9에 아슬아슬했고 둘로 0.98이 됐다.
+2026-10-28 결정(S2): request_log에는 new·changed만 남긴다.
+2026-10-28 결정(S2): capture 5개 보관은 (record_id, screen_code) 단위로 센다.
+2026-10-28 결정(S2): dict_relation·user_column 열은 id와 payload로 최소.
+2026-10-28 결정(S2): 휴지통 건을 다시 수집하면 되살린다(deleted_at 비움, 응답 fields.restored=true).
 2026-10-29 실측(S3, 공개 입찰공고목록): 조회건수 250은 먹는다. select에 option을 더하고 addItem·setValue를 **글자 값**('250')으로 부르면 값이 바뀐다(숫자를 넘기면 무시됨). 보이는 그리드의 쪽 크기는 pageList.setPageSize(n)로 바로 바뀌고 요청은 0건이다(select만으로는 pageList가 그대로).
 2026-10-29 실측(S3): 기간 칸은 inputCalendar가 아니라 `input` 컴포넌트이고 값은 YYYYMMDD 글자다. 그래서 "보이는 YYYYMMDD 값 input 첫 쌍"으로 찾는다(−1년·+1년 모두 요청 0건).
 2026-10-29 결정(S3): core 수집 응답에 restored:true가 올 수 있다(휴지통 건 재수집). 진단 줄에 "되살림 n건"으로 센다. shared 타입·스키마는 S5 몫이라 확장은 지역 타입으로만 읽는다.
