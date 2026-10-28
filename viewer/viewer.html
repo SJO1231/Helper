@@ -4,16 +4,27 @@
   <meta charset="utf-8">
   <title>Helper 뷰어</title>
   <style>
-    html, body { height: 100%; margin: 0; font: 13px/1.4 system-ui, sans-serif; }
-    body { display: flex; flex-direction: column; }
+    html, body { height: 100%; margin: 0; font: 13px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933; }
+    body { display: flex; flex-direction: column; background: #f6f7f9; }
     #toolbar {
-      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-      padding: 6px 8px; border-bottom: 1px solid #ccc;
+      display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center;
+      padding: 8px 12px; background: #fff; border-bottom: 1px solid #e3e7ec;
     }
     #toolbar .spacer { flex: 1; }
-    #status { color: #555; }
+    #toolbar label { display: inline-flex; gap: 6px; align-items: center; color: #52606d; }
+    #toolbar button, #toolbar select {
+      height: 28px; padding: 0 10px; font: inherit; color: #1f2933;
+      background: #fff; border: 1px solid #cfd6de; border-radius: 6px;
+    }
+    #toolbar button { cursor: pointer; }
+    #toolbar button:hover:not(:disabled) { background: #f3f5f8; }
+    #toolbar button:disabled { color: #9aa5b1; cursor: default; }
+    #status { font-size: 12px; color: #7b8794; }
     #status.error { color: #b00020; }
-    #grid { flex: 1; min-height: 0; }
+    #grid {
+      flex: 1; min-height: 0; margin: 8px 12px 12px;
+      background: #fff; border: 1px solid #e3e7ec; border-radius: 6px;
+    }
   </style>
 </head>
 <body>

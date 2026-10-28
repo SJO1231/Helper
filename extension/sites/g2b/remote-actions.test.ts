@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ROW_COUNT_CHOICES, applyRowCount, shiftYear } from './remote-actions';
+import { ROW_COUNT_CHOICES, applyRowCount, clickSearch, shiftYear } from './remote-actions';
 import { makeWindow } from './test-fixtures';
 import type { FakeWindow } from './test-fixtures';
 
@@ -161,5 +161,59 @@ describe('applyRowCount', () => {
     expect(applyRowCount(win, 0).ok).toBe(false);
     expect(applyRowCount(win, 1.5).ok).toBe(false);
     expect(calls).toEqual([]);
+  });
+});
+
+describe('clickSearch', () => {
+  function watchClicks(win: FakeWindow, id: string) {
+    const clicks: string[] = [];
+    win.document.getElementById(id)!.addEventListener('click', () => clicks.push(id));
+    return clicks;
+  }
+  test('clicks the visible button whose text is 조회', () => {
+    const win = setup('<button id="b1">조회</button><button id="b2">저장</button>');
+    const clicks = watchClicks(win, 'b1');
+    expect(clickSearch(win)).toEqual({ ok: true });
+    expect(clicks).toEqual(['b1']);
+  });
+  test('accepts an input button by value and a 검색 label', () => {
+    const win = setup('<input id="b1" type="button" value="검색">');
+    const clicks = watchClicks(win, 'b1');
+    expect(clickSearch(win).ok).toBe(true);
+    expect(clicks).toEqual(['b1']);
+  });
+  test('skips hidden buttons', () => {
+    const win = setup('<button id="hid">조회</button><button id="shown">검색</button>', ['hid']);
+    const hidden = watchClicks(win, 'hid');
+    const shown = watchClicks(win, 'shown');
+    clickSearch(win);
+    expect(hidden).toEqual([]);
+    expect(shown).toEqual(['shown']);
+  });
+  test('ignores buttons outside the body', () => {
+    const win = setup('');
+    win.document.body.insertAdjacentHTML('beforeend', '<button id="out">조회</button>');
+    (win.document.getElementById('out') as any).getClientRects = () => [{}];
+    expect(clickSearch(win).ok).toBe(false);
+  });
+  test('clicks the wrapping button when only an inner span has the text', () => {
+    const win = setup('<a id="a1"><span id="s1">조회</span></a>');
+    const clicks = watchClicks(win, 'a1');
+    clickSearch(win);
+    expect(clicks).toEqual(['a1']);
+  });
+  test('without a button, presses Enter in the first visible input', () => {
+    const win = setup('<input id="hid"><input id="in1"><input id="in2">', ['hid']);
+    const keys: string[] = [];
+    for (const id of ['hid', 'in1', 'in2']) {
+      win.document.getElementById(id)!.addEventListener('keydown', (e: any) => keys.push(`${id}:${e.key}`));
+    }
+    expect(clickSearch(win)).toEqual({ ok: true });
+    expect(keys).toEqual(['in1:Enter']);
+  });
+  test('no button and no input returns ok false with a reason', () => {
+    const result = clickSearch(setup('<div id="d">내용</div>'));
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBeTruthy();
   });
 });

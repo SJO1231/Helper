@@ -1,7 +1,7 @@
 import { installScreenWatch } from '../../common/screen-watch';
 import { collectScreen } from './collect';
 import { readScreenState } from './identify';
-import { applyRowCount, shiftYear } from './remote-actions';
+import { applyRowCount, clickSearch, shiftYear } from './remote-actions';
 import type { ExtractMode } from '../../../shared/types';
 
 // MAIN world 진입점. background가 executeScript로 window.__helper의 함수를 부르고,
@@ -9,6 +9,7 @@ import type { ExtractMode } from '../../../shared/types';
 (window as any).__helper = {
   collect: (mode: ExtractMode) => collectScreen(window, mode),
   shiftYear: (delta: -1 | 1) => shiftYear(window, delta),
+  clickSearch: () => clickSearch(window),
   applyRowCount: (n: number) => applyRowCount(window, n),
 };
 

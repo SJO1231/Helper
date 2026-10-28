@@ -105,6 +105,14 @@ describe('remote controls', () => {
     await settle();
     expect(t.sent.map((m) => [m.kind, m.delta])).toEqual([['shift-year', -1], ['shift-year', 1]]);
   });
+  test('search button sends click-search and reports a missing button', async () => {
+    const missing = { ok: true, data: { ok: false, reason: '못 찾음' } };
+    const t = mount((m) => (m.kind === 'click-search' ? missing : { ok: true, data: null }));
+    t.q('[data-action="search"]').click();
+    await settle();
+    expect(t.sent.map((m) => m.kind)).toEqual(['click-search']);
+    expect(t.q('[data-role="toast"]').textContent).toBe('못 찾음');
+  });
   test('row count select and typed value both send row-count', async () => {
     const t = mount(routing('bid'));
     const select = t.q('[data-role="row-count"]');
