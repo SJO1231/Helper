@@ -1,0 +1,3592 @@
+{
+  "rows": [
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "aagrSbmsnElctHdwrSeCd",
+      "label": "서류 전자/수기 제출구분(서류 종류 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "addCgntTxam",
+      "label": "추가 인지세액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advcPinfrmPsbltyRat",
+      "label": "선급금 선고지 비율(%)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advcPinfrmYn",
+      "label": "선급금 선고지 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advfGivePsbltyRat",
+      "label": "선급금 지급가능 비율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advfGivePsbltyYn",
+      "label": "선급금 지급가능 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advfPinfrmPsbltyRat",
+      "label": "선급금 선고지 가능 비율(%)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advfPinfrmYn",
+      "label": "선급금 선고지 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "advlTxam",
+      "label": "종가세액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "affcClclnTrgtYn",
+      "label": "사후정산 대상 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "agncFee",
+      "label": "대리점 수수료 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "albmNopg",
+      "label": "면수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "alotAmt",
+      "label": "배정금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "alotBgtAmt",
+      "label": "배정예산"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "antcPrcmFee",
+      "label": "예상 조달수수료"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "aplcnCrnyCd",
+      "label": "계약/적용 통화코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "aplcnCrtrPrce",
+      "label": "적용기준가격"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "arvlAphrCd",
+      "label": "도착 항구코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "asetUntCd",
+      "label": "자산단위코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "asntCoreCpntNm",
+      "label": "조립국가 대상 주요/핵심부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "asntNtnCd",
+      "label": "조립국가 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "asntNtnNm",
+      "label": "조립국가 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "asntOdn1StpeCpntNm",
+      "label": "조립국가 대상 주요/핵심부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "asntOdn2StpeCpntNm",
+      "label": "조립국가 대상 주요/핵심부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "atcsCd",
+      "label": "법령 조항 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "atcsNm",
+      "label": "국가(지방)계약법시행령"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "atflRmrk",
+      "label": "첨부파일 비고"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "atrzDt",
+      "label": "결재일시 후보(게시일시와 구별)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "atrzSttsNm",
+      "label": "결재상태명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "authrtBgngYmd",
+      "label": "권리 시작/종료일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "authrtEndYmd",
+      "label": "권리 시작/종료일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "avtsmtBankAddr",
+      "label": "통지은행 정보(현재 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "avtsmtBankNm",
+      "label": "통지은행 정보(현재 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "avtsmtBankSfcdVal",
+      "label": "통지은행 정보(현재 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "baseAmt",
+      "label": "기초금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bderCnt",
+      "label": "입찰자 수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bdngAmtRangLmtYn",
+      "label": "투찰금액 범위제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bdngAmtRangLmtYnNm",
+      "label": "투찰금액 범위제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bfSpecRcptYn",
+      "label": "사전규격 관련 여부(접수/공개 여부 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bfSpecRegNo",
+      "label": "사전규격 등록번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bfssPicNm",
+      "label": "사업 담당자명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bgngNvnoVal",
+      "label": "시작/종료 번호(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bgtAmt",
+      "label": "예산금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bgtImplSeCd",
+      "label": "예산 집행구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidBlffNm",
+      "label": "입찰 집행관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidClsfNo",
+      "label": "입찰분류번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidClsfYn",
+      "label": "입찰분류 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidDepoPayTermDay",
+      "label": "입찰보증금 납부기한일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidDepoPayTermTime",
+      "label": "입찰보증금 납부기한시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidLmtSeCd",
+      "label": "입찰제한 구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidLmtUntyNm",
+      "label": "입찰참가 제한 업종명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidMthdCd",
+      "label": "입찰방식(입180002 → 전자입찰)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidMthdNm",
+      "label": "입찰방식 명칭"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPbancItemSqno",
+      "label": "입찰공고 품목순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPbancNm",
+      "label": "입찰공고명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPbancNo",
+      "label": "입찰공고번호(본번호)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPbancNoOrd",
+      "label": "입찰공고번호·차수 결합 표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPbancOrd",
+      "label": "입찰공고차수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPbancText",
+      "label": "입찰공고번호·차수 결합 표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPgstNm",
+      "label": "입찰진행상태 명칭(입160010 → 개찰완료)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPrceEvlRt",
+      "label": "입찰가격 평가비율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPrcpLmtYn",
+      "label": "입찰참가 제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPrcpLmtYnNm",
+      "label": "입찰참가 제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidPrgrsOrd",
+      "label": "입찰진행차수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidQlfcRegDay",
+      "label": "입찰참가자격 등록 마감일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bidQlfcRegTime",
+      "label": "입찰참가자격 등록 마감시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bizAmt",
+      "label": "사업금액(추정가격+부가세)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bizAmtFeeSumAmt",
+      "label": "사업금액·수수료 합계"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "blndEvlAplcnYn",
+      "label": "블라인드 평가 적용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bondPchaAmt",
+      "label": "채권 매입금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bondSeCd",
+      "label": "채권구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bsamCmptProdYn",
+      "label": "중소기업간 경쟁제품 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bsneMixtCtrtYn",
+      "label": "업무 혼합계약 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bulkDrftOdn1BdcnCn",
+      "label": "일괄기안 부가조건 내용 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bulkDrftOdn2BdcnCn",
+      "label": "일괄기안 부가조건 내용 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "bzmnRegNo",
+      "label": "사업자등록번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cgntTxam",
+      "label": "인지세 부과액(물품제조계약)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "chckrId",
+      "label": "검수자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "chckrNm",
+      "label": "검수자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "chgRsn",
+      "label": "계약 변경사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "chngDttm",
+      "label": "등록/변경/입력일시(업무일자와 구별)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "clndNoVal",
+      "label": "지번 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "clsfCrtrBidYn",
+      "label": "분류별 입찰 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cltuItemYn",
+      "label": "문화상품 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cmptncBrcoOrgnCd",
+      "label": "관할 지청·조직코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cmusSwItemSeCd",
+      "label": "상용 소프트웨어 품목구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cncdIntpCd",
+      "label": "공동이행 관련 코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cnscAbltEvlAmt",
+      "label": "시공능력 평가액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "coexCllbEvlAplcnYn",
+      "label": "공동·협업 평가 적용 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "coexStlmTrgtYn",
+      "label": "상생결제 대상 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "coreCpntAsntNtnCd",
+      "label": "핵심부품 조립국가 코드/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "coreCpntAsntNtnNm",
+      "label": "핵심부품 조립국가 코드/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "coreCpntPlorNtnCd",
+      "label": "핵심부품 원산지 코드/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "coreCpntPlorNtnNm",
+      "label": "핵심부품 원산지 코드/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "cornPbancRsn",
+      "label": "재공고 사유 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentIntpNm",
+      "label": "계약상대자 이행명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentPicId",
+      "label": "계약상대자 담당자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentPicNm",
+      "label": "계약상대자 담당자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentSeCd",
+      "label": "계약상대자 구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentTlphNo",
+      "label": "계약상대자 전화번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentUntyGrpNm",
+      "label": "계약상대자명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctentUntyGrpNo",
+      "label": "계약상대자 통합기관번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrlPrcmExcpYn",
+      "label": "중앙조달 예외 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtAmt",
+      "label": "품목별 계약금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtAprvYmd",
+      "label": "계약 승인일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtBrcoOrgnCd",
+      "label": "계약 지청·조직코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtChgOrd",
+      "label": "계약변경차수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtChgSeCd",
+      "label": "계약변경구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtChrsIdntYn",
+      "label": "계약특성 확인 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtChrsSeCd",
+      "label": "계약특성"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtCndtCn",
+      "label": "계약조건 내용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtCrnyCd",
+      "label": "계약/적용 통화코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndAmt",
+      "label": "계약요청 품목금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndBizNm",
+      "label": "계약요청 사업명(요청명)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndQty",
+      "label": "계약요청 품목수량"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndRcptItemSqno",
+      "label": "계약요청 접수 품목순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndRcptNo",
+      "label": "계약요청 접수번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndRcptOrd",
+      "label": "계약요청 접수차수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDmndUprc",
+      "label": "계약요청 품목단가"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDpdrNm",
+      "label": "계약 조직/직책명(개별 약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDt",
+      "label": "현재 차수 계약일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDvofNm",
+      "label": "계약 조직/직책명(개별 약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtDvtkSeNm",
+      "label": "계약관 직책명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtFee",
+      "label": "수수료"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtGrnteAmt",
+      "label": "계약 전체의 계약보증금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtGtnrt",
+      "label": "계약보증금률"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtItemNm",
+      "label": "계약 품목명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtItemSqnm",
+      "label": "계약 품목순번 표시명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtItemSqno",
+      "label": "계약 품목순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtMthdCd",
+      "label": "계약방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtMthdNm",
+      "label": "계약방법 명칭"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtNm",
+      "label": "계약명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtNo",
+      "label": "계약번호(본번호)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtNoOrd",
+      "label": "계약번호·변경차수 결합 표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtPicNm",
+      "label": "계약담당자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtPlanYear",
+      "label": "국방 조달계획연도 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtPrdCn",
+      "label": "납품기한"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtQty",
+      "label": "품목별 계약수량"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtSharAmt",
+      "label": "현재 계약차수의 업체 지분금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtSharRat",
+      "label": "현재 계약차수의 업체 지분율(%)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtSlcfNm",
+      "label": "계약 조직/직책명(개별 약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtSqms",
+      "label": "계약 면적 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtTyCd",
+      "label": "계약구분(계120001 → 총액계약)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtTyNm",
+      "label": "계약구분 명칭"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtUntCd",
+      "label": "계약 품목단위 값/코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtUntVal",
+      "label": "계약 품목단위 값/코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctrtUprc",
+      "label": "품목별 계약단가"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctwtIsrNm",
+      "label": "보증서 발급자명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctwtSbmsnMthdCd",
+      "label": "계약보증서 제출방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ctwtStokNoVal",
+      "label": "보증 증권번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dcmtDepoEsntlPayTrgtYn",
+      "label": "하자보수보증금 필수납부 대상 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dcmtGtnrt",
+      "label": "하자보수보증금률"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ddcCtcrAddr",
+      "label": "공제 계약자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ddcCtcrNm",
+      "label": "공제 계약자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ddcEvlAmt",
+      "label": "공제 평가금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "depsInstNm",
+      "label": "예치기관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "deptNm",
+      "label": "부서명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "devyCndtCd",
+      "label": "인도조건"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "devyCndtCdExcel",
+      "label": "인도조건 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "devyCndtNm",
+      "label": "인도조건 명칭"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dfrlScrAplcnYn",
+      "label": "차등점수 적용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dfrlScrItvlScr",
+      "label": "차등점수 간격점수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dgtnBizYn",
+      "label": "정보화사업 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dgtnBizYnNm",
+      "label": "정보화사업 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsPlacNm",
+      "label": "납품장소"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsSqno",
+      "label": "납품순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermChcSeCd",
+      "label": "납품기한 선택구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermCn",
+      "label": "납품기한 내용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermDt",
+      "label": "납품기한 날짜"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermDtExcel",
+      "label": "납품기한 날짜 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermMtnb",
+      "label": "납품 개월수 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermNody",
+      "label": "납품일수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermNodyExcel",
+      "label": "납품일수 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dlvgdsTermYmd",
+      "label": "납품기한 날짜"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmndInstBizPicNm",
+      "label": "수요기관 업무담당자명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmndInstBizPicTlphNo",
+      "label": "수요기관 업무담당자 전화번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmndInstPicFaxNo",
+      "label": "수요기관 담당자 팩스번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstAcmlSpdtAmt",
+      "label": "수요기관 누적 인지세액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstAcntgNm",
+      "label": "수요기관 회계구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstNm",
+      "label": "수요기관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstPicId",
+      "label": "수요기관 담당자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstPicNm",
+      "label": "수요기관 담당자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstRvwRsltCd",
+      "label": "수요기관/조달청 검토결과"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstSpdtBrdnRt",
+      "label": "수요기관 인지세 부담률"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstSpdtJintPayYn",
+      "label": "수요기관 인지세 공동납부 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstTlphNo",
+      "label": "수요기관 전화번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstUntyGrpNm",
+      "label": "수요기관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstUntyGrpNo",
+      "label": "수요기관 통합기관번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstcCmmyYn",
+      "label": "국내 상품 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstcOvrsSeCd",
+      "label": "국내/국제 입찰구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dmstcOvrsSeNm",
+      "label": "국내/국제 입찰구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dolrCtrtAmt",
+      "label": "달러 계약금액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dolrCtrtUprc",
+      "label": "달러 계약단가"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "drawPlrlPnprTnum",
+      "label": "추첨 복수예비가격 개수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "drctEctnIdrpIdntYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "drpmSbpySeCd",
+      "label": "지급방법(직130001 → 직불, 직130002 → 대지급)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dtfrBizYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dtlCtknSeCd",
+      "label": "세부 계약종류 구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dtlsPrnm",
+      "label": "세부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dtlsPrnmNm",
+      "label": "세부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dtlsPrnmNo",
+      "label": "세부품명번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "dutyObsrIdrpIdntYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "egnrEvlTrgtYn",
+      "label": "기술평가 대상 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "eltsbAgreYn",
+      "label": "전자제출 동의 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "eml",
+      "label": "이메일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "emrgPbancRsnCd",
+      "label": "긴급공고 사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "emrgPbancYn",
+      "label": "긴급공고 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "endDt",
+      "label": "시작/종료 일시(일정표)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "endNvnoVal",
+      "label": "시작/종료 번호(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "engDmstNm",
+      "label": "영문 수요기관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "engItemNm",
+      "label": "영문 품목명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "engItemSpecVal",
+      "label": "영문 품목규격"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ernnEtpsAddr",
+      "label": "해외 관련업체 연락처/주소(정확한 역할 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ernnEtpsCtrtEctnGrnteAmt",
+      "label": "관련 해외업체 계약이행보증금액(업체 역할 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ernnEtpsCtrtEctnGtnrt",
+      "label": "관련 해외업체 계약이행보증금률(업체 역할 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ernnEtpsFaxNo",
+      "label": "해외 관련업체 연락처/주소(정확한 역할 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ernnEtpsTlphNo",
+      "label": "해외 관련업체 연락처/주소(정확한 역할 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ernnEtpsUntyGrpNo",
+      "label": "해외 관련업체 통합기관번호(정확한 역할 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "esdacYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsAddr",
+      "label": "업체 주소"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsCrtrBndlCtrtYn",
+      "label": "업체 기준 묶음계약 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsDlayNody",
+      "label": "업체 지연일수/사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsDlayRsn",
+      "label": "업체 지연일수/사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsFaxNo",
+      "label": "업체 팩스번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsPicId",
+      "label": "업체 담당자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsPicNm",
+      "label": "업체 담당자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "etpsTlphNo",
+      "label": "업체 전화번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "eusrNm",
+      "label": "최종사용자명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlDocSbmsnBgngDay",
+      "label": "평가서류 제출 시작일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlDocSbmsnBgngTime",
+      "label": "평가서류 제출 시작시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlDocSbmsnDdlnDay",
+      "label": "평가서류 제출 마감일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlDocSbmsnDdlnTime",
+      "label": "평가서류 제출 마감시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlDocSbmsnElctHdwrSeCd",
+      "label": "서류 전자/수기 제출구분(서류 종류 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlMaagSeCd",
+      "label": "평가 관리구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlPicYn",
+      "label": "평가담당자 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evlSysUtztnYn",
+      "label": "평가시스템 이용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "evrtLaseChrg",
+      "label": "회차별 리스료 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "excnItrt",
+      "label": "실행 이자율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "extlPbfnAsetDmndNoVal",
+      "label": "외부 재정 자산요청번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "extlPbfnAsetDmndSqnoVal",
+      "label": "외부 재정 자산요청 순번 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "extlPbfnBizId",
+      "label": "외부 재정 사업 ID 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "extlPbfnYn",
+      "label": "외부 재정시스템 사용 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "faxNo",
+      "label": "팩스번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fctrRspbMhct",
+      "label": "하자담보책임기간(개월수)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fctrRspbMtnb",
+      "label": "하자담보책임기간(개월수)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fctrRspbNbyr",
+      "label": "하자담보책임기간(연수)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fctrRspbPrdAplcnYn",
+      "label": "하자담보책임기간 적용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fctrRspbText",
+      "label": "하자담보책임기간 표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "feePayExmtTyCd",
+      "label": "수수료 납부·면제 유형 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fildCnddYn",
+      "label": "현장설명 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "flawEctnBudlGrnteYn",
+      "label": "하자이행 일괄보증 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fncrNm",
+      "label": "재무관"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fprdYn",
+      "label": "외국산 허용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "fprdYnNm",
+      "label": "외국산 허용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frcpCtrtGrnteChrg",
+      "label": "외자계약 보증수수료"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frcpCtrtItcg",
+      "label": "외자계약 부대비용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frcpCtrtPrem",
+      "label": "외자계약 보험료 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frcpCtrtSptdCt",
+      "label": "외자계약 기술지원비 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frcpCtrtTrngCt",
+      "label": "외자계약 교육훈련비 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frcpItemDevyCndtCd",
+      "label": "외자물품 인도조건"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frgtWbilSeCd",
+      "label": "화물운송장 구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "frstCtrtDt",
+      "label": "최초계약일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ftalPrcmCtrtEntFormSeCd",
+      "label": "조달 계약체결 형태구분(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "g2bYn",
+      "label": "나라장터 관련 여부(정확한 용도 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "giveAcntBankCd",
+      "label": "지급계좌 은행코드/계좌번호(수집 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "giveMmrdIdntYn",
+      "label": "지급각서 확인 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "grnteCrdrNm",
+      "label": "보증 채권자 후보 — 값은 기관장 직함"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "grpNgtnCtrtBizClsfCd",
+      "label": "단체 수의계약 업무분류 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "gvmnItemClsfNo",
+      "label": "정부 물품분류번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "hefcEtamYn",
+      "label": "고효율 기자재 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "hghrkInstCd",
+      "label": "상위기관 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "hskCd",
+      "label": "HSK 품목분류코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "idrpIdntYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "igiInspInstSeCd",
+      "label": "검수기관 구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "igiInspInstSeNm",
+      "label": "검수기관 구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "igiInstUntyGrpNm",
+      "label": "검수기관 번호/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "igiInstUntyGrpNo",
+      "label": "검수기관 번호/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "implBlmt",
+      "label": "이행 잔액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "incmCgntAddPchaAmt",
+      "label": "수입인지 추가 구매금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "incmCgntPchaAmt",
+      "label": "수입인지 구매금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "infoLeakPrhbTrgtYn",
+      "label": "정보누출금지 대상 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "infoLeakPrhbTrgtYnNm",
+      "label": "정보누출금지 대상 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inscCtrtDdcRat",
+      "label": "보험계약 공제율 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inscCtrtTrgtYnIdntYn",
+      "label": "보험계약 대상 여부 확인 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inscStokNoVal",
+      "label": "보험 증권번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inscStokVldBgngYmd",
+      "label": "보험증권 유효 시작/종료일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inscStokVldEndYmd",
+      "label": "보험증권 유효 시작/종료일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "insdAddr",
+      "label": "피보험자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "insdNm",
+      "label": "피보험자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspInstSeCd",
+      "label": "검사기관 구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspInstSeNm",
+      "label": "검사기관 구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspInstUntyGrpNm",
+      "label": "검사기관 번호/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspInstUntyGrpNo",
+      "label": "검사기관 번호/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspNody",
+      "label": "검사일수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspTyCd",
+      "label": "검사형태"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "inspTyCdExcel",
+      "label": "검사형태 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "insrId",
+      "label": "검사자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "insrNm",
+      "label": "검사자 ID/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "instDlayNody",
+      "label": "기관 지연일수/사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "instDlayRsn",
+      "label": "기관 지연일수/사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "invtProdCtrtYn",
+      "label": "혁신제품 계약 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "iritemClsfNm",
+      "label": "기관별 물품분류번호/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "iritemClsfNo",
+      "label": "기관별 물품분류번호/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "iritemClsfNoUseYn",
+      "label": "기관별 물품분류번호 사용 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "iritemClsfStepCdVal",
+      "label": "기관별 물품분류 단계코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itasRegInstNm",
+      "label": "무형자산 등록번호/명/기관/일자 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itasRegNm",
+      "label": "무형자산 등록번호/명/기관/일자 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itasRegNoVal",
+      "label": "무형자산 등록번호/명/기관/일자 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itasRegYmd",
+      "label": "무형자산 등록번호/명/기관/일자 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itcemSbmsnYn",
+      "label": "서약서/각서 제출 여부(문서종류 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itcemUntyAtchFileNo",
+      "label": "문서유형별 통합 첨부번호(문서 약어 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemCertTyCdLst",
+      "label": "품목인증 유형코드 목록"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemCertTyCdLstExcel",
+      "label": "품목인증 유형코드 목록 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemCfnm",
+      "label": "물품명 후보(정확한 용어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemClsfBdngLmtAtrbCd",
+      "label": "물품분류 투찰제한 속성"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemClsfBdngLmtAtrbNm",
+      "label": "물품분류 투찰제한 속성"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemClsfNm",
+      "label": "물품분류명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemClsfNo",
+      "label": "물품분류번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemDelRsn",
+      "label": "품목 삭제사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemDtlClsfNo",
+      "label": "물품 세부분류번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemDtlSpecCn",
+      "label": "품목 상세규격"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemFee",
+      "label": "품목 수수료 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemIdnfNm",
+      "label": "물품식별명/규격 표시 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemIdnfNo",
+      "label": "물품식별번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemIvtrNoVal",
+      "label": "재고번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemSpecVal",
+      "label": "품목 상세규격"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itemWght",
+      "label": "물품중량"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itgtCtratIdntYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itnistUntyGrpNo",
+      "label": "내부기관 통합기관번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itrlPrcmAsetNoVal",
+      "label": "내부 조달 자산번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itrlPrcmItemIdnfNm",
+      "label": "내부 조달 물품식별명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itrlPrcmItemIdnfNmVal",
+      "label": "내부 조달 물품식별명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itrlPrcmItemIdnfNoVal",
+      "label": "내부 조달 물품식별번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "itrrTrnpItcg",
+      "label": "내륙 운송 부대비용 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jbizProdYn",
+      "label": "중소기업제품 관련 여부(정확한 라벨 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jdgtEvlAmt",
+      "label": "감정평가금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jintCtrtCmnMthoNm",
+      "label": "공동계약 구성방식 표시명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jintShreSeCd",
+      "label": "공동 분담구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jintSyddCmnMthoCd",
+      "label": "공동수급 구성방식"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jintSyddCmnMthoNm",
+      "label": "공동수급 구성방식 명칭(공500004 → 단독계약)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "jintSyddRsnCd",
+      "label": "공동수급 사유코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "kimgrpIncsYn",
+      "label": "특정 제품군 여부/포함 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "kimgrpYn",
+      "label": "특정 제품군 여부/포함 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "laseCtrtNo",
+      "label": "리스 계약번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "laseExcnYmd",
+      "label": "리스 실행일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "laseFee",
+      "label": "리스 수수료"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "laseYn",
+      "label": "리스 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lcnsLmtYn",
+      "label": "업종·면허 제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lcnsLmtYnNm",
+      "label": "업종·면허 제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lcrtTyCd",
+      "label": "계약법 구분(계040001 → 국가계약법, 계040002 → 지방계약법)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lctnNm",
+      "label": "소재지명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ldcgCd",
+      "label": "지목코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lgqtDlgdiExclYn",
+      "label": "장기 납품 관련 제외 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lmtGupSqno",
+      "label": "제한그룹 순번/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lmtGupSqnoNm",
+      "label": "제한그룹 순번/명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lmtKndCd",
+      "label": "제한종류 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lmtSqno",
+      "label": "제한 순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lotmCtnuCtrtYn",
+      "label": "장기계속계약 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lotmCtnuCtrtYnNm",
+      "label": "장기계속계약 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lotmPrttnSbpyYn",
+      "label": "장기 분할 지급 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lotmYn",
+      "label": "장기계약 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lqdmRat",
+      "label": "지체상금률(일당 %)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lrcoPtcpLmtExcpYn",
+      "label": "대기업 참여제한 예외 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lrcoPtcpLmtExcpYnNm",
+      "label": "대기업 참여제한 예외 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ltcrEstblMthdCd",
+      "label": "신용장 개설방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ltcrVldYmd",
+      "label": "신용장 유효일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lvyBoaSeCd",
+      "label": "징수·부담 구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "lwrdAtcsNm",
+      "label": "하위 법령 조항 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mixtCtrtAffcClclnYn",
+      "label": "혼합계약 사후정산 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mmLeseChrg",
+      "label": "월 임대료"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mmMgcs",
+      "label": "월 관리비"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mnftrItemLmtCn",
+      "label": "제조물품 제한 내용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mnftrItemLmtYn",
+      "label": "제조물품 제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mnftrItemLmtYnNm",
+      "label": "제조물품 제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "modlNm",
+      "label": "모델명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mrstDepsNoVal",
+      "label": "유가증권 예치번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mrstFamtAmt",
+      "label": "유가증권 액면금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mrstFamtIrrt",
+      "label": "유가증권 액면이율 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mrstMtryYmd",
+      "label": "유가증권 발행/만기일 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mrstPblcnYmd",
+      "label": "유가증권 발행/만기일 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "mrstSharRat",
+      "label": "유가증권 지분율 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfmRgstTrgtYn",
+      "label": "국방 등록대상 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsItemSpecNo",
+      "label": "규격번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsIvtrNo",
+      "label": "재고번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsPrcmCtrtPlanYear",
+      "label": "국방 조달계획연도 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsPrcmDmndNo",
+      "label": "국방 조달요구번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsPrcmItemDlvgdsMtruNm",
+      "label": "국방 납품부대명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsPrcmPlanChgOrd",
+      "label": "국방 조달계획 변경차수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndfsPrcmPlanDlvgdsSqno",
+      "label": "국방 조달계획 납품순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndpfExpndDmndNoVal",
+      "label": "국방 지출요청번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ndpfExpndYn",
+      "label": "국방 지출 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "newLotmSeCd",
+      "label": "신규·장기 구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "nflcNm",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ngtnCtrtBizClsfCd",
+      "label": "수의계약 업무분류 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "noticeBase",
+      "label": "공고 본번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "nwEqpmCnsuOperBizYn",
+      "label": "신규 장비 구축·운영 사업 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ocfmEdocNo",
+      "label": "문서 전자문서번호(문서 약어 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ocfmUntyAtchFileNo",
+      "label": "문서유형별 통합 첨부번호(문서 약어 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn1PlorNtnNm",
+      "label": "원산지 국가명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn1ShpgAphrCd",
+      "label": "선적 항구 코드(차수 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn1StpeCpntAsntNtnCd",
+      "label": "주요부품 조립국가 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn1StpeCpntAsntNtnNm",
+      "label": "주요부품 조립국가 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn1StpeCpntPlorNtnCd",
+      "label": "주요부품 원산지 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn1StpeCpntPlorNtnNm",
+      "label": "주요부품 원산지 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn2PlorNtnCd",
+      "label": "원산지 국가(차수/순번 의미 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn2ShpgAphrCd",
+      "label": "선적 항구 코드(차수 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn2StpeCpntAsntNtnCd",
+      "label": "주요부품 조립국가 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn2StpeCpntAsntNtnNm",
+      "label": "주요부품 조립국가 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn2StpeCpntPlorNtnCd",
+      "label": "주요부품 원산지 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn2StpeCpntPlorNtnNm",
+      "label": "주요부품 원산지 코드/명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn3PlorNtnCd",
+      "label": "원산지 국가(차수/순번 의미 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "odn3ShpgAphrCd",
+      "label": "선적 항구 코드(차수 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ofdcCn",
+      "label": "공문 내용 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "olCtrtYn",
+      "label": "온라인계약 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "onbsPlacCd",
+      "label": "개찰장소 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "onbsPrnmntDay",
+      "label": "개찰 예정일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "onbsPrnmntDt",
+      "label": "개찰 예정일시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "onbsPrnmntTime",
+      "label": "개찰 예정시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "oncMaxDlreqAmt",
+      "label": "1회 최대 납품요구금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "oncMaxDlreqamtRt",
+      "label": "1회 최대 납품요구금액 비율 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "optnItmltDsgnYn",
+      "label": "선택 품목 지정 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ord",
+      "label": "일정 순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "orgpAntpSeCd",
+      "label": "원본/사본 구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "osinspYn",
+      "label": "외부검사 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ovrlCtrtYn",
+      "label": "총괄계약 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ovrsFrgh",
+      "label": "해외 운임"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ownrAddr",
+      "label": "소유자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ownrNm",
+      "label": "소유자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ownrTlphNo",
+      "label": "소유자 개인정보(물품 MVP 제외)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancChgRsn",
+      "label": "공고 변경사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancInstUntyGrpNm",
+      "label": "공고기관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancKndCd",
+      "label": "공고종류"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancKndNm",
+      "label": "공고종류"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancPicNm",
+      "label": "공고 담당자명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancPstgDt",
+      "label": "공고 게시일시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pbancSttsCd",
+      "label": "공고상태"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pblcnInstNm",
+      "label": "발행기관명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pblcnNotm",
+      "label": "발행회차 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "picNm",
+      "label": "담당자명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "placNm",
+      "label": "장소(일정표)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "plorCoreCpntNm",
+      "label": "원산지 대상 주요/핵심부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "plorOdn1StpeCpntNm",
+      "label": "원산지 대상 주요/핵심부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "plorOdn2StpeCpntNm",
+      "label": "원산지 대상 주요/핵심부품명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pmcsRtnmEvlTrgtYn",
+      "label": "평가대상 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pmcsRtnmEvlcrtAmt",
+      "label": "평가기준 금액(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pnpr",
+      "label": "예정가격"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pnprDcsnMthoCd",
+      "label": "예정가격 결정방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pnprDcsnMthoNm",
+      "label": "예정가격 결정방법 명칭"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pnprPgmUseYn",
+      "label": "예정가격 프로그램 사용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pnprRwrtYn",
+      "label": "예정가격 재작성 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ppsRvwRsltCd",
+      "label": "수요기관/조달청 검토결과"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsDtlItemQty",
+      "label": "구매대상 품목수량"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsDtlItemQtyExcel",
+      "label": "구매대상 품목수량 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsDtlItemUntVal",
+      "label": "구매대상 품목 단위"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsDtlItemUntValExcel",
+      "label": "구매대상 품목 단위 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsDtlItemUprc",
+      "label": "구매대상 품목 추정단가"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsDtlItemUprcExcel",
+      "label": "구매대상 품목 추정단가 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsRsltnNo",
+      "label": "구매결의번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prchsRsltnSqno",
+      "label": "구매결의순번 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prcmBsneAreaCd",
+      "label": "조달업무영역 코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prcmBsneSeNm",
+      "label": "조달업무구분명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "presTlphNo",
+      "label": "대표 전화번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prflcAplcnCrtrCd",
+      "label": "물가변동적용기준(물130001 → 지수조정율, 물130002 → 품목조정율)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prfmncLmtYn",
+      "label": "실적제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prfmncLmtYnNm",
+      "label": "실적제한 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prgNm",
+      "label": "진행방법(일정표)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "procsCtrtWtotAgreYn",
+      "label": "계약 진행 동의 여부(정확한 용어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prodCertAsctCd",
+      "label": "제품인증 관련코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prptDtlSeCd",
+      "label": "재산 구분/세부구분/항목 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prptItmsCd",
+      "label": "재산 구분/세부구분/항목 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prptSeCd",
+      "label": "재산 구분/세부구분/항목 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prsntnTmmn",
+      "label": "발표시간(분) 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prsntnYn",
+      "label": "발표 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prspPrce",
+      "label": "추정가격"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prttnDlvgdsPsbltyYn",
+      "label": "분할납품 가능 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prttnDlvgdsPsbltyYnNm",
+      "label": "분할납품 가능 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prttnShpgPrmsYn",
+      "label": "분할선적 허용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prumAmt",
+      "label": "보험료 금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "prvctImplYn",
+      "label": "수의계약 사유 관련 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ptcpIntpCd",
+      "label": "참여이행 관련 코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "ptnrIntpCd",
+      "label": "분담이행 관련 코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pvctCntltUntyAtchFileNo",
+      "label": "문서유형별 통합 첨부번호(문서 약어 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pvctMmrdSbmsnYn",
+      "label": "서약서/각서 제출 여부(문서종류 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "pvctMmrdUntyAtchFileNo",
+      "label": "문서유형별 통합 첨부번호(문서 약어 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "qestRspnsTmmn",
+      "label": "질의응답시간(분) 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "qttyAlotSeNm",
+      "label": "물량배정 구분"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "qtyUntNm",
+      "label": "수량단위명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rbidPrmsYn",
+      "label": "재입찰 허용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rbidPrmsYnNm",
+      "label": "재입찰 허용 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rcptBraOrgnCd",
+      "label": "접수 지청·조직코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rcryCtrtAmt",
+      "label": "원화 계약금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rcryExrt",
+      "label": "원화 환율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rcrySpamAmt",
+      "label": "물품대금(원화/원통화 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rcryTlgrRdmpExrt",
+      "label": "원화 전신환 매도율 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgInstNm",
+      "label": "등기기관명 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgYmd",
+      "label": "등기일자 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgnLgdngCd",
+      "label": "지역 법정동 코드"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgnLmtYn",
+      "label": "지역제한 여부/표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgnLmtYnNm",
+      "label": "지역제한 여부/표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgstDttm",
+      "label": "등록/변경/입력일시(업무일자와 구별)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rgtbNoVal",
+      "label": "권리증 번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rlsYn",
+      "label": "공개 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rmrkCn",
+      "label": "비고 내용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rowAmtSum",
+      "label": "행 금액 합계 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rprsCtentUntyGrpNm",
+      "label": "대표 계약상대자명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rprsvNm",
+      "label": "대표자명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rprsvUnptYnIdntYn",
+      "label": "부정당 제재/조세포탈/대표자 제재 확인 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rschDvlpItemYn",
+      "label": "연구개발물품 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rschDvlpItemYnNm",
+      "label": "연구개발물품 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rspdntId",
+      "label": "응답자 ID"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rspnsDt",
+      "label": "응답일시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rspnsTyCd",
+      "label": "응답유형 코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rsreRat",
+      "label": "비율(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rsrvDtlsPrnmNo",
+      "label": "예약 세부품명번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "rtrcnYn",
+      "label": "취소 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "samePrceBidAtmtDrawYn",
+      "label": "동가 입찰 자동추첨 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "samePrceBidAtmtDrawYnNm",
+      "label": "동가 입찰 자동추첨 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "sbmsnOdrDocNmLst",
+      "label": "제출서류명 목록"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "sbrtSysUseYn",
+      "label": "하도급 시스템 사용 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "schlMlsvFdmtYn",
+      "label": "학교급식 식재료 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "sckrAplcnYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdLwlmRat",
+      "label": "낙찰하한율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdMthdCd",
+      "label": "낙찰방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdMthdDtlsCrtrNo",
+      "label": "낙찰 심사/세부기준 번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdMthdDtlsNm",
+      "label": "낙찰방법 세부기준 표시"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdMthdNm",
+      "label": "낙찰방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdSrngCrtrNo",
+      "label": "낙찰 심사/세부기준 번호 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "scsbdSrngDtlsCrtrSqno",
+      "label": "낙찰 심사 세부기준 순번"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "seq",
+      "label": "공고 차수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "sftyInspYn",
+      "label": "안전검사 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "sgctClclnMthdCd",
+      "label": "대금 정산방법(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "shpgAphrCd",
+      "label": "선적 항구 코드(차수 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "shpgPrnmntNody",
+      "label": "선적 예정일수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "shpgPrnmntYmd",
+      "label": "선적 예정일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "shpgTermMtnb",
+      "label": "선적기한 개월수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "shpgTermYmd",
+      "label": "선적기한 일자"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "shpgTrnpMthdCd",
+      "label": "선적 운송방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "skdwCndtCtrtYn",
+      "label": "조건부 계약 여부(조건 약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "slCprcmBsneSeCd",
+      "label": "조달업무구분 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "slprRcptBgngDay",
+      "label": "입찰서 접수 시작일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "slprRcptBgngTime",
+      "label": "입찰서 접수 시작시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "slprRcptDdlnDay",
+      "label": "입찰서 접수 마감일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "slprRcptDdlnTime",
+      "label": "입찰서 접수 마감시각"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "smrlCmptItemYn",
+      "label": "중소기업간 경쟁제품 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "smrlCmptItemYnNm",
+      "label": "중소기업간 경쟁제품 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spamAmt",
+      "label": "물품대금(원화/원통화 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spdtGuidMatrIdntYn",
+      "label": "인지세 안내사항 확인 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spdtTxtnTrgtYn",
+      "label": "인지세 과세대상 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specAtrbCn",
+      "label": "규격 속성명/내용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specAtrbNm",
+      "label": "규격 속성명/내용"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specKndCd",
+      "label": "규격종류"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specKndCdExcel",
+      "label": "규격종류 · Excel용 보조값"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specKndNm",
+      "label": "규격종류"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specNoVal",
+      "label": "규격번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "specRlsDt",
+      "label": "사전규격 공개일시 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplEtpsBzmnRegNo",
+      "label": "공급업체 사업자등록번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplEtpsCtrtEctnGrnteAmt",
+      "label": "공급업체 계약이행보증금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplEtpsCtrtEctnGtnrt",
+      "label": "공급업체 계약이행보증금률 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplEtpsNm",
+      "label": "공급업체명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplEtpsUntyGrpNo",
+      "label": "공급업체 통합기관번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplRgnDtlsRgnNm",
+      "label": "공급지역 번호/명/상세명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplRgnNm",
+      "label": "공급지역 번호/명/상세명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "spplRgnNo",
+      "label": "공급지역 번호/명/상세명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "startDt",
+      "label": "시작/종료 일시(일정표)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "stdCtrtMthdCd",
+      "label": "계약방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "stdCtrtMthdNm",
+      "label": "계약방법"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "stdPbadmsReqNody",
+      "label": "표준 행정 소요일수 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "stdPbadmsReqNodyNm",
+      "label": "표준 행정 소요일수 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "subject",
+      "label": "진행명(일정표)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "swSprtnOderFeeDscntYn",
+      "label": "소프트웨어 분리발주 수수료 할인 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "taxevYnIdntYn",
+      "label": "부정당 제재/조세포탈/대표자 제재 확인 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "tdolrCtrtAmt",
+      "label": "전체 달러 계약금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "techAbltEvlRt",
+      "label": "기술능력 평가비율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "techEvlAgncYn",
+      "label": "기술평가 대행 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "title",
+      "label": "공고명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "tlbkpngCtrtAmt",
+      "label": "총부기 계약금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "tlphNo",
+      "label": "전화번호"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "totlLaseChrg",
+      "label": "총 리스료"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "totlPnprTnum",
+      "label": "총 예비가격 개수"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "totlPymtAmt",
+      "label": "품대"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "tpSrngTrgtYn",
+      "label": "심사대상 여부(약어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "trcrnyCtrtAmt",
+      "label": "전체 통화 계약금액 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "trffAmt",
+      "label": "관세액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "trmtPsbltyYn",
+      "label": "환적 가능 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "unptRsttHistIdntYn",
+      "label": "부정당 제재/조세포탈/대표자 제재 확인 여부 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "uprcClcBassCn",
+      "label": "단가 산출근거"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "usagNm",
+      "label": "용도명"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "usefAmt",
+      "label": "용도별/분류별 금액(정확한 용어 미확정)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "usrDocFtreCd",
+      "label": "사용자 문서형태 코드 후보"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "vatAmt",
+      "label": "부가가치세액"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "vatIncsYn",
+      "label": "부가세 포함 여부"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "vatRat",
+      "label": "부가세율"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "wholSharAmt",
+      "label": "전체지분금액(전체 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "wholSharRat",
+      "label": "전체지분율(전체 범위 확인)"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "wrtYmd",
+      "label": "접수일"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "wtoBidRsnCd",
+      "label": "국제입찰 사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "wtoBidRsnNm",
+      "label": "국제입찰 사유"
+    },
+    {
+      "scope": "system",
+      "scope_id": "",
+      "key": "wtotIdntYn",
+      "label": "용어 미확정 — 약어만으로 번역하지 않음"
+    }
+  ]
+}

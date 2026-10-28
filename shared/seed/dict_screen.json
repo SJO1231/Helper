@@ -1,0 +1,64 @@
+{
+  "rows": [
+    {
+      "site": "g2b",
+      "menu_no": "01114",
+      "scrn_no": "",
+      "menu_cang_val": "",
+      "name": "조달요구 접수 상세",
+      "stage": "receipt",
+      "source_route": "",
+      "key_fields": [
+        "ctrtDmndRcptNo",
+        "ctrtDmndRcptOrd"
+      ],
+      "link": null,
+      "options": {}
+    },
+    {
+      "site": "g2b",
+      "menu_no": "01117",
+      "scrn_no": "",
+      "menu_cang_val": "",
+      "name": "조달요구 접수(목록형)",
+      "stage": "receipt",
+      "source_route": "",
+      "key_fields": [
+        "ctrtDmndRcptNo",
+        "ctrtDmndRcptOrd"
+      ],
+      "link": null,
+      "options": {}
+    },
+    {
+      "site": "g2b",
+      "menu_no": "01179",
+      "scrn_no": "",
+      "menu_cang_val": "",
+      "name": "입찰공고 상세",
+      "stage": "bid",
+      "source_route": "",
+      "key_fields": [
+        "bidPbancNo",
+        "bidPbancOrd"
+      ],
+      "link": null,
+      "options": {}
+    },
+    {
+      "site": "g2b",
+      "menu_no": "01579",
+      "scrn_no": "",
+      "menu_cang_val": "",
+      "name": "계약 상세",
+      "stage": "contract",
+      "source_route": "",
+      "key_fields": [
+        "ctrtNo",
+        "ctrtChgOrd"
+      ],
+      "link": null,
+      "options": {}
+    }
+  ]
+}
