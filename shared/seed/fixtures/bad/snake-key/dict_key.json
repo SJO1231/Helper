@@ -1,0 +1,21 @@
+{
+  "rows": [
+    {
+      "std_key": "key_a",
+      "module": "V1",
+      "stages": [
+        "receipt"
+      ],
+      "type": "text",
+      "label": "V-SECRET",
+      "as_column": 1,
+      "index": 0,
+      "derived": 0,
+      "display": {
+        "source": [
+          "data_map"
+        ]
+      }
+    }
+  ]
+}
