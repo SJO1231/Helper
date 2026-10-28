@@ -1,0 +1,21 @@
+{
+  "site": "g2b",
+  "menu_no": "M0001",
+  "scrn_no": "S0001",
+  "url": "https://example.invalid/",
+  "mode": "visible",
+  "raw": {
+    "state": { "menuNo": "M0001" },
+    "param": { "paramA": "V1" },
+    "pointInfo": [{ "k": "dmA.keyA", "v": "V1", "l": "L1", "visible": true }],
+    "tables": [
+      {
+        "id": "gridA",
+        "dataList": "dlA",
+        "visible": true,
+        "columns": [{ "k": "colA", "l": "LA" }],
+        "rows": [{ "colA": "V1" }]
+      }
+    ]
+  }
+}

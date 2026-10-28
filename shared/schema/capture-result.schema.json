@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capture-result",
+  "type": "object",
+  "required": ["status", "record_id", "stage", "changed", "unknown_keys"],
+  "properties": {
+    "status": { "enum": ["same", "new", "changed", "rejected"] },
+    "record_id": { "type": ["string", "null"] },
+    "stage": { "enum": ["receipt", "bid", "contract", null] },
+    "changed": { "type": "array", "items": { "type": "string" } },
+    "unknown_keys": { "type": "integer", "minimum": 0 },
+    "reason": { "type": "string" }
+  },
+  "if": { "properties": { "status": { "const": "rejected" } }, "required": ["status"] },
+  "then": { "required": ["reason"] }
+}

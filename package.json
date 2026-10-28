@@ -1,0 +1,13 @@
+{
+  "name": "helper",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify": "tsc --noEmit && vitest run"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
