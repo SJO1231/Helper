@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "records-page",
+  "type": "object",
+  "required": ["records", "total"],
+  "properties": {
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "fields"],
+        "properties": { "id": { "type": ["string", "integer"] }, "fields": { "type": "object" } }
+      }
+    },
+    "total": { "type": "integer", "minimum": 0 }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dict-screen",
+  "type": "object",
+  "required": [
+    "site", "menu_no", "scrn_no", "menu_cang_val", "name", "stage", "source_route", "key_fields", "link", "options"
+  ],
+  "properties": {
+    "site": { "type": "string" },
+    "menu_no": { "type": "string" },
+    "scrn_no": { "type": "string" },
+    "menu_cang_val": { "type": "string" },
+    "name": { "type": "string" },
+    "stage": { "enum": ["receipt", "bid", "contract", null] },
+    "source_route": { "type": "string" },
+    "key_fields": { "type": "array", "items": { "type": "string" }, "maxItems": 2 }
+  },
+  "if": { "properties": { "stage": { "type": "string" } }, "required": ["stage"] },
+  "then": { "properties": { "key_fields": { "minItems": 1 } } }
+}

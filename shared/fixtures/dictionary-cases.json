@@ -1,0 +1,46 @@
+{
+  "aliases": [
+    { "site": "g2b", "screen_code": "S1", "source_key": "dmX.keyA", "std_key": "stdFromScreen" },
+    { "site": "g2b", "screen_code": null, "source_key": "dmX.keyA", "std_key": "stdFromGlobal" },
+    { "site": "g2b", "screen_code": "", "source_key": "dmW.keyC", "std_key": "stdFromEmpty" },
+    { "site": "g2b", "screen_code": "S1", "source_key": "keyD", "std_key": "keyB" },
+    { "site": "g2b", "screen_code": null, "source_key": "param.keyE", "std_key": "keyB" }
+  ],
+  "stdKeys": ["keyB", "keyD", "stdFromScreen", "stdFromGlobal", "stdFromEmpty"],
+  "labels": [
+    { "scope": "system", "scope_id": "", "key": "keyB", "label": "sys-B" },
+    { "scope": "site", "scope_id": "g2b", "key": "keyB", "label": "site-B" },
+    { "scope": "screen", "scope_id": "S1", "key": "keyB", "label": "screen-B" },
+    { "scope": "user", "scope_id": "", "key": "keyB", "label": "user-B" },
+    { "scope": "system", "scope_id": "", "key": "keyF", "label": "sys-F" },
+    { "scope": "site", "scope_id": "g2b", "key": "keyF", "label": "site-F" },
+    { "scope": "screen", "scope_id": "S1", "key": "keyF", "label": "screen-F" },
+    { "scope": "system", "scope_id": "", "key": "keyG", "label": "sys-G" },
+    { "scope": "site", "scope_id": "g2b", "key": "keyG", "label": "site-G" },
+    { "scope": "system", "scope_id": "", "key": "keyH", "label": "sys-H" },
+    { "scope": "site", "scope_id": "other", "key": "keyH", "label": "other-site-H" },
+    { "scope": "system", "scope_id": "", "key": "keyJ", "label": "sys-J" },
+    { "scope": "user", "scope_id": "", "key": "keyJ", "label": "" }
+  ],
+  "stdKeyCases": [
+    { "k": "dmX.keyA", "screen": "S1", "expect": "stdFromScreen" },
+    { "k": "dmX.keyA", "screen": "S2", "expect": "stdFromGlobal" },
+    { "k": "dmW.keyC", "screen": "S9", "expect": "stdFromEmpty" },
+    { "k": "keyB", "screen": "S1", "expect": "keyB" },
+    { "k": "dmY.keyB", "screen": "S1", "expect": "keyB" },
+    { "k": "param.keyB", "screen": "S1", "expect": "keyB" },
+    { "k": "keyD", "screen": "S1", "expect": "keyB" },
+    { "k": "keyD", "screen": "S2", "expect": "keyD" },
+    { "k": "param.keyE", "screen": "S2", "expect": "keyB" },
+    { "k": "dmZ.nothing", "screen": "S1", "expect": null }
+  ],
+  "labelCases": [
+    { "key": "keyB", "screen": "S1", "screenL": "LS", "expect": "user-B" },
+    { "key": "keyF", "screen": "S1", "screenL": "LS", "expect": "screen-F" },
+    { "key": "keyF", "screen": "S2", "screenL": "LS", "expect": "site-F" },
+    { "key": "keyG", "screen": "S1", "screenL": "LS", "expect": "site-G" },
+    { "key": "keyH", "screen": "S1", "screenL": "LS", "expect": "sys-H" },
+    { "key": "keyJ", "screen": "S1", "screenL": "LS", "expect": "sys-J" },
+    { "key": "keyI", "screen": "S1", "screenL": "LS", "expect": "LS" }
+  ]
+}

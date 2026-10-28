@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capture-request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["site", "menu_no", "scrn_no", "url", "mode", "raw"],
+  "properties": {
+    "site": { "const": "g2b" },
+    "menu_no": { "type": "string" },
+    "scrn_no": { "type": "string" },
+    "url": { "type": "string" },
+    "mode": { "enum": ["visible", "hidden", "all"] },
+    "raw": {
+      "type": "object",
+      "required": ["state", "param", "pointInfo", "tables"],
+      "properties": {
+        "state": { "type": "object", "additionalProperties": { "type": "string" } },
+        "param": { "type": "object", "additionalProperties": { "type": "string" } },
+        "pointInfo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["k", "v", "l", "visible"],
+            "properties": {
+              "k": { "type": "string" },
+              "v": { "type": "string" },
+              "l": { "type": "string" },
+              "visible": { "type": "boolean" }
+            }
+          }
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "dataList", "visible", "columns", "rows"],
+            "properties": {
+              "id": { "type": "string" },
+              "dataList": { "type": "string" },
+              "visible": { "type": "boolean" },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["k", "l"],
+                  "properties": { "k": { "type": "string" }, "l": { "type": "string" } }
+                }
+              },
+              "rows": { "type": "array", "items": { "type": "object", "additionalProperties": { "type": "string" } } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

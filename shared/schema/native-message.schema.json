@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "native-message",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": { "type": { "const": "hello" } }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["port", "token", "schema_version"],
+      "properties": {
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "token": { "type": "string", "minLength": 1 },
+        "schema_version": { "type": "integer" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "method", "path", "headers", "body"],
+      "properties": {
+        "type": { "const": "request" },
+        "method": { "enum": ["GET", "POST", "PATCH", "PUT"] },
+        "path": { "type": "string" },
+        "headers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "body": {}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "body"],
+      "properties": { "status": { "type": "integer" }, "body": {} }
+    }
+  ]
+}
