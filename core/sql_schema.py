@@ -11,6 +11,9 @@ DICT_TABLES = ("dict_key", "dict_alias", "dict_label", "dict_code", "dict_screen
                "dict_relation", "user_column")
 WRITABLE_DICT = DICT_TABLES[:6]
 PUBLIC_SKIP = ("request_log", "schema_version", "settings_shared", "settings_personal")
+# 뷰어에 내는 수집 이력 열. raw(JSON 전문)는 일부러 뺀다
+CAPTURE_COLUMNS = (("capture_id", "수집번호"), ("record_id", "업무키"), ("screen_code", "화면"),
+                   ("url", "주소"), ("captured_at", "수집시각"), ("raw_hash", "해시"))
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 TABLE_NAME = re.compile(r"^g2b_(receipt|bid|contract)(?:_([A-Za-z0-9]+))?$")
 

@@ -4,11 +4,14 @@ from core.dict_codec import decode_row
 from core.dictionary import label_index, resolve_label
 from core.errors import BadRequest, NotFound
 from core.sql_query import order_by, where_clause
-from core.sql_schema import PUBLIC_SKIP, SITE, key_stage_name, parse_table, quote_ident
+from core.sql_schema import CAPTURE_COLUMNS, PUBLIC_SKIP, SITE, key_stage_name, parse_table, quote_ident
 
 DEFAULT_LIMIT = 500
 MAX_LIMIT = 5000
 ID_COLUMNS = {"main": "record_id", "capture": "capture_id"}
+KIND_LABELS = {"capture": "수집 이력"}
+# 수집 이력은 최근 것부터 읽는다. 다른 테이블은 정렬을 안 주면 넣은 순서(rowid)다
+DEFAULT_SORTS = {"capture": "-captured_at,-capture_id"}
 
 
 def list_tables(db):
@@ -16,7 +19,8 @@ def list_tables(db):
     for row in db.rows("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"):
         kind, stage, _ = parse_table(row["name"])
         if kind and row["name"] not in PUBLIC_SKIP:
-            out.append({"id": row["name"], "fields": {"label": row["name"], "stage": stage, "kind": kind}})
+            label = KIND_LABELS.get(kind, row["name"])
+            out.append({"id": row["name"], "fields": {"label": label, "stage": stage, "kind": kind}})
     return out
 
 
@@ -35,6 +39,9 @@ def list_columns(db, table):
             "label": resolve_label(index, key["std_key"], None, SITE, key["label"] or key["std_key"]),
             "type": key["type"], "index": bool(key["index"])}}
             for key in dict_read.column_keys(db, key_stage_name(stage, alias))]
+    if kind == "capture":
+        return [{"id": name, "fields": {"label": label, "type": "text", "index": False}}
+                for name, label in CAPTURE_COLUMNS]
     return [{"id": name, "fields": {"label": name, "type": "text", "index": False}}
             for name in db.table_columns(table)]
 
@@ -51,7 +58,9 @@ def list_records(db, table, sort=None, filters=None, limit=DEFAULT_LIMIT, offset
     where, params = where_clause(filters, columns, hide_deleted=kind == "main")
     name = quote_ident(table)
     total = db.rows(f"SELECT COUNT(*) AS n FROM {name}{where}", params)[0]["n"]
-    sql = f"SELECT rowid AS _id, * FROM {name}{where} ORDER BY {order_by(sort, types, columns)} LIMIT ? OFFSET ?"
+    shown = "*" if kind != "capture" else ", ".join(quote_ident(column) for column, _ in CAPTURE_COLUMNS)
+    order = order_by(sort or DEFAULT_SORTS.get(kind), types, columns)
+    sql = f"SELECT rowid AS _id, {shown} FROM {name}{where} ORDER BY {order} LIMIT ? OFFSET ?"
     id_column = ID_COLUMNS.get(kind, "_id")
     records = []
     for row in db.rows(sql, (*params, limit, offset)):
