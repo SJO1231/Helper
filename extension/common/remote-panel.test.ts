@@ -16,9 +16,13 @@ function memoryStore(initial?: Partial<PanelState>) {
   return { store, saved };
 }
 
-async function mount(initial?: Partial<PanelState>) {
+async function mount(initial?: Partial<PanelState>, slowLoad = false) {
   const win = new Window({ url: 'https://example.invalid/', width: 1000, height: 700 }) as any;
   const { store, saved } = memoryStore(initial);
+  let finishLoad: () => void = () => undefined;
+  if (slowLoad) {
+    store.load = () => new Promise((resolve) => (finishLoad = () => resolve(initial)));
+  }
   const send = async () => ({ ok: true, data: null }) as any;
   const remote = createRemote({ doc: win.document, send, panelStore: store });
   const q = (selector: string) => remote.root.querySelector(selector) as any;
@@ -31,7 +35,7 @@ async function mount(initial?: Partial<PanelState>) {
   await settle();
   const fire = (target: any, type: string, x: number, y: number) =>
     target.dispatchEvent(new win.MouseEvent(type, { bubbles: true, composed: true, clientX: x, clientY: y }));
-  return { win, remote, q, saved, fire };
+  return { win, remote, q, saved, fire, finishLoad: () => finishLoad() };
 }
 
 describe('clampPosition', () => {
@@ -111,6 +115,41 @@ describe('remote panel motion', () => {
   test('a saved position is clamped to the current screen', async () => {
     const t = await mount({ left: 9000, top: 9000, collapsed: false });
     expect(t.q('.bar').style.left).toBe('740px');
+  });
+  test('pointercancel ends the drag and saves the position', async () => {
+    const t = await mount();
+    t.fire(t.q('.title'), 'pointerdown', 10, 10);
+    t.fire(t.win.document, 'pointermove', 110, 60);
+    t.fire(t.win.document, 'pointercancel', 110, 60);
+    t.fire(t.win.document, 'pointermove', 400, 400);
+    expect(t.q('.bar').style.left).toBe('100px');
+    expect(t.saved.at(-1)).toEqual({ left: 100, top: 50, collapsed: false });
+  });
+  test('the drag captures the pointer when the browser supports it', async () => {
+    const t = await mount();
+    const captured: number[] = [];
+    t.q('.title').setPointerCapture = (id: number) => captured.push(id);
+    const down = new t.win.MouseEvent('pointerdown', { bubbles: true, composed: true, clientX: 10, clientY: 10 });
+    Object.defineProperty(down, 'pointerId', { value: 7 });
+    t.q('.title').dispatchEvent(down);
+    expect(captured).toEqual([7]);
+  });
+  test('a saved position that loads after the user started dragging is ignored', async () => {
+    const t = await mount({ left: 500, top: 300, collapsed: true }, true);
+    t.fire(t.q('.title'), 'pointerdown', 10, 10);
+    t.fire(t.win.document, 'pointermove', 110, 60);
+    t.fire(t.win.document, 'pointerup', 110, 60);
+    t.finishLoad();
+    await settle();
+    expect(t.q('.bar').style.left).toBe('100px');
+    expect(t.q('.bar').hidden).toBe(false);
+  });
+  test('resizing the window clamps the panel back inside', async () => {
+    const t = await mount({ left: 700, top: 50, collapsed: false });
+    expect(t.q('.bar').style.left).toBe('700px');
+    t.win.innerWidth = 600;
+    t.win.dispatchEvent(new t.win.Event('resize'));
+    expect(t.q('.bar').style.left).toBe('340px');
   });
   test('garbage in storage is ignored', async () => {
     const t = await mount({ left: 'x' as any, collapsed: 'yes' as any });

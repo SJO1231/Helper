@@ -97,6 +97,13 @@ export function buildColumnDefs(
   }));
 }
 
+export interface ColumnChangeEvent { source: string; finished?: boolean }
+
+// 코드가 낸 변화는 저장하지 않는다. 열 정의 교체(타입 적용)는 'gridOptionsChanged'로 오고 기본값을 싣고 있다.
+export function shouldSaveColumnChange(event: ColumnChangeEvent): boolean {
+  return event.source !== 'api' && event.source !== 'gridOptionsChanged' && event.finished !== false;
+}
+
 export function mountGrid(
   element: HTMLElement,
   columns: ColumnInfo[],
@@ -107,8 +114,8 @@ export function mountGrid(
   const types: Record<string, KeyType> = Object.fromEntries(columns.map((c) => [c.id, c.fields.type]));
   let memory: ReturnType<typeof createColumnMemory> | undefined;
   // 코드(api)가 바꾼 변화는 저장하지 않는다. 복원·초기화가 다시 저장을 부르는 것을 막는다.
-  const remember = (event: { source: string; finished?: boolean }) => {
-    if (event.source !== 'api' && event.finished !== false) memory?.save();
+  const remember = (event: ColumnChangeEvent) => {
+    if (shouldSaveColumnChange(event)) memory?.save();
   };
   const api = createGrid(element, {
     columnDefs: buildColumnDefs(columns, types, extras.codeMeanings),
