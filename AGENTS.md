@@ -28,6 +28,6 @@
 - 명령: `npm run verify`(tsc, vitest, 빌드), `pytest core/tests`. CI도 같은 명령을 돈다.
 
 ## 기록 규칙
-- SPEC.md는 현재 상태만, 200줄 이하. 바뀌면 본문을 고치고 DECISIONS.md에 날짜·결정·이유 한 줄.
+- SPEC.md는 현재 상태만, 200줄 이하. 바뀌면 본문을 고치고 DECISIONS.md에 날짜·결정·이유 한 줄. 2단계 끝 기준은 docs/SPEC2.md.
 - 기능을 빼는 결정도 넣는 결정과 같이 적는다.
 - 세션 끝에 "상태·남은 일·막힌 것" 3줄을 남긴다.
