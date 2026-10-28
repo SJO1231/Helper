@@ -55,6 +55,43 @@ export function shiftYear(win: Window, delta: -1 | 1): ActionResult & { year?: n
   return { ok: true, year };
 }
 
+const SEARCH_LABELS = ['조회', '검색'];
+const CLICKABLE = 'a,button,input[type="button"],span,div';
+
+function visibleBodyElements(win: Window, selector: string): Element[] {
+  return Array.from(win.document.querySelectorAll(selector)).filter(
+    (el) => inBody(el, win.document) && isVisible(el),
+  );
+}
+
+function findSearchButton(win: Window): Element | null {
+  const labeled = visibleBodyElements(win, CLICKABLE).find((el) => {
+    // 글자를 감싼 큰 div(본문 자신 포함)가 먼저 걸리지 않도록 span·div는 끝 요소만 본다.
+    const isBox = el.tagName === 'SPAN' || el.tagName === 'DIV';
+    if (isBox && el.children.length > 0) return false;
+    const text = (el as HTMLElement).innerText ?? el.textContent ?? '';
+    return SEARCH_LABELS.includes((text || (el as HTMLInputElement).value || '').trim());
+  });
+  if (!labeled) return null;
+  // 글자만 든 span·div는 감싼 a·button이 실제 누르는 대상이다(v4.2 방식).
+  const isPlainBox = labeled.tagName === 'SPAN' || labeled.tagName === 'DIV';
+  return (isPlainBox && (labeled.closest('a') ?? labeled.closest('button'))) || labeled;
+}
+
+// 조회 버튼을 찾아 누른다. 없으면 보이는 첫 입력 칸에 Enter를 보낸다(v4.2 doSearch).
+export function clickSearch(win: Window): ActionResult {
+  const button = findSearchButton(win);
+  if (button) {
+    (button as HTMLElement).click();
+    return { ok: true };
+  }
+  const input = visibleBodyElements(win, 'input')[0];
+  if (!input) return { ok: false, reason: '보이는 조회 버튼이나 입력 칸을 찾지 못함' };
+  const KeyEvent = (win as any).KeyboardEvent as typeof KeyboardEvent;
+  input.dispatchEvent(new KeyEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', keyCode: 13 }));
+  return { ok: true };
+}
+
 const isNumericSelect = (el: Element): boolean => {
   const options = Array.from((el as HTMLSelectElement).options);
   return options.length > 0 && options.every((o) => /^\d+$/.test(o.value));

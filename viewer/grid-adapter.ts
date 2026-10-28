@@ -5,6 +5,7 @@ import {
   ModuleRegistry,
   TextFilterModule,
   createGrid,
+  themeQuartz,
   type ColDef,
   type IDatasource,
   type IGetRowsParams,
@@ -90,6 +91,7 @@ export function mountGrid(
   const types: Record<string, KeyType> = Object.fromEntries(columns.map((c) => [c.id, c.fields.type]));
   const api = createGrid(element, {
     columnDefs: buildColumnDefs(columns, types),
+    theme: themeQuartz,
     rowHeight: ROW_HEIGHT,
     rowModelType: 'infinite',
     cacheBlockSize: PAGE_SIZE,

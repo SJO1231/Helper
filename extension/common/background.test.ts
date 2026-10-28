@@ -235,8 +235,11 @@ describe('other messages', () => {
   test('remote actions run in the page of the sender tab', async () => {
     const t = setup();
     await t.handlers.handle({ kind: 'shift-year', delta: -1 }, TAB);
+    await t.handlers.handle({ kind: 'click-search' }, TAB);
     await t.handlers.handle({ kind: 'row-count', n: 250 }, TAB);
-    expect(t.pageCalls).toEqual([[7, 'shiftYear', [-1]], [7, 'applyRowCount', [250]]]);
+    expect(t.pageCalls).toEqual([
+      [7, 'shiftYear', [-1]], [7, 'clickSearch', []], [7, 'applyRowCount', [250]],
+    ]);
   });
   test('open-viewer opens the viewer page without calling the core', async () => {
     const t = setup();

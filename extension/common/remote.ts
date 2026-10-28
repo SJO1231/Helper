@@ -21,18 +21,32 @@ const EMPTY_DIAG: Diagnostics = {
 
 const STYLE = `
 :host { all: initial; }
-.bar { position: fixed; top: 80px; right: 12px; z-index: 2147483647; width: 230px; padding: 8px;
-  font: 12px/1.4 sans-serif; color: #1a1a1a; background: #fff; border: 1px solid #888; border-radius: 6px; }
-.bar > * { margin: 2px 0; }
-.row { display: flex; gap: 4px; align-items: center; }
+.bar { position: fixed; top: 80px; right: 12px; z-index: 2147483647; width: 260px; box-sizing: border-box;
+  padding: 10px 12px 12px; font: 12px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933;
+  background: #fff; border: 1px solid #e3e7ec; border-radius: 10px; box-shadow: 0 6px 20px rgba(15, 23, 42, .12); }
+.bar > * { margin: 0 0 8px; }
+.bar > :last-child { margin-bottom: 0; }
+.title { padding-bottom: 6px; border-bottom: 1px solid #eef0f3; font-size: 13px; font-weight: 600; }
+.row { display: flex; gap: 6px; align-items: center; }
 .row > * { flex: 1; min-width: 0; }
-[data-role="diagnostics"] { color: #444; word-break: keep-all; }
-[data-role="toast"] { color: #0a5; font-weight: bold; }
+button, select, input { box-sizing: border-box; height: 28px; padding: 0 8px; font: inherit; color: inherit;
+  background: #fff; border: 1px solid #cfd6de; border-radius: 6px; }
+button { cursor: pointer; }
+button:hover:not(:disabled) { background: #f3f5f8; }
+button:disabled { color: #9aa5b1; cursor: default; }
+button[data-action="search"], button[data-action="collect"] { color: #fff; background: #2f6fed; border-color: #2f6fed; }
+button[data-action="search"]:hover:not(:disabled), button[data-action="collect"]:hover:not(:disabled) {
+  background: #2760d4; }
+button[data-action="collect"]:disabled { color: #fff; background: #a9bff0; border-color: #a9bff0; }
+[data-role="diagnostics"] { font-size: 11px; color: #7b8794; word-break: keep-all; }
+[data-role="toast"] { color: #0a7a4b; font-weight: 600; }
+[data-role="toast"]:empty { display: none; }
 [data-role="snapshot"] { position: fixed; inset: 5%; z-index: 2147483647; overflow: auto; padding: 12px;
-  font: 12px/1.4 sans-serif; color: #1a1a1a; background: #fff; border: 2px solid #555; }
+  font: 12px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933; background: #fff;
+  border: 1px solid #e3e7ec; border-radius: 10px; box-shadow: 0 10px 32px rgba(15, 23, 42, .2); }
 table { border-collapse: collapse; margin-bottom: 12px; }
-th, td { border: 1px solid #ccc; padding: 2px 6px; text-align: left; white-space: nowrap; }
-th { background: #eee; position: sticky; top: 0; }
+th, td { border: 1px solid #dde2e8; padding: 2px 6px; text-align: left; white-space: nowrap; }
+th { background: #f3f5f8; position: sticky; top: 0; }
 `;
 
 export function createRemote(deps: RemoteDeps) {
@@ -86,12 +100,11 @@ export function createRemote(deps: RemoteDeps) {
     return line;
   };
   bar.append(
-    row(collectButton, snapshotButton),
+    el('div', { class: 'title' }, 'Helper'),
+    row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회')),
+    row(rowSelect, rowInput, button('row-count-apply', '적용')),
     modeSelect,
-    row(button('year-minus', '−1년'), button('year-plus', '+1년')),
-    rowSelect,
-    row(rowInput, button('row-count-apply', '적용')),
-    button('open-viewer', '뷰어'),
+    row(collectButton, snapshotButton, button('open-viewer', '뷰어')),
     toast,
     diagnostics,
   );
@@ -196,6 +209,12 @@ export function createRemote(deps: RemoteDeps) {
     const { ok, year, reason } = reply.data as { ok: boolean; year?: number; reason?: string };
     say(ok ? `${year}년 1월 1일 ~ 12월 31일` : (reason ?? '기간을 바꾸지 못함'));
   }
+  async function search(): Promise<void> {
+    const reply = await send({ kind: 'click-search' });
+    if (!reply.ok) return noteFailure(reply);
+    const { ok, reason } = reply.data as { ok: boolean; reason?: string };
+    say(ok ? '조회를 눌렀음' : (reason ?? '조회를 누르지 못함'));
+  }
   async function applyRowCount(n: number): Promise<void> {
     const reply = await send({ kind: 'row-count', n });
     if (!reply.ok) return noteFailure(reply);
@@ -209,6 +228,7 @@ export function createRemote(deps: RemoteDeps) {
   });
   root.querySelector('[data-action="year-minus"]')!.addEventListener('click', () => void shiftYear(-1));
   root.querySelector('[data-action="year-plus"]')!.addEventListener('click', () => void shiftYear(1));
+  root.querySelector('[data-action="search"]')!.addEventListener('click', () => void search());
   rowSelect.addEventListener('change', () => void applyRowCount(Number(rowSelect.value)));
   root.querySelector('[data-action="row-count-apply"]')!.addEventListener('click', () => {
     void applyRowCount(Number(rowInput.value));
