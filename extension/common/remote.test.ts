@@ -93,7 +93,7 @@ describe('remote controls', () => {
   });
   test('viewer button asks the background to open the viewer', async () => {
     const t = mount(routing(null));
-    expect(t.q('[data-action="open-viewer"]').textContent).toBe('뷰어');
+    expect(t.q('[data-action="open-viewer"]').textContent).toBe('뷰어 열기');
     t.q('[data-action="open-viewer"]').click();
     await settle();
     expect(t.sent.map((m) => m.kind)).toEqual(['open-viewer']);

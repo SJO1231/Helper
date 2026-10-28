@@ -5,6 +5,7 @@ import type { CaptureReply, Reply } from './background';
 import { formatCaptureResult, formatDiagnostics, formatFailure } from './diagnostics';
 import { attachPanelMotion, chromePanelStore } from './remote-panel';
 import type { PanelStore } from './remote-panel';
+import { STYLE } from './remote-style';
 import { renderSnapshot } from './snapshot-view';
 import type { SnapshotData } from './snapshot-view';
 
@@ -21,43 +22,6 @@ const EMPTY_DIAG: Diagnostics = {
   forms: 0, grids: 0, droppedEmptyRef: 0, droppedSameDataList: 0, failedGrids: 0,
   droppedParam: 0, unknownKeys: 0, core: 'ok',
 };
-
-const STYLE = `
-:host { all: initial; }
-.bar { position: fixed; top: 80px; right: 12px; z-index: 2147483647; width: 260px; box-sizing: border-box;
-  padding: 10px 12px 12px; font: 12px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933;
-  background: #fff; border: 1px solid #e3e7ec; border-radius: 10px; box-shadow: 0 6px 20px rgba(15, 23, 42, .12); }
-.bar > * { margin: 0 0 8px; }
-.bar > :last-child { margin-bottom: 0; }
-[hidden] { display: none !important; }
-.title { display: flex; align-items: center; justify-content: space-between; cursor: move; touch-action: none;
-  user-select: none; padding-bottom: 6px; border-bottom: 1px solid #eef0f3; font-size: 13px; font-weight: 600; }
-.row { display: flex; gap: 6px; align-items: center; }
-.row > * { flex: 1; min-width: 0; }
-button, select, input { box-sizing: border-box; height: 28px; padding: 0 8px; font: inherit; color: inherit;
-  background: #fff; border: 1px solid #cfd6de; border-radius: 6px; }
-button { cursor: pointer; }
-.title button { width: 28px; flex: none; padding: 0; cursor: pointer; }
-.bubble { position: fixed; top: 80px; right: 12px; z-index: 2147483646; width: 46px; height: 46px; padding: 0;
-  border-radius: 50%; color: #fff; font-weight: 700; font-size: 11px; background: #2f6fed; border: 0;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, .25); cursor: move; touch-action: none; user-select: none; }
-.bubble:hover:not(:disabled) { background: #2760d4; }
-button:hover:not(:disabled) { background: #f3f5f8; }
-button:disabled { color: #9aa5b1; cursor: default; }
-button[data-action="search"], button[data-action="collect"] { color: #fff; background: #2f6fed; border-color: #2f6fed; }
-button[data-action="search"]:hover:not(:disabled), button[data-action="collect"]:hover:not(:disabled) {
-  background: #2760d4; }
-button[data-action="collect"]:disabled { color: #fff; background: #a9bff0; border-color: #a9bff0; }
-[data-role="diagnostics"] { font-size: 11px; color: #7b8794; word-break: keep-all; }
-[data-role="toast"] { color: #0a7a4b; font-weight: 600; }
-[data-role="toast"]:empty { display: none; }
-[data-role="snapshot"] { position: fixed; inset: 5%; z-index: 2147483647; overflow: auto; padding: 12px;
-  font: 12px/1.4 "Malgun Gothic", system-ui, sans-serif; color: #1f2933; background: #fff;
-  border: 1px solid #e3e7ec; border-radius: 10px; box-shadow: 0 10px 32px rgba(15, 23, 42, .2); }
-table { border-collapse: collapse; margin-bottom: 12px; }
-th, td { border: 1px solid #dde2e8; padding: 2px 6px; text-align: left; white-space: nowrap; }
-th { background: #f3f5f8; position: sticky; top: 0; }
-`;
 
 export function createRemote(deps: RemoteDeps) {
   const { doc, send, panelStore } = deps;
@@ -79,7 +43,7 @@ export function createRemote(deps: RemoteDeps) {
   const Observer = doc.defaultView!.MutationObserver;
   let motion: ReturnType<typeof attachPanelMotion> | undefined;
   new Observer(() => {
-    if (host.isConnected || !doc.body) return;
+    if (host.isConnected || !doc.body || motion?.isClosed()) return;
     doc.body.appendChild(host);
     motion?.reapply();
   }).observe(doc.documentElement, { childList: true, subtree: true });
@@ -115,25 +79,41 @@ export function createRemote(deps: RemoteDeps) {
   const title = el('div', { class: 'title' });
   const collapseButton = button('collapse', '—');
   collapseButton.title = '접기';
-  title.append(el('span', {}, 'Helper'), collapseButton);
+  const closeButton = button('close', '×');
+  closeButton.title = '종료';
+  const actions = el('div', { class: 'actions' });
+  actions.append(collapseButton, closeButton);
+  title.append(el('span', {}, 'Helper'), actions);
   const bubble = el('button', { class: 'bubble', type: 'button', title: '펼치기' }, 'G2B');
-  bar.append(
-    title,
-    row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회'),
-      button('excel', '엑셀')),
-    row(rowSelect, rowInput, button('row-count-apply', '적용')),
-    modeSelect,
-    row(collectButton, snapshotButton, button('open-viewer', '뷰어')),
-    toast,
-    diagnostics,
-  );
+  const coreStatus = el('div', { 'data-role': 'core-status' });
+  const TABS: [string, string][] = [['work', '업무'], ['collect', '수집'], ['viewer', '뷰어']];
+  const tabButtons = TABS.map(([name, text]) => el('button', { 'data-tab': name, role: 'tab', type: 'button' }, text));
+  const tabBar = el('div', { class: 'tabs', role: 'tablist' });
+  tabBar.append(...tabButtons);
+  const pane = (name: string, ...children: HTMLElement[]) => {
+    const node = el('div', { class: 'pane', 'data-pane': name });
+    node.append(...children);
+    return node;
+  };
+  const panes = [
+    pane('work',
+      row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회'), button('excel', '엑셀')),
+      row(rowSelect, rowInput, button('row-count-apply', '적용'))),
+    pane('collect', modeSelect, row(collectButton, snapshotButton)),
+    pane('viewer', button('open-viewer', '뷰어 열기'), coreStatus),
+  ];
+  bar.append(title, tabBar, ...panes, toast, diagnostics);
   root.append(el('style', {}, STYLE), bar, bubble);
-  motion = attachPanelMotion({ doc, bar, bubble, handle: title, collapseButton, store: panelStore });
+  motion = attachPanelMotion({
+    doc, bar, bubble, handle: title, collapseButton, closeButton, host,
+    tabs: { buttons: tabButtons, panes }, store: panelStore,
+  });
 
   function render(): void {
     const stageMissing = state.screenKnown && !state.screen?.stage;
     collectButton.disabled = state.busy || state.menuNo === null || stageMissing;
     snapshotButton.disabled = state.busy;
+    coreStatus.textContent = !state.diag ? '코어 상태 미확인' : state.diag.core === 'ok' ? '코어 연결' : '코어 꺼짐';
     if (state.diag) {
       diagnostics.textContent = formatDiagnostics(state.diag, {
         registeredScreens: state.registeredScreens,

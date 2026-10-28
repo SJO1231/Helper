@@ -1,5 +1,5 @@
 /// <reference types="chrome" />
-export interface PanelState { left?: number; top?: number; collapsed: boolean }
+export interface PanelState { left?: number; top?: number; collapsed: boolean; tab?: string }
 export interface PanelStore {
   load: () => Promise<Partial<PanelState> | undefined>;
   save: (state: PanelState) => void;
@@ -38,19 +38,36 @@ interface Parts {
   bubble: HTMLElement;
   handle: HTMLElement;
   collapseButton: HTMLElement;
+  closeButton: HTMLElement;
+  host: HTMLElement;
+  // 탭 버튼과 칸은 data-tab·data-pane 이름이 짝이다. 첫 탭이 기본이다.
+  tabs: { buttons: HTMLElement[]; panes: HTMLElement[] };
   store?: PanelStore;
 }
 
 export function attachPanelMotion(parts: Parts) {
-  const { doc, bar, bubble, handle, collapseButton, store } = parts;
+  const { doc, bar, bubble, handle, collapseButton, closeButton, host, tabs, store } = parts;
   const view = () => ({ width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
   const state: PanelState = { collapsed: false };
   let dragMoved = false;
   let userActed = false;
+  let closed = false;
+  const tabNames = tabs.buttons.map((button) => button.dataset.tab!);
 
   const shown = () => (state.collapsed ? bubble : bar);
 
+  function showTab(): void {
+    const active = state.tab ?? tabNames[0];
+    for (const button of tabs.buttons) {
+      const on = button.dataset.tab === active;
+      button.setAttribute('aria-selected', String(on));
+      button.classList.toggle('active', on);
+    }
+    for (const pane of tabs.panes) pane.hidden = pane.dataset.pane !== active;
+  }
+
   function apply(): void {
+    showTab();
     bar.hidden = state.collapsed;
     bubble.hidden = !state.collapsed;
     if (state.left === undefined || state.top === undefined) return;
@@ -117,10 +134,25 @@ export function attachPanelMotion(parts: Parts) {
     dragMoved = false;
   });
 
+  for (const button of tabs.buttons) {
+    button.addEventListener('click', () => {
+      userActed = true;
+      state.tab = button.dataset.tab;
+      apply();
+      save();
+    });
+  }
+  // 종료는 저장된 위치·접힘을 건드리지 않고 이 페이지가 살아 있는 동안만 떼어 둔다.
+  closeButton.addEventListener('click', () => {
+    closed = true;
+    host.remove();
+  });
+
   void store?.load().then((saved) => {
     // 불러오는 사이 사용자가 만졌으면 사용자의 것이 우선이다.
     if (!saved || userActed) return;
     if (typeof saved.collapsed === 'boolean') state.collapsed = saved.collapsed;
+    if (typeof saved.tab === 'string' && tabNames.includes(saved.tab)) state.tab = saved.tab;
     if (isNumber(saved.left) && isNumber(saved.top)) {
       state.left = saved.left;
       state.top = saved.top;
@@ -130,5 +162,5 @@ export function attachPanelMotion(parts: Parts) {
 
   doc.defaultView?.addEventListener('resize', apply);
   apply();
-  return { reapply: apply };
+  return { reapply: apply, isClosed: () => closed };
 }
