@@ -22,8 +22,10 @@ function filterFor(mode: ExtractMode, doc: Document): ElementFilter {
 }
 
 export async function collectScreen(win: Window, mode: ExtractMode): Promise<CollectedScreen> {
+  // 기다리는 동안 다른 메뉴로 가면 사용자가 누른 화면이 아니라 새 화면을 읽게 되므로, 기다리기 전의 화면을 기억한다.
+  const clicked = readScreenState(win);
   await waitUntilLoaded(win);
-  const before = readScreenState(win);
+  const before = clicked ?? readScreenState(win);
   if (!before) throw new Error('no-screen');
 
   const fieldsPerFrame: PointField[][] = [];

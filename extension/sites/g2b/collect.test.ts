@@ -69,7 +69,9 @@ describe('collectScreen determinism', () => {
 describe('collectScreen frames', () => {
   const field = (win: any, id: string) => win[id].getValue();
   test('frames merge; on the same K the visible one wins', async () => {
-    const child = makeWindow({ forms: [{ id: 'c', ref: 'd.k', value: 'CHILD' }, { id: 'c2', ref: 'd.only', value: 'X' }] });
+    const child = makeWindow({
+      forms: [{ id: 'c', ref: 'd.k', value: 'CHILD' }, { id: 'c2', ref: 'd.only', value: 'X' }],
+    });
     const top = makeWindow({
       state: STATE,
       forms: [{ id: 't', ref: 'd.k', value: 'TOP', visible: false }],
@@ -149,6 +151,15 @@ describe('collectScreen guards', () => {
       return original();
     };
     await expect(collectScreen(win, 'visible')).rejects.toThrow('screen-changed');
+  });
+  test('a menu change while waiting for the process bar rejects with screen-changed', async () => {
+    vi.useFakeTimers();
+    const win = makeWindow({ state: STATE, processBarVisible: true, forms: [{ id: 'f', ref: 'd.f', value: 'V' }] });
+    const settled = expect(collectScreen(win, 'visible')).rejects.toThrow('screen-changed');
+    setState(win, { ...STATE, menuNo: 'M0002' });
+    (win.document.getElementById('__processbarIFrame') as any).getClientRects = () => [];
+    vi.advanceTimersByTime(400);
+    await settled;
   });
   test('raw carries state without param and param flattened', async () => {
     const withParam = { ...STATE, param: { k1: 'V', obj: { k2: 'V' }, deep: [1] } };

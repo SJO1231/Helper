@@ -54,9 +54,16 @@ function normalizeScreen(fields: Record<string, unknown>): DictScreen {
 }
 
 async function loadDictionary(core: CoreClient) {
-  const all = async (table: string) => (await core.getRecords(table, { limit: DICT_LIMIT })).records.map((r) => r.fields);
+  const all = async (table: string) => {
+    const page = await core.getRecords(table, { limit: DICT_LIMIT });
+    return page.records.map((r) => r.fields);
+  };
   const [aliases, keys, labels] = await Promise.all([all('dict_alias'), all('dict_key'), all('dict_label')]);
-  return makeDictionaryView(aliases as unknown as DictAlias[], keys as unknown as DictKey[], labels as unknown as DictLabel[]);
+  return makeDictionaryView(
+    aliases as unknown as DictAlias[],
+    keys as unknown as DictKey[],
+    labels as unknown as DictLabel[],
+  );
 }
 
 function allKeys(raw: RawCapture): string[] {
@@ -139,7 +146,10 @@ export function createHandlers(deps: BackgroundDeps) {
       const known = await core.getRecords('dict_screen', { filter: { site: [SITE], menu_no: [m.menuNo] }, limit: 1 });
       await core.putRecords(
         'dict_screen',
-        [{ require: { site: SITE, menu_no: m.menuNo }, fields: { scrn_no: m.scrnNo, menu_cang_val: m.menuCangVal, name: m.menuNm } }],
+        [{
+          require: { site: SITE, menu_no: m.menuNo },
+          fields: { scrn_no: m.scrnNo, menu_cang_val: m.menuCangVal, name: m.menuNm },
+        }],
         { noupdate: true },
       );
       return { ok: true as const, data: { registered: known.total === 0 } };

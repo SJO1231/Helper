@@ -93,13 +93,62 @@ describe('remote controls', () => {
   test('row count select and typed value both send row-count', async () => {
     const t = mount(routing('bid'));
     const select = t.q('[data-role="row-count"]');
-    expect(Array.from(select.options).map((o: any) => o.value)).toEqual(['10', '30', '50', '100', '250', '500', '1000']);
+    const values = Array.from(select.options).map((o: any) => o.value);
+    expect(values).toEqual(['10', '30', '50', '100', '250', '500', '1000']);
     select.value = '100';
     select.dispatchEvent(new t.win.Event('change'));
     t.q('[data-role="row-count-input"]').value = '75';
     t.q('[data-action="row-count-apply"]').click();
     await settle();
     expect(t.sent.map((m) => [m.kind, m.n])).toEqual([['row-count', 100], ['row-count', 75]]);
+  });
+});
+
+describe('screen lookup when the core was off', () => {
+  test('collect stays enabled after a failed lookup and asks again on click', async () => {
+    let coreUp = false;
+    const t = mount((m) => {
+      if (m.kind === 'screen-info') {
+        return coreUp ? { ok: true, data: screenRow('bid') } : { ok: false, code: 'offline', error: '코어 꺼짐' };
+      }
+      return routing('bid')(m);
+    });
+    await t.remote.handleScreenChange(change);
+    expect(t.q('[data-action="collect"]').disabled).toBe(false);
+    coreUp = true;
+    t.q('[data-action="collect"]').click();
+    await settle();
+    expect(t.sent.filter((m) => m.kind === 'collect')).toHaveLength(1);
+    expect(t.sent.filter((m) => m.kind === 'screen-info')).toHaveLength(2);
+  });
+  test('after a retry that finds no stage nothing is collected', async () => {
+    let up = false;
+    const t = mount((m) => {
+      if (m.kind !== 'screen-info') return routing('bid')(m);
+      return up ? { ok: true, data: screenRow(null) } : { ok: false, code: 'offline', error: 'x' };
+      return routing('bid')(m);
+    });
+    await t.remote.handleScreenChange(change);
+    up = true;
+    t.q('[data-action="collect"]').click();
+    await settle();
+    expect(t.sent.filter((m) => m.kind === 'collect')).toHaveLength(0);
+    expect(t.q('[data-action="collect"]').disabled).toBe(true);
+  });
+  test('a late lookup for an old screen does not overwrite the current one', async () => {
+    const pending: Record<string, (v: unknown) => void> = {};
+    const t = mount((m) => {
+      if (m.kind === 'screen-info') return new Promise((resolve) => void (pending[m.menuNo] = resolve));
+      return { ok: true, data: { registered: false } };
+    });
+    const first = t.remote.handleScreenChange({ ...change, menuNo: 'OLD' });
+    const second = t.remote.handleScreenChange({ ...change, menuNo: 'NEW' });
+    await settle();
+    pending.NEW({ ok: true, data: screenRow('bid') });
+    await second;
+    pending.OLD({ ok: true, data: screenRow(null) });
+    await first;
+    expect(t.q('[data-action="collect"]').disabled).toBe(false);
   });
 });
 
@@ -155,11 +204,15 @@ describe('diagnostics', () => {
     expect(formatDiagnostics(diag, { registeredScreens: 2, restored: 3 })).toMatch(/새로 등록한 화면 2.*되살림 3건/);
   });
   test('changed result reads 바뀐 칸 n개', () => {
-    const result = { status: 'changed', record_id: 'R', stage: 'bid', changed: ['a', 'b', 'c'], unknown_keys: 0 } as const;
+    const result = {
+      status: 'changed', record_id: 'R', stage: 'bid', changed: ['a', 'b', 'c'], unknown_keys: 0,
+    } as const;
     expect(formatCaptureResult({ ...result, changed: [...result.changed] })).toBe('바뀐 칸 3개');
   });
   test('rejected result carries its reason', () => {
-    const result = { status: 'rejected', record_id: null, stage: null, changed: [], unknown_keys: 0, reason: 'R1' } as const;
+    const result = {
+      status: 'rejected', record_id: null, stage: null, changed: [], unknown_keys: 0, reason: 'R1',
+    } as const;
     expect(formatCaptureResult({ ...result, changed: [] })).toContain('R1');
   });
 });
@@ -189,8 +242,8 @@ describe('collect results in the remote', () => {
   });
   test('offline core shows 코어 꺼짐', async () => {
     const t = mount((m) => {
-      if (m.kind === 'collect') return { ok: false, code: 'offline', error: '코어 꺼짐', diag: { ...diag, core: 'offline' } };
-      return routing('bid')(m);
+      if (m.kind !== 'collect') return routing('bid')(m);
+      return { ok: false, code: 'offline', error: '코어 꺼짐', diag: { ...diag, core: 'offline' } };
     });
     await t.remote.handleScreenChange(change);
     t.q('[data-action="collect"]').click();
@@ -198,7 +251,10 @@ describe('collect results in the remote', () => {
     expect(t.q('[data-role="diagnostics"]').textContent).toContain('코어 꺼짐');
   });
   test('a failed page read shows its reason, not a stale result', async () => {
-    const t = mount((m) => (m.kind === 'collect' ? { ok: false, code: 'loading', error: 'loading' } : routing('bid')(m)));
+    const t = mount((m) => {
+      if (m.kind !== 'collect') return routing('bid')(m);
+      return { ok: false, code: 'loading', error: 'loading' };
+    });
     await t.remote.handleScreenChange(change);
     t.q('[data-action="collect"]').click();
     await settle();

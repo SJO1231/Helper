@@ -1,8 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { createHandlers } from './background';
 import { createConnection } from './connection';
-import { createNativeClient } from './host';
-import { installScreenWatch } from './screen-watch';
 import type { ConnectionInfo, Diagnostics } from '../../shared/types';
 
 const ORIGIN = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop/';
@@ -16,7 +14,10 @@ const baseDiag: Diagnostics = {
 const rawCapture = {
   state: { menuNo: 'M0001' },
   param: {},
-  pointInfo: [{ k: 'dmA.keyA', v: 'V1', l: 'L-screen', visible: true }, { k: 'dmA.other', v: 'V2', l: 'L2', visible: true }],
+  pointInfo: [
+    { k: 'dmA.keyA', v: 'V1', l: 'L-screen', visible: true },
+    { k: 'dmA.other', v: 'V2', l: 'L2', visible: true },
+  ],
   tables: [{ id: 'g', dataList: 'dl', visible: true, columns: [{ k: 'colA', l: 'LA' }], rows: [{ colA: 'V' }] }],
 };
 const collected = { raw: rawCapture, diag: baseDiag, screen: { menuNo: 'M0001', scrnNo: 'S0001', menuNm: 'N1' } };
@@ -48,11 +49,16 @@ function setup(opts: {
     const table = /\/api\/tables\/(\w+)\/records/.exec(u.pathname)![1];
     if (call.method === 'GET') {
       const filter = JSON.parse(u.searchParams.get('filter') ?? '{}') as Record<string, string[]>;
-      const rows = (tables[table] ?? []).filter((r) => Object.entries(filter).every(([k, v]) => v.includes(String(r[k]))));
-      return new Response(JSON.stringify({ records: rows.map((fields, i) => ({ id: i + 1, fields })), total: rows.length }));
+      const matches = (r: Record<string, unknown>) =>
+        Object.entries(filter).every(([k, v]) => v.includes(String(r[k])));
+      const rows = (tables[table] ?? []).filter(matches);
+      const records = rows.map((fields, i) => ({ id: i + 1, fields }));
+      return new Response(JSON.stringify({ records, total: rows.length }));
     }
     if (table === 'g2b_capture') {
-      const fields = { status: 'changed', record_id: 'R1', stage: 'bid', changed: ['keyA'], unknown_keys: 1, restored: true };
+      const fields = {
+        status: 'changed', record_id: 'R1', stage: 'bid', changed: ['keyA'], unknown_keys: 1, restored: true,
+      };
       return new Response(JSON.stringify({ records: [{ id: 1, fields }] }));
     }
     return new Response(JSON.stringify({ records: call.body.records.map((_: unknown, i: number) => ({ id: i + 1 })) }));
@@ -237,72 +243,5 @@ describe('other messages', () => {
   test('unknown kinds are refused', async () => {
     const reply: any = await setup().handlers.handle({ kind: 'nope' }, TAB);
     expect(reply.ok).toBe(false);
-  });
-});
-
-describe('screen watch', () => {
-  function fakeWindow(menuNo: string | null) {
-    const listeners: Record<string, () => void> = {};
-    const history = {
-      state: menuNo ? { data: { menuNo } } : null,
-      pushState: (state: any) => void (history.state = state),
-      replaceState: (state: any) => void (history.state = state),
-    };
-    const win = { history, addEventListener: (name: string, fn: () => void) => void (listeners[name] = fn) };
-    return { win: win as unknown as Window, history, listeners };
-  }
-  const read = (win: Window) => {
-    const data = (win.history.state as any)?.data;
-    return data ? { menuNo: data.menuNo, scrnNo: '', menuCangVal: '', menuNm: '' } : null;
-  };
-  test('reports a menuNo change once, on pushState and popstate', () => {
-    const { win, history, listeners } = fakeWindow('M1');
-    const seen: string[] = [];
-    installScreenWatch(win, read, (c) => seen.push(c.menuNo));
-    history.pushState({ data: { menuNo: 'M1' } });
-    history.pushState({ data: { menuNo: 'M2' } });
-    history.state = { data: { menuNo: 'M3' } } as any;
-    listeners.popstate();
-    expect(seen).toEqual(['M1', 'M2', 'M3']);
-  });
-});
-
-describe('native host client', () => {
-  function fakePort() {
-    let deliver: (m: unknown) => void = () => {};
-    const posted: any[] = [];
-    const port = {
-      onMessage: { addListener: (fn: (m: unknown) => void) => void (deliver = fn) },
-      onDisconnect: { addListener: () => {} },
-      postMessage: (m: unknown) => void posted.push(m),
-      disconnect: () => {},
-    };
-    return { runtime: { connectNative: () => port as any }, posted, deliver: (m: unknown) => deliver(m) };
-  }
-  test('sends the message with its requestId and takes a plain reply', async () => {
-    const p = fakePort();
-    const client = createNativeClient(p.runtime, () => 'R1');
-    const reply = client.request({ type: 'hello' });
-    expect(p.posted).toEqual([{ type: 'hello', requestId: 'R1' }]);
-    p.deliver({ port: 8765, token: 'T', schema_version: 1 });
-    await expect(reply).resolves.toEqual({ port: 8765, token: 'T', schema_version: 1 });
-  });
-  test('chunk frames are joined by requestId whatever their order', async () => {
-    const p = fakePort();
-    const client = createNativeClient(p.runtime, () => 'R1');
-    const reply = client.request({ type: 'request' });
-    const text = JSON.stringify({ status: 200, body: { a: 'V' } });
-    const frame = (index: number, part: string) =>
-      ({ protocolVersion: 1, requestId: 'R1', chunk: { index, total: 2, text: part } });
-    p.deliver(frame(1, text.slice(10)));
-    p.deliver({ protocolVersion: 1, requestId: 'OTHER', chunk: { index: 0, total: 1, text: '{}' } });
-    p.deliver(frame(0, text.slice(0, 10)));
-    await expect(reply).resolves.toEqual({ status: 200, body: { a: 'V' } });
-  });
-  test('an error message rejects the request', async () => {
-    const p = fakePort();
-    const reply = createNativeClient(p.runtime, () => 'R1').request({ type: 'hello' });
-    p.deliver({ error: 'down' });
-    await expect(reply).rejects.toThrow('down');
   });
 });

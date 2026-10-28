@@ -39,6 +39,9 @@ export function createRemote(deps: RemoteDeps) {
   const { doc, send } = deps;
   const state = {
     screen: null as DictScreen | null,
+    menuNo: null as string | null,
+    screenKnown: false, // 화면 사전 조회가 성공했는지. 코어가 꺼져 있었다면 false라 수집을 눌러 다시 묻는다
+    lookupSeq: 0,
     diag: null as Diagnostics | null,
     registeredScreens: 0,
     restored: 0,
@@ -60,8 +63,12 @@ export function createRemote(deps: RemoteDeps) {
   const modeSelect = el('select', { 'data-role': 'mode' });
   for (const [value, text] of MODES) modeSelect.appendChild(Object.assign(el('option', {}, text), { value }));
   const rowSelect = el('select', { 'data-role': 'row-count' });
-  for (const n of ROW_COUNT_CHOICES) rowSelect.appendChild(Object.assign(el('option', {}, String(n)), { value: String(n) }));
-  const rowInput = el('input', { 'data-role': 'row-count-input', type: 'number', min: '1', placeholder: '직접 입력' });
+  for (const n of ROW_COUNT_CHOICES) {
+    rowSelect.appendChild(Object.assign(el('option', {}, String(n)), { value: String(n) }));
+  }
+  const rowInput = el('input', {
+    'data-role': 'row-count-input', type: 'number', min: '1', placeholder: '직접 입력',
+  });
   const toast = el('div', { 'data-role': 'toast' });
   const diagnostics = el('div', { 'data-role': 'diagnostics' });
   const collectButton = button('collect', '수집');
@@ -85,7 +92,8 @@ export function createRemote(deps: RemoteDeps) {
   root.append(el('style', {}, STYLE), bar);
 
   function render(): void {
-    collectButton.disabled = state.busy || !state.screen?.stage;
+    const stageMissing = state.screenKnown && !state.screen?.stage;
+    collectButton.disabled = state.busy || state.menuNo === null || stageMissing;
     snapshotButton.disabled = state.busy;
     if (state.diag) {
       diagnostics.textContent = formatDiagnostics(state.diag, {
@@ -121,16 +129,28 @@ export function createRemote(deps: RemoteDeps) {
 
   const currentMode = () => modeSelect.value as ExtractMode;
 
+  // 화면을 연달아 바꾸면 늦게 온 옛 화면의 답이 지금 화면을 덮을 수 있어 순번이 맞는 답만 쓴다.
+  async function lookUpScreen(menuNo: string): Promise<void> {
+    const seq = ++state.lookupSeq;
+    const info = await send({ kind: 'screen-info', menuNo });
+    if (seq !== state.lookupSeq) return;
+    state.screen = info.ok ? info.data : null;
+    state.screenKnown = info.ok;
+    render();
+  }
+
   async function handleScreenChange(change: ScreenChange): Promise<void> {
+    state.menuNo = change.menuNo;
+    state.screen = null;
+    state.screenKnown = true;
+    render();
     const changed = await send({ kind: 'screen.changed', ...change });
     if (changed.ok) {
       if (changed.data.registered) state.registeredScreens++;
     } else {
       noteFailure(changed);
     }
-    const info = await send({ kind: 'screen-info', menuNo: change.menuNo });
-    state.screen = info.ok ? info.data : null;
-    render();
+    await lookUpScreen(change.menuNo);
   }
 
   function closeSnapshot(): void {
@@ -145,6 +165,10 @@ export function createRemote(deps: RemoteDeps) {
   }
 
   collectButton.addEventListener('click', () => guarded(async () => {
+    if (!state.screenKnown && state.menuNo !== null) {
+      await lookUpScreen(state.menuNo);
+      if (!state.screen?.stage) return say('이 화면은 단계가 정해지지 않아 수집할 수 없음');
+    }
     const reply = await send({ kind: 'collect', mode: currentMode() });
     if (!reply.ok) return noteFailure(reply);
     const { result, diag } = reply.data as { result: CaptureReply; diag: Diagnostics };
