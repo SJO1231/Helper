@@ -46,6 +46,7 @@ export function attachPanelMotion(parts: Parts) {
   const view = () => ({ width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
   const state: PanelState = { collapsed: false };
   let dragMoved = false;
+  let userActed = false;
 
   const shown = () => (state.collapsed ? bubble : bar);
 
@@ -72,7 +73,14 @@ export function attachPanelMotion(parts: Parts) {
     const grab = { x: event.clientX - rect.left, y: event.clientY - rect.top };
     const origin = { x: event.clientX, y: event.clientY };
     dragMoved = false;
+    userActed = true;
     event.preventDefault();
+    // 포인터가 창 밖이나 iframe 위로 나가도 move·up을 계속 받으려는 것이다.
+    try {
+      (event.currentTarget as Element | null)?.setPointerCapture?.((event as PointerEvent).pointerId);
+    } catch {
+      /* 잡을 수 없는 포인터면 문서 이벤트만으로 끈다 */
+    }
 
     const move = (e: MouseEvent) => {
       if (Math.abs(e.clientX - origin.x) + Math.abs(e.clientY - origin.y) > DRAG_SLOP) dragMoved = true;
@@ -83,10 +91,12 @@ export function attachPanelMotion(parts: Parts) {
     const stop = () => {
       doc.removeEventListener('pointermove', move as EventListener);
       doc.removeEventListener('pointerup', stop);
+      doc.removeEventListener('pointercancel', stop);
       if (dragMoved) save();
     };
     doc.addEventListener('pointermove', move as EventListener);
     doc.addEventListener('pointerup', stop);
+    doc.addEventListener('pointercancel', stop);
   }
 
   handle.addEventListener('pointerdown', (event) => {
@@ -96,6 +106,7 @@ export function attachPanelMotion(parts: Parts) {
   bubble.addEventListener('pointerdown', (event) => startDrag(event as MouseEvent, bubble));
 
   function setCollapsed(collapsed: boolean): void {
+    userActed = true;
     state.collapsed = collapsed;
     apply();
     save();
@@ -107,7 +118,8 @@ export function attachPanelMotion(parts: Parts) {
   });
 
   void store?.load().then((saved) => {
-    if (!saved) return;
+    // 불러오는 사이 사용자가 만졌으면 사용자의 것이 우선이다.
+    if (!saved || userActed) return;
     if (typeof saved.collapsed === 'boolean') state.collapsed = saved.collapsed;
     if (isNumber(saved.left) && isNumber(saved.top)) {
       state.left = saved.left;
@@ -116,6 +128,7 @@ export function attachPanelMotion(parts: Parts) {
     apply();
   }).catch(() => undefined);
 
+  doc.defaultView?.addEventListener('resize', apply);
   apply();
   return { reapply: apply };
 }
