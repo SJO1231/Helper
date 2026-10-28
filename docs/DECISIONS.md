@@ -73,5 +73,9 @@ DB 구조 3안 비교. A를 승인했다.
 2026-10-29 실측(S3, 공개 입찰공고목록): 조회건수 250은 먹는다. select에 option을 더하고 addItem·setValue를 **글자 값**('250')으로 부르면 값이 바뀐다(숫자를 넘기면 무시됨). 보이는 그리드의 쪽 크기는 pageList.setPageSize(n)로 바로 바뀌고 요청은 0건이다(select만으로는 pageList가 그대로).
 2026-10-29 실측(S3): 기간 칸은 inputCalendar가 아니라 `input` 컴포넌트이고 값은 YYYYMMDD 글자다. 그래서 "보이는 YYYYMMDD 값 input 첫 쌍"으로 찾는다(−1년·+1년 모두 요청 0건).
 2026-10-29 결정(S3): core 수집 응답에 restored:true가 올 수 있다(휴지통 건 재수집). 진단 줄에 "되살림 n건"으로 센다. shared 타입·스키마는 S5 몫이라 확장은 지역 타입으로만 읽는다.
-2026-10-29 seed: Ű 942, ȭ�� 4, alias 1, �ڵ� 41, �� 598, reference 5(Agent SDK ��ġ, Sonnet).
-2026-10-29 seed ����: python -m core.seed_load [����] [--db]. �ڵ� ���� ����, ������� 0��(noupdate).
+2026-10-29 seed: 키 942, 화면 4, alias 1, 코드 41, 라벨 598, reference 5(Agent SDK 배치, Sonnet).
+2026-10-29 seed 적재: python -m core.seed_load [폴더] [--db]. 자동 실행 없음, 재적재는 0건(noupdate).
+2026-10-29 결정(S7): 뷰어의 exceljs는 Excel 버튼을 누를 때 읽는다(esm 조각 나누기, 설정은 scripts/viewer-build.mjs 하나를 빌드·bench가 같이 씀). 이유: 처음 열 때 1.7MB 번들을 읽느라 이 PC에서 첫 쪽이 1.5초를 넘었고, 나눈 뒤 0.43초.
+2026-10-29 실측(S7): 나라장터는 처음 뜬 뒤 body를 비우고 다시 그려 리모컨 host가 떨어진다. 같은 host를 다시 붙인다(상태 유지).
+2026-10-29 결정(S7): 리모컨에 "뷰어" 버튼. background가 chrome.tabs.create로 viewer.html을 연다(권한 추가 없음). CI의 PR 리뷰 봇 작업은 뺐다(크레딧, 2단계에서 다시).
+2026-10-29 1단계 끝 기준 통과(네 명령 출력은 PR #12)

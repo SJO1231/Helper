@@ -34,12 +34,13 @@ def read_exact(stream, length):
     return result
 
 
-def response_frames(response, chunk_size=60000):
+def response_frames(response, request_id='', chunk_size=60000):
     encoded = dumps(response)
     if len(encoded.encode('utf-8')) < 750000:
         return [response]
     chunks = [encoded[i:i + chunk_size] for i in range(0, len(encoded), chunk_size)]
-    return [{'requestId': response.get('requestId', ''), 'chunk': {'index': i, 'total': len(chunks), 'text': text}}
+    # 확장은 조각을 요청의 requestId로 모으므로 응답 몸통이 아니라 요청에서 가져온다.
+    return [{'requestId': request_id, 'chunk': {'index': i, 'total': len(chunks), 'text': text}}
             for i, text in enumerate(chunks)]
 
 
@@ -54,11 +55,15 @@ def native_loop(host, input_stream, output_stream):
         payload = read_exact(input_stream, size)
         if payload is None:
             raise EOFError('Missing request body')
+        request_id = ''
         try:
-            response = host.handle(loads(payload.decode('utf-8')))
+            message = loads(payload.decode('utf-8'))
+            if isinstance(message, dict):
+                request_id = str(message.get('requestId', ''))
+            response = host.handle(message)
         except (ValueError, UnicodeError) as error:
             response = {'status': 400, 'body': {'error': f'JSON을 읽을 수 없다: {error}'}}
-        for frame in response_frames(response):
+        for frame in response_frames(response, request_id):
             encoded = dumps(frame).encode('utf-8')
             output_stream.write(struct.pack('<I', len(encoded)))
             output_stream.write(encoded)

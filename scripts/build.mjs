@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildManifest } from './manifest.mjs';
+import { viewerBuildOptions } from './viewer-build.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'dist/extension');
@@ -44,7 +45,7 @@ await bundle('extension/common/background.ts', 'background.js', 'esm');
 await bundle('extension/sites/g2b/page.ts', 'page.js', 'iife');
 await bundle('extension/common/remote.ts', 'remote.js', 'iife');
 if (hasViewer) {
-  await bundle('viewer/main.ts', 'viewer.js', 'iife');
+  await build(viewerBuildOptions(root, output));
   await copyFile(viewerHtml, path.join(output, 'viewer.html'));
 }
 const manifest = buildManifest({ key: identity.key, hasViewer });

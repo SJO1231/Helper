@@ -4,12 +4,13 @@ import { createRequire } from 'node:module';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { buildViewerBundle, writeBenchExtension } from './bench/build-extension.mjs';
 import { coreGet, runSeed, startCore } from './bench/core-process.mjs';
 import * as measure from './bench/measure.mjs';
 
 const { chromium } = createRequire(import.meta.url)('playwright');
-const HELPERS = new URL('./bench/page-helpers.js', import.meta.url).pathname;
+const HELPERS = fileURLToPath(new URL('./bench/page-helpers.js', import.meta.url));
 const SIZES = [1000, 10000];
 const LIMITS = { firstPageMs: 1000, sortMs: 300, filterMs: 300, typeChangeMs: 500, frameShare: 0.9 };
 const round = (n) => Math.round(n * 10) / 10;

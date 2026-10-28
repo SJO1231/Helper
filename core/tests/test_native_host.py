@@ -128,6 +128,18 @@ def test_native_loop_reports_invalid_json_and_continues(home):
     assert replies[0]["status"] == 400 and replies[1]["token"] == "T"
 
 
+class BigReplyHost:
+    def handle(self, message):
+        return {"status": 200, "body": {"text": "가" * 400_000}}
+
+
+def test_native_loop_chunks_carry_the_request_id():
+    sink = io.BytesIO()
+    native_loop(BigReplyHost(), io.BytesIO(frame({"type": "request", "requestId": "q7"})), sink)
+    replies = read_frames(sink.getvalue())
+    assert len(replies) > 1 and {r["requestId"] for r in replies} == {"q7"}
+
+
 def test_native_loop_rejects_truncated_frame(home):
     host = NativeHost(is_alive=lambda port: True, start_service=must_not_start)
     with pytest.raises(EOFError):

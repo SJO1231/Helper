@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "types": []
   },
-  "include": ["shared", "extension", "viewer"]
+  "include": ["shared", "extension", "viewer", "scripts"]
 }

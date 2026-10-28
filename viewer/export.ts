@@ -1,4 +1,3 @@
-import ExcelJS from 'exceljs';
 import type { CoreClient } from '../shared/core-client';
 import type { ColumnInfo } from '../shared/types';
 import type { RowFilter } from './paged-source';
@@ -41,6 +40,8 @@ export async function exportXlsx(
   columns: ColumnInfo[],
   q: ExportQuery,
 ): Promise<Blob> {
+  // exceljs는 크다. 처음 열 때 읽으면 첫 쪽이 늦어지므로 Excel을 누를 때만 불러온다.
+  const { default: ExcelJS } = await import('exceljs');
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet(table.replace(SHEET_NAME_FORBIDDEN, '_').slice(0, SHEET_NAME_MAX));
   sheet.addRow(columns.map((c) => c.fields.label));

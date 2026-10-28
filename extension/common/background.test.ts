@@ -71,6 +71,7 @@ function setup(opts: {
     },
   };
   const pageCalls: [number, string, unknown[]][] = [];
+  const openedViewers: string[] = [];
   const connection = createConnection({
     host, fetchImpl,
     store: { get: async () => stored, set: async (v) => void (stored = v) },
@@ -78,12 +79,13 @@ function setup(opts: {
   const handlers = createHandlers({
     connection,
     extensionOrigin: ORIGIN,
+    openViewer: async (table) => void openedViewers.push(table),
     runInPage: async (tabId, method, args) => {
       pageCalls.push([tabId, method, args]);
       return (opts.pageOutcome ?? { ok: true, data: method === 'collect' ? collected : { ok: true } }) as any;
     },
   });
-  return { handlers, sent, pageCalls, hellos: () => hellos };
+  return { handlers, sent, pageCalls, openedViewers, hellos: () => hellos };
 }
 
 const writes = (sent: Sent[]) => sent.filter((s) => s.method !== 'GET');
@@ -235,6 +237,13 @@ describe('other messages', () => {
     await t.handlers.handle({ kind: 'shift-year', delta: -1 }, TAB);
     await t.handlers.handle({ kind: 'row-count', n: 250 }, TAB);
     expect(t.pageCalls).toEqual([[7, 'shiftYear', [-1]], [7, 'applyRowCount', [250]]]);
+  });
+  test('open-viewer opens the viewer page without calling the core', async () => {
+    const t = setup();
+    const reply: any = await t.handlers.handle({ kind: 'open-viewer' }, TAB);
+    expect(reply.ok).toBe(true);
+    expect(t.openedViewers).toEqual(['']);
+    expect(t.sent).toEqual([]);
   });
   test('page messages without a tab are refused', async () => {
     const reply: any = await setup().handlers.handle({ kind: 'collect', mode: 'visible' }, {});
