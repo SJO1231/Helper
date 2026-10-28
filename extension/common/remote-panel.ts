@@ -148,6 +148,33 @@ export function attachPanelMotion(parts: Parts) {
     host.remove();
   });
 
+  function resetPosition(): void {
+    userActed = true;
+    delete state.left;
+    delete state.top;
+    for (const node of [bar, bubble]) {
+      node.style.left = '';
+      node.style.top = '';
+      node.style.right = '';
+    }
+    save();
+  }
+
+  // 문서 하나에 한 번만 붙인다. 패널을 다시 붙여도 이 함수는 다시 불리지 않는다.
+  doc.addEventListener('keydown', (event) => {
+    const isG = event.code === 'KeyG' || event.key?.toLowerCase() === 'g';
+    if (!event.altKey || event.ctrlKey || event.metaKey || !isG) return;
+    event.preventDefault();
+    if (event.shiftKey) return resetPosition();
+    if (closed) {
+      closed = false;
+      doc.body.appendChild(host);
+      apply();
+      return;
+    }
+    setCollapsed(!state.collapsed);
+  });
+
   void store?.load().then((saved) => {
     // 불러오는 사이 사용자가 만졌으면 사용자의 것이 우선이다.
     if (!saved || userActed) return;
