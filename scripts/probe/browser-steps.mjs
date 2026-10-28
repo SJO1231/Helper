@@ -94,7 +94,7 @@ export async function clickSearch(s) {
 }
 
 // 보이는 그리드(id가 _<gridSuffix>로 끝남)에서 고를 행 번호를 찾는다.
-// pick: { first: true } | { emptyField: '필드' } | { text: '셀 글자' }
+// pick: { first: true } | { emptyField: '필드' } | { filledField: '필드' } | { text: '셀 글자' }
 async function pickRow(page, gridSuffix, colId, pick) {
   return page.evaluate(([root, suffix, col, p]) => {
     const el = [...document.getElementById(root).querySelectorAll('.w2grid[id]')]
@@ -104,6 +104,7 @@ async function pickRow(page, gridSuffix, colId, pick) {
     let index = -1;
     if (p.first) index = 0;
     if (p.emptyField) index = window[el.id].getAllJSON().findIndex((r) => !r[p.emptyField]);
+    if (p.filledField) index = window[el.id].getAllJSON().findIndex((r) => !!r[p.filledField]);
     if (p.text) index = cells.findIndex((td) => td.textContent.trim() === p.text);
     if (index < 0 || !cells[index]) return { error: 'no matching row' };
     return { gridId: el.id, index };

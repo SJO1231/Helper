@@ -35,6 +35,11 @@ const TARGETS = [
     key: '입찰공고목록', open: { menuCangVal: 'PNPE001_01' }, search: true,
     details: [
       { key: '공고명(첫 행)', grid: BID_GRID, col: 'bidPbancNm', pick: { first: true } },
+      // 첫 행이 어느 종류인지는 그날 목록에 따라 바뀌므로 두 종류를 따로 고른다.
+      {
+        key: '공고명(연계 URL 있는 첫 행)', grid: BID_GRID, col: 'bidPbancNm',
+        pick: { filledField: 'linkInstPbancLnkUrl' },
+      },
       {
         key: '공고명(연계 URL 빈 첫 행)', grid: BID_GRID, col: 'bidPbancNm',
         pick: { emptyField: 'linkInstPbancLnkUrl' },
