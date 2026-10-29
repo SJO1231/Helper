@@ -110,7 +110,7 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 
 ### 5.2 구조 변경과 운영
 - 키 승격(`as_column` 0→1)은 `ADD COLUMN`과 raw로 과거 행 채우기를 한 트랜잭션으로. 되돌림은 `DROP COLUMN`(raw에 값 남음).
-- WAL, busy_timeout, 프로세스 안 RLock, `executescript` 쓰지 않음. 백업은 `VACUUM INTO`.
+- WAL, busy_timeout, 프로세스 안 RLock, `executescript` 쓰지 않음. 백업·복원은 `python -m core.backup make|restore`(VACUUM INTO, 복원은 schema_version이 같을 때만, 복원 전 현재 DB 보존).
 
 ## 6. 사전 4개의 필드
 | 사전 | 필드 | 규칙 |
