@@ -8,4 +8,4 @@ docs/SPEC.md는 현재 상태만 적는다(200줄 이하). 이 파일은 2단계
 
 ## 끝 기준
 각 기능의 PR이 아래 줄을 채운다. 형식: `번호. 기능 — 명령 — 기준 — 통과 PR`.
-①. 백업 복원 — pytest core/tests — 백업 뒤 행 추가·복원 시 행 수 동일, schema_version 다르면 거절, 복원 전 보존 파일 — PR #번호
+①. 백업 복원 — pytest core/tests — 백업 뒤 행 추가·복원 시 행 수 동일, schema_version 다르면 거절, 복원 전 보존 파일 — PR #23
