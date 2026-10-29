@@ -212,3 +212,15 @@ def test_restored_response_is_replayed_for_same_request_id(seeded):
     seeded.trash_record("g2b_bid", "V1")
     first = w(seeded, capture_fields(key_b="V2"), "r2")
     assert w(seeded, capture_fields(key_b="V2"), "r2") == first and first["restored"] is True
+
+
+def test_same_raw_after_stage_change_still_fills_new_stage_main(seeded):
+    cap = capture_fields()
+    w(seeded, cap, "r1")
+    screen = {"require": {"site": "g2b", "menu_no": "M0001"}, "fields": {"stage": "contract"}}
+    seeded.upsert_records("dict_screen", [screen], False)
+    seeded.add_records("dict_key", [{"fields": {"std_key": "keyZ", "label": "keyZ", "type": "text", "as_column": 1,
+                                                "module": "t", "stages": ["contract"]}}])
+    res = w(seeded, cap, "r2")
+    assert res["stage"] == "contract" and res["record_id"] == "V1"
+    assert count(seeded, "g2b_contract") == 1

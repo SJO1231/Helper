@@ -76,14 +76,17 @@ def _store(db, fields, digest):
 
     main = SITE_PREFIX + stage
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    if db.rows("SELECT 1 FROM g2b_capture WHERE raw_hash = ?", (digest,)):
+    capture_id = _capture_id_for_hash(db, digest)
+    if capture_id is not None and _main_row_exists(db, main, record_id):
         db.run(f"UPDATE {quote_ident(main)} SET captured_at = ? WHERE record_id = ?", (now, record_id))
         restored = _restore_from_trash(db, main, record_id)
         return result("same", record_id, restored=restored), restored
 
-    capture_id = db.run(*insert_statement("g2b_capture", {
-        "record_id": record_id, "screen_code": menu_no, "url": fields.get("url", ""), "captured_at": now,
-        "raw_hash": digest, "raw": canonical(fields["raw"])})).lastrowid
+    # 같은 원본이어도 단계가 바뀌어 메인 행이 없으면 capture는 재사용하고 메인 쓰기를 이어 한다
+    if capture_id is None:
+        capture_id = db.run(*insert_statement("g2b_capture", {
+            "record_id": record_id, "screen_code": menu_no, "url": fields.get("url", ""), "captured_at": now,
+            "raw_hash": digest, "raw": canonical(fields["raw"])})).lastrowid
     columns = [k["std_key"] for k in dict_read.column_keys(db, stage)]
     existing = _existing_values(db, main, record_id, columns)
     incoming = {k: v for k, v in flat.values.items() if k in columns}
@@ -101,6 +104,15 @@ def _store(db, fields, digest):
     if existing is None:
         return result("new", record_id, restored=restored), True
     return result("changed", record_id, changed, restored=restored), True
+
+
+def _capture_id_for_hash(db, digest):
+    rows = db.rows("SELECT capture_id FROM g2b_capture WHERE raw_hash = ? ORDER BY capture_id DESC LIMIT 1", (digest,))
+    return rows[0]["capture_id"] if rows else None
+
+
+def _main_row_exists(db, main, record_id):
+    return bool(db.rows(f"SELECT 1 FROM {quote_ident(main)} WHERE record_id = ?", (record_id,)))
 
 
 def _restore_from_trash(db, main, record_id):
