@@ -35,8 +35,9 @@ const installTriggerSpy = async (page) => {
       const original = util.getComponentById.bind(util);
       util.__spied = true;
       window.__excelTriggers = [];
-      util.getComponentById = (id) => {
-        const component = original(id);
+      // 둘째 인자(스코프)를 떨어뜨리면 사이트의 $p.getComponentById가 맵을 못 찾아 "Map Id" 안내창이 뜬다.
+      util.getComponentById = (id, ...rest) => {
+        const component = original(id, ...rest);
         for (const name of ['trigger', 'fireEvent']) {
           if (component && typeof component[name] === 'function' && !component[name].__spied) {
             const fn = component[name].bind(component);
@@ -75,13 +76,17 @@ const visibleLayerTitles = (page) => page.evaluate((source) => {
 // 엑셀을 누르는 동작(press) 전에 걸어 두고, press의 결과와 15초간 모은 관측을 돌려준다.
 export async function observeExcelPress(s, press) {
   const { page } = s;
-  const seen = { dialogs: [], popups: [], files: [], downloads: 0, downloadAt: null };
+  const seen = { dialogs: [], popups: [], files: [], downloads: 0, downloadAt: null, excelRequests: [] };
   let pressedAt = null;
   const onDialog = (d) => {
     seen.dialogs.push({ 종류: d.type(), 문구: d.message().replace(/\s+/g, ' ').slice(0, 80) });
     d.accept().catch(() => {});
   };
   const onPopup = (p) => seen.popups.push(pathOf(p.url()));
+  // 엑셀 버튼의 실제 효과는 /...Excel.do 요청이다. 파일 응답은 서버 사정으로 15초를 넘길 수 있다.
+  const onRequest = (r) => {
+    if (pressedAt !== null && /excel/i.test(pathOf(r.url()))) seen.excelRequests.push(pathOf(r.url()));
+  };
   const onResponse = (r) => {
     if (pressedAt === null) return;
     const h = r.headers();
@@ -96,6 +101,7 @@ export async function observeExcelPress(s, press) {
   };
   page.on('dialog', onDialog);
   page.context().on('page', onPopup);
+  page.on('request', onRequest);
   page.on('response', onResponse);
   page.on('download', onDownload);
   try {
@@ -113,6 +119,7 @@ export async function observeExcelPress(s, press) {
   } finally {
     page.off('dialog', onDialog);
     page.context().off('page', onPopup);
+    page.off('request', onRequest);
     page.off('response', onResponse);
     page.off('download', onDownload);
   }

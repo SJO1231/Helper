@@ -30,7 +30,7 @@ const readSiteAlert = (page) => page.evaluate(() => {
 
 const SEARCH_WAIT_MS = 10000;
 const REDRAW_MS = 1000;
-const NAME = '엑셀 버튼: 확인창 수락 뒤 다운로드';
+const NAME = '엑셀 버튼: 엑셀 요청(…Excel.do)이 나가고 사이트 안내창 없음';
 
 // 조회를 누르고 조회 응답이 와서 그리드가 다시 그려질 때까지 기다린다. 응답이 없으면 false.
 async function searchAndWaitRedraw(s) {
@@ -52,11 +52,9 @@ async function searchAndWaitRedraw(s) {
 }
 
 // 조회가 끝나기 전에 엑셀을 누르면 사이트가 재검색 안내창으로 막는다(화면 규칙). 그래서 조회 뒤에 누른다.
-// 기준: 확인창이 뜨고, 수락 뒤 15초(관측 시간) 안에 download 또는 파일 응답이 있다.
-function judgeExcel(observed) {
-  const confirmed = observed.dialogs.length > 0;
-  const received = observed.downloads > 0 || observed.files.length > 0;
-  return confirmed && received;
+// 기준: 엑셀 요청이 나가고 사이트 안내창이 없다. 공개 화면의 엑셀은 확인창 없이 바로 받으며, 파일 응답은 15초를 넘길 수 있어 기록만 한다.
+function judgeExcel(observed, alertText) {
+  return observed.excelRequests.length > 0 && alertText === '(없음)';
 }
 
 export async function checkExcelButton(s) {
@@ -67,8 +65,9 @@ export async function checkExcelButton(s) {
     const toast = (await readToast(s)) || '(없음)';
     const alertText = await readSiteAlert(s.page);
     await closePopups(s.page);
-    report(NAME, searched && judgeExcel(observed), {
+    report(NAME, searched && judgeExcel(observed, alertText), {
       조회_응답: searched,
+      엑셀_요청: observed.excelRequests,
       확인창: observed.dialogs.map((d) => `${d.종류}: ${d.문구}`),
       다운로드_초: observed.downloadAt === null ? '(없음)' : observed.downloadAt / 1000,
       토스트: toast,
