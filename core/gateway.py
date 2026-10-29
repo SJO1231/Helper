@@ -84,6 +84,22 @@ class Gateway:
         with self._lock:  # VACUUM은 트랜잭션 밖에서만 돈다
             self.run("VACUUM INTO ?", (str(dest),))
 
+    def integrity_check(self):
+        return self.rows("PRAGMA integrity_check")[0]["integrity_check"]
+
+    @staticmethod
+    def stored_schema_version(path):
+        """다른 파일의 schema_version을 읽기 전용으로 읽는다. Gateway로 열면 표를 만들어 파일을 바꾸므로 따로 둔다."""
+        try:
+            db = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
+            try:
+                row = db.execute("SELECT version FROM schema_version WHERE module = ?", (SCHEMA_MODULE,)).fetchone()
+            finally:
+                db.close()
+        except sqlite3.Error as error:
+            raise StorageError(f"백업 파일을 읽을 수 없다: {error}") from error
+        return row[0] if row else None
+
     def add_records(self, table, records, request_id=None):
         return dict_write.add_records(self, table, records, request_id)
 
