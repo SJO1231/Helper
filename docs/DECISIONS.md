@@ -88,4 +88,4 @@ DB 구조 3안 비교. A를 승인했다.
 2026-10-29 B2: 뷰어에서 dict_* 편집(AG Grid 기본 편집기, 칸마다 PATCH 1회, 기본키 열 제외, 행 추가·삭제 없음).
 2026-10-29 ③: 스냅샷 창에서 미등록 키를 dict_key로 올림(PUT noupdate, std_key = K 마지막 이름, as_column 0, 열 생성·alias는 안 함).
 2026-10-29 ④: 직링크는 dict_screen 행에서만, 이동은 com.gfnOpenMenuMove. 런처는 E2 승인 뒤.
-2026-10-29 ⑤: 자동수집은 사용자 신뢰 클릭 → 로딩 끝 → 1회 수집(기본 꺼짐, remotePanel.autoCollect). 타이머·XHR 후크·함수 감싸기 없음.
+2026-10-29 ⑤: 자동수집은 사용자 클릭·리모컨 조회류 → 로딩 끝 → 1회 수집(기본 꺼짐, remotePanel.autoCollect). 타이머·XHR 후크·함수 감싸기 없음.

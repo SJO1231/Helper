@@ -18,6 +18,11 @@ export function announceAutoCollect(win: Window | null | undefined, on: boolean)
   win?.postMessage({ source: 'helper-remote', type: 'auto-collect', on }, '*');
 }
 
+// 리모컨이 조회처럼 화면 동작을 일으킨 뒤, MAIN world에 로딩이 끝나는지 한 번 지켜 달라고 한다.
+export function requestSettleWatch(win: Window | null | undefined): void {
+  win?.postMessage({ source: 'helper-remote', type: 'watch-settle' }, '*');
+}
+
 export function createAutoCollectToggle(doc: Document) {
   const label = doc.createElement('label');
   const box = doc.createElement('input');

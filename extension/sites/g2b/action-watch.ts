@@ -28,18 +28,28 @@ function isUserButtonClick(event: Event): boolean {
 export function installActionWatch(win: Window, onSettled: () => void, opts: ActionWatchOptions = {}) {
   const { graceMs = 300, pollMs = 50, loadedIntervalMs } = opts;
   let pending = false; // 한 번의 동작에 알림은 최대 한 번
-  const onClick = (event: Event) => {
-    if (pending || !isUserButtonClick(event)) return;
+  let enabled = false;
+  // 사용자 클릭과 리모컨의 화면 동작이 같은 규칙으로 센다.
+  const watchSettle = () => {
+    if (pending) return;
     pending = true;
     void loadingStartsSoon(win, graceMs, pollMs)
       .then((started) => (started ? waitUntilLoaded(win, { intervalMs: loadedIntervalMs }).then(onSettled) : undefined))
       .catch(() => undefined) // 10초 넘게 안 끝나면 포기한다
       .finally(() => (pending = false));
   };
+  const onClick = (event: Event) => {
+    if (isUserButtonClick(event)) watchSettle();
+  };
   return {
     setEnabled(on: boolean) {
+      enabled = on;
       win.document.removeEventListener('click', onClick, true);
       if (on) win.document.addEventListener('click', onClick, true);
+    },
+    // 리모컨이 조회 같은 화면 동작을 대신 누른 뒤 부른다. 꺼져 있으면 아무것도 안 한다.
+    watchAfterRemoteAction() {
+      if (enabled) watchSettle();
     },
   };
 }

@@ -110,7 +110,7 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 
 ### 5.2 구조 변경과 운영
 - 키 승격(`as_column` 0→1)은 `ADD COLUMN`과 raw로 과거 행 채우기를 한 트랜잭션으로. 되돌림은 `DROP COLUMN`(raw에 값 남음).
-- WAL, busy_timeout, 프로세스 안 RLock, `executescript` 쓰지 않음. 백업·복원은 `python -m core.backup make|restore`(VACUUM INTO, 복원은 schema_version이 같을 때만, 복원 전 현재 DB 보존).
+- WAL, busy_timeout, 프로세스 안 RLock, `executescript` 안 씀. 백업·복원: `python -m core.backup make|restore`(같은 schema_version만, 복원 전 현재 DB 보존).
 
 ## 6. 사전 4개의 필드
 | 사전 | 필드 | 규칙 |
@@ -153,12 +153,12 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 - 프레임 합치기: WebSquare(`$p`)가 있는 모든 프레임에서 읽어 하나로 합친다. 같은 K가 겹치면 보이는 쪽,
   둘 다 같으면 최상위 프레임에 가까운 쪽을 쓴다. 공개 화면은 프레임이 하나라 vitest 구조 fixture로 시험한다.
 - 로딩 중: `#__processbarIFrame`이 보이면 200ms마다 다시 보고 최대 10초 기다린다. 넘으면 "불러오는 중"으로 거절한다.
-- 진단 줄: 읽은 폼·그리드 수, 뺀 수(빈 ref·같은 dataList·실패 그리드·버린 param), 미등록 키 수(스냅샷 창에 목록과 '사전에 올리기' 버튼; dict_key에 PUT noupdate, as_column 0), 코어 연결 상태.
+- 진단 줄: 읽은 폼·그리드 수, 뺀 수, 미등록 키 수(스냅샷 창 '사전에 올리기': dict_key PUT noupdate, as_column 0, 그리드 K는 stages 빈 배열), 코어 상태.
 - 리모컨 −1년/+1년: 보이는 시작일·끝일 첫 쌍을 찾아 시작일의 해 ±1로 정하고, 두 칸을 그 해 1월 1일·12월 31일로
   바꾼다. 기간 칸은 값이 YYYYMMDD인 보이는 `input`이다. 조회 버튼은 누르지 않는다. 조회건수: 10·30·50·100·250·500·1000 또는 직접 입력한 값을 쪽 크기로 넣는다.
   select에 없는 값이면 option을 더하고 컴포넌트 `addItem` 뒤 `setValue`(글자 값만 먹는다)를 부르고, 쪽 목록 `setPageSize`로 쪽 크기를 맞춘다(S3 실측).
-- 조회·엑셀 버튼: 리모컨이 화면의 버튼(a·button·input 버튼·role=button)을 글자로 찾아 누른다. 못 찾으면 실패 알림. 직링크: '업무' 탭 select는 dict_screen 행(name·menu_cang_val)에서 만들고 '이동'은 com.gfnOpenMenuMove(menu_cang_val)로 간다.
-- 패널 위치·접힘·자동수집 스위치: `remotePanel`(chrome.storage.local)에 저장·복원. 자동수집(기본 꺼짐)은 켜져 있고 사용자의 신뢰된 클릭 뒤 로딩 표시가 뜨고 끝나면 stage 있는 화면만 1회 수집.
+- 조회·엑셀 버튼: 리모컨이 화면 버튼을 글자로 찾아 누른다(못 찾으면 실패 알림). 직링크: '업무' 탭 select는 dict_screen 행, '이동'은 com.gfnOpenMenuMove.
+- 패널 위치·접힘·자동수집 스위치는 `remotePanel`에 저장. 자동수집(기본 꺼짐)은 사용자·리모컨(조회류) 버튼 뒤 로딩이 끝나면 stage 있는 화면만 1회 수집.
 - 뷰어 열 폭·순서·숨김: `localStorage`에 테이블별로 저장한다(정렬·필터는 저장하지 않는다).
 - 코드 열 뜻 표시: 화면에만 보인다. 정렬·필터·내보내기는 원값이다.
 

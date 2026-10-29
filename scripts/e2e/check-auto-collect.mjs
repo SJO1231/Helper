@@ -70,7 +70,7 @@ export async function checkAutoCollect(s, core) {
 
   const presses = await readCollectPresses(s.page);
   const pass = offDelta === 0 && offAuto === 0 && Boolean(firstRan) && firstToast.startsWith('자동 ')
-    && (onDelta === 0 || onDelta === 1) && Boolean(secondRan) && secondDelta === 0 && presses === 0;
+    && onDelta === 1 && Boolean(secondRan) && secondDelta === 0 && presses === 0;
   return {
     pass, 화면: menuNo, 꺼짐_capture변화: offDelta, 꺼짐_자동수집: offAuto, 켜짐_자동수집됨: Boolean(firstRan),
     켜짐_capture변화: onDelta, 한번더_자동수집됨: Boolean(secondRan), 한번더_capture변화: secondDelta,

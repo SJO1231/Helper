@@ -2,12 +2,16 @@
 import type { Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
 import type { CaptureReply, Reply } from './background';
-import { AUTO_TOAST_PREFIX, announceAutoCollect, createAutoCollectToggle, shouldAutoCollect } from './auto-collect';
+import {
+  AUTO_TOAST_PREFIX, announceAutoCollect, createAutoCollectToggle, requestSettleWatch, shouldAutoCollect,
+} from './auto-collect';
 import { createDirectLink } from './direct-link';
 import { formatCaptureResult, formatDiagnostics, formatFailure } from './diagnostics';
 import { attachPanelMotion, chromePanelStore } from './remote-panel';
 import type { PanelStore } from './remote-panel';
 import { STYLE } from './remote-style';
+import { listenToPage } from './remote-page-link';
+import { createSiteActions } from './remote-site-actions';
 import { renderSnapshot } from './snapshot-view';
 import type { SnapshotData } from './snapshot-view';
 
@@ -74,7 +78,13 @@ export function createRemote(deps: RemoteDeps) {
   const snapshotButton = button('snapshot', '스냅샷');
   const autoToggle = createAutoCollectToggle(doc);
 
-  const directLink = createDirectLink({ doc, send, say, noteFailure, currentMenuNo: () => state.menuNo });
+  // 자동수집이 켜져 있을 때만 MAIN world에 알린다(MAIN도 꺼져 있으면 무시한다).
+  const watchSettle = () => {
+    if (autoToggle.box.checked) requestSettleWatch(doc.defaultView);
+  };
+  const directLink = createDirectLink({
+    doc, send, say, noteFailure, currentMenuNo: () => state.menuNo, onNavigated: watchSettle,
+  });
 
   const bar = el('div', { class: 'bar' });
   const row = (...children: HTMLElement[]) => {
@@ -202,6 +212,7 @@ export function createRemote(deps: RemoteDeps) {
     if (!reply.ok) return auto ? undefined : noteFailure(reply);
     const { result, diag } = reply.data as { result: CaptureReply; diag: Diagnostics };
     state.diag = diag;
+    if (auto && result.status === 'rejected') return; // 코어가 거절한 수집은 한 일이 아니다
     if (result.restored) state.restored++;
     if (auto) state.autoCollected++;
     say((auto ? AUTO_TOAST_PREFIX : '') + formatCaptureResult(result));
@@ -209,8 +220,17 @@ export function createRemote(deps: RemoteDeps) {
 
   collectButton.addEventListener('click', () => guarded(() => collectOnce(false)));
 
-  // MAIN world가 사용자의 버튼 동작이 끝났다고 알리면 1회 수집한다.
-  async function handleActionSettled(): Promise<void> {
+  // MAIN world가 버튼 동작(사용자·리모컨)이 끝났다고 알리면 1회 수집한다.
+  // 화면이 바뀐 동작이면 screen.changed보다 먼저 올 수 있어, 알림에 실린 menuNo로 화면 사전을 다시 읽은 뒤 판정한다.
+  async function handleActionSettled(currentMenuNo?: string | null): Promise<void> {
+    if (!autoToggle.box.checked) return;
+    if (currentMenuNo) {
+      if (currentMenuNo !== state.menuNo) {
+        state.menuNo = currentMenuNo;
+        state.screen = null;
+      }
+      await lookUpScreen(currentMenuNo);
+    }
     const ready = shouldAutoCollect({
       on: autoToggle.box.checked, busy: state.busy, menuNo: state.menuNo,
       screenKnown: state.screenKnown, stage: state.screen?.stage,
@@ -225,19 +245,7 @@ export function createRemote(deps: RemoteDeps) {
     openSnapshot(reply.data);
   }));
 
-  // 화면 버튼을 대신 누르는 동작들은 모두 같은 답 꼴({ok, reason})이다.
-  async function siteAction(message: Record<string, unknown>, done: (data: any) => string, failed: string) {
-    const reply = await send(message);
-    if (!reply.ok) return noteFailure(reply);
-    const data = reply.data as { ok: boolean; reason?: string };
-    say(data.ok ? done(data) : (data.reason ?? failed));
-  }
-  const shiftYear = (delta: -1 | 1) => siteAction(
-    { kind: 'shift-year', delta }, (d) => `${d.year}년 1월 1일 ~ 12월 31일`, '기간을 바꾸지 못함');
-  const search = () => siteAction({ kind: 'click-search' }, () => '조회를 눌렀음', '조회를 누르지 못함');
-  const clickExcel = () => siteAction({ kind: 'click-excel' }, () => '엑셀을 눌렀음', '엑셀을 누르지 못함');
-  const applyRowCount = (n: number) => siteAction(
-    { kind: 'row-count', n }, () => `조회건수 ${n}`, '조회건수를 바꾸지 못함');
+  const { shiftYear, search, clickExcel, applyRowCount } = createSiteActions({ send, say, noteFailure, watchSettle });
 
   root.querySelector('[data-action="open-viewer"]')!.addEventListener('click', async () => {
     const reply = await send({ kind: 'open-viewer' });
@@ -281,18 +289,7 @@ function mountInPage(): void {
     }));
   const remote = createRemote({ doc: document, send, panelStore: chromePanelStore() });
   void remote.refreshScreenList();
-  window.addEventListener('message', (event) => {
-    const data = event.data;
-    if (event.source === window && data?.source === 'helper-page' && data.type === 'screen.changed') {
-      void remote.handleScreenChange(data.change);
-      remote.announceAutoCollect(); // page.js가 늦게 떴어도 스위치 값을 받게 한다
-    }
-    if (event.source === window && data?.source === 'helper-page' && data.type === 'action.settled') {
-      void remote.handleActionSettled();
-    }
-  });
-  // page.js가 먼저 떠서 보낸 첫 화면 알림을 놓쳤을 수 있으니 한 번 다시 묻는다.
-  window.postMessage({ source: 'helper-remote', type: 'ping' }, '*');
+  listenToPage(window, remote);
 }
 
 if (typeof chrome !== 'undefined' && chrome.runtime?.id && typeof document !== 'undefined') mountInPage();

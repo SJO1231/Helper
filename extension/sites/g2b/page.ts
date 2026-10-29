@@ -22,8 +22,10 @@ const watch = installScreenWatch(window, readScreenState, (change) => {
 });
 
 // 사용자가 버튼을 눌러 로딩이 끝나면 알린다. 켜기·끄기는 리모컨이 보낸다(기본 꺼짐).
+// 끝난 시점의 menuNo를 함께 실어, 리모컨이 화면 알림 순서와 상관없이 새 화면을 판정하게 한다.
 const actions = installActionWatch(window, () => {
-  window.postMessage({ source: 'helper-page', type: 'action.settled' }, '*');
+  const menuNo = readScreenState(window)?.menuNo ?? null;
+  window.postMessage({ source: 'helper-page', type: 'action.settled', menuNo }, '*');
 });
 
 window.addEventListener('message', (event) => {
@@ -31,4 +33,5 @@ window.addEventListener('message', (event) => {
   if (event.source !== window || data?.source !== 'helper-remote') return;
   if (data.type === 'ping') watch.announce();
   if (data.type === 'auto-collect') actions.setEnabled(data.on === true);
+  if (data.type === 'watch-settle') actions.watchAfterRemoteAction();
 });

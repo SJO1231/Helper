@@ -8,11 +8,12 @@ export interface DirectLinkDeps {
   say: (text: string) => void;
   noteFailure: (reply: Extract<Reply, { ok: false }>) => void;
   currentMenuNo: () => string | null;
+  onNavigated: () => void;
 }
 
 // 리모컨 '업무' 탭의 직링크 줄. 목록은 background가 dict_screen 행에서 만들어 준다.
 export function createDirectLink(deps: DirectLinkDeps) {
-  const { doc, send, say, noteFailure, currentMenuNo } = deps;
+  const { doc, send, say, noteFailure, currentMenuNo, onNavigated } = deps;
   const select = doc.createElement('select');
   select.setAttribute('data-role', 'screen-select');
   const goButton = doc.createElement('button');
@@ -48,6 +49,7 @@ export function createDirectLink(deps: DirectLinkDeps) {
     if (!reply.ok) return noteFailure(reply);
     const { ok, reason } = reply.data as { ok: boolean; reason?: string };
     say(ok ? `이동: ${choice.textContent}` : (reason ?? '이동하지 못함'));
+    if (ok) onNavigated();
   });
 
   show([]);

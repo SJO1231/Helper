@@ -88,4 +88,28 @@ describe('action watch', () => {
     await wait(150);
     expect(t.settled()).toBe(1);
   });
+  test('remote action: loading shows then ends → notifies once; no loading → nothing', async () => {
+    const t = mount();
+    t.watch.watchAfterRemoteAction();
+    t.watch.watchAfterRemoteAction(); // 진행 중에는 두 번째를 무시한다
+    await wait(20);
+    t.show(true);
+    await wait(40);
+    t.show(false);
+    await wait(120);
+    expect(t.settled()).toBe(1);
+    t.watch.watchAfterRemoteAction();
+    await wait(200);
+    expect(t.settled()).toBe(1);
+  });
+  test('remote action while disabled → nothing', async () => {
+    const t = mount();
+    t.watch.setEnabled(false);
+    t.watch.watchAfterRemoteAction();
+    t.show(true);
+    await wait(30);
+    t.show(false);
+    await wait(150);
+    expect(t.settled()).toBe(0);
+  });
 });
