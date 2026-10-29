@@ -53,4 +53,12 @@ describe('direct link row', () => {
     expect(t.q('[data-role="screen-select"]').disabled).toBe(true);
     expect(t.q('[data-action="open-screen"]').disabled).toBe(true);
   });
+  test('a truncated screen list shows 직링크 목록 잘림 in the diagnostics line', async () => {
+    const t = mount((m) => (m.kind === 'screen-list' ? { ok: true, data: [], truncated: true } : routing('bid')(m)));
+    await t.remote.refreshScreenList();
+    expect(t.q('[data-role="diagnostics"]').textContent).toContain('직링크 목록 잘림');
+    const plain = mount(routing('bid'));
+    await plain.remote.refreshScreenList();
+    expect(plain.q('[data-role="diagnostics"]').textContent).not.toContain('잘림');
+  });
 });

@@ -16,7 +16,7 @@ const SCREEN_LIST_LIMIT = 500;
 
 export type CaptureReply = CaptureResult & { restored?: boolean };
 export type Reply<T = unknown> =
-  | { ok: true; data: T }
+  | { ok: true; data: T; truncated?: boolean }
   | { ok: false; error: string; code: string; diag?: Diagnostics };
 export interface Sender { tab?: { id?: number; url?: string }; url?: string }
 export type PageOutcome = { ok: true; data: unknown } | { ok: false; error: string };
@@ -159,13 +159,15 @@ export function createHandlers(deps: BackgroundDeps) {
   // 직링크 목록의 유일한 출처는 dict_screen 행이다.
   async function screenList(): Promise<Reply> {
     return connection.withCore(async (core) => {
-      const page = await core.getRecords('dict_screen', { filter: { site: [SITE] }, limit: SCREEN_LIST_LIMIT });
+      const query = { filter: { site: [SITE] }, sort: 'name', limit: SCREEN_LIST_LIMIT };
+      const page = await core.getRecords('dict_screen', query);
       const data = page.records.map(({ fields }) => ({
         menu_no: String(fields.menu_no ?? ''),
         menu_cang_val: String(fields.menu_cang_val ?? ''),
         name: String(fields.name ?? ''),
       }));
-      return { ok: true as const, data };
+      // 목록이 한도를 넘으면 잘렸다고 알려, 직링크에 없는 화면이 있음을 리모컨이 보이게 한다.
+      return page.total > SCREEN_LIST_LIMIT ? { ok: true as const, data, truncated: true } : { ok: true as const, data };
     });
   }
 

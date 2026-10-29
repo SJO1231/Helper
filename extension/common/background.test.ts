@@ -322,6 +322,15 @@ describe('direct link', () => {
     expect(t.sent.map((s) => s.path.split('?')[0])).toEqual(['/api/tables/dict_screen/records']);
     expect(t.pageCalls).toEqual([]);
   });
+  test('screen-list asks for name order and flags a list over the limit as truncated', async () => {
+    const many = Array.from({ length: 501 }, (_, i) => ({ site: 'g2b', menu_no: `M${i}`, menu_cang_val: 'C', name: 'N' }));
+    const t = setup({ tables: { dict_screen: many } });
+    const reply: any = await t.handlers.handle({ kind: 'screen-list' }, TAB);
+    expect(new URL('http://x' + t.sent[0].path).searchParams.get('sort')).toBe('name');
+    expect(reply.truncated).toBe(true);
+    const small: any = await setup({ tables: { dict_screen: rows } }).handlers.handle({ kind: 'screen-list' }, TAB);
+    expect(small.truncated).toBeUndefined();
+  });
   test('screen-list is empty when dict_screen has no rows', async () => {
     const reply: any = await setup().handlers.handle({ kind: 'screen-list' }, TAB);
     expect(reply).toEqual({ ok: true, data: [] });

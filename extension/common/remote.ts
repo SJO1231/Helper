@@ -24,6 +24,7 @@ export interface ScreenChange { menuNo: string; scrnNo: string; menuCangVal: str
 
 const MODES: [ExtractMode, string][] = [['visible', '보이는 것만'], ['hidden', '숨김 포함'], ['all', '전체']];
 const TOAST_MS = 4000;
+const TRUNCATED_NOTE = '직링크 목록 잘림';
 const EMPTY_DIAG: Diagnostics = {
   forms: 0, grids: 0, droppedEmptyRef: 0, droppedSameDataList: 0, failedGrids: 0,
   droppedParam: 0, unknownKeys: 0, core: 'ok',
@@ -39,6 +40,7 @@ export function createRemote(deps: RemoteDeps) {
     diag: null as Diagnostics | null,
     registeredScreens: 0,
     restored: 0,
+    screenListTruncated: false,
     autoCollected: 0,
     busy: false,
   };
@@ -84,6 +86,10 @@ export function createRemote(deps: RemoteDeps) {
   };
   const directLink = createDirectLink({
     doc, send, say, noteFailure, currentMenuNo: () => state.menuNo, onNavigated: watchSettle,
+    onTruncated: (truncated) => {
+      state.screenListTruncated = truncated;
+      render();
+    },
   });
 
   const bar = el('div', { class: 'bar' });
@@ -132,13 +138,13 @@ export function createRemote(deps: RemoteDeps) {
     collectButton.disabled = state.busy || state.menuNo === null || stageMissing;
     snapshotButton.disabled = state.busy;
     coreStatus.textContent = !state.diag ? '코어 상태 미확인' : state.diag.core === 'ok' ? '코어 연결' : '코어 꺼짐';
-    if (state.diag) {
-      diagnostics.textContent = formatDiagnostics(state.diag, {
-        registeredScreens: state.registeredScreens,
-        restored: state.restored,
-        autoCollected: state.autoCollected,
-      });
-    }
+    const parts = [state.diag && formatDiagnostics(state.diag, {
+      registeredScreens: state.registeredScreens,
+      restored: state.restored,
+      autoCollected: state.autoCollected,
+    })];
+    if (state.screenListTruncated) parts.push(TRUNCATED_NOTE);
+    diagnostics.textContent = parts.filter(Boolean).join(' · ');
   }
 
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
