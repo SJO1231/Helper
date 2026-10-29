@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { EXT_PAGE, TAB, rawCapture, setup, writes } from './background-test-kit';
+import { formatFailure } from './diagnostics';
 
 describe('screen auto-registration', () => {
   test('screen change sends PUT dict_screen with noupdate and site+menu_no require', async () => {
@@ -88,6 +89,12 @@ describe('collect', () => {
     const attempts = t.sent.length;
     await t.handlers.handle({ kind: 'screen-info', menuNo: 'M1' }, TAB);
     expect(t.sent.slice(attempts).some((s) => s.path.endsWith('g2b_capture/records'))).toBe(false);
+  });
+  test.each(['not-ready', 'no-result'])('page error %s gets its own code and a Korean text', async (error) => {
+    const t = setup({ pageOutcome: { ok: false, error } });
+    const reply: any = await t.handlers.handle({ kind: 'collect', mode: 'visible' }, TAB);
+    expect(reply).toMatchObject({ ok: false, code: error });
+    expect(formatFailure(reply.code, reply.error)).toMatch(/[가-힣]/);
   });
   test('page errors become coded replies', async () => {
     const t = setup({ pageOutcome: { ok: false, error: 'screen-changed' } });

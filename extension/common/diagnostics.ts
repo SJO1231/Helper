@@ -34,6 +34,8 @@ const PAGE_ERROR_TEXT: Record<string, string> = {
   loading: '화면을 불러오는 중이라 읽지 못함',
   'no-screen': '화면 정보를 찾지 못함',
   'screen-changed': '읽는 동안 화면이 바뀜',
+  'not-ready': '화면 도우미가 아직 준비되지 않음',
+  'no-result': '화면에서 답이 오지 않음',
   offline: '코어 꺼짐',
 };
 

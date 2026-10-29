@@ -29,7 +29,7 @@ interface CollectedScreen {
 }
 type Message = { kind: string } & Record<string, any>;
 
-const PAGE_ERROR_CODES = ['loading', 'no-screen', 'screen-changed'];
+const PAGE_ERROR_CODES = ['loading', 'no-screen', 'screen-changed', 'not-ready', 'no-result'];
 const failure = (code: string, error: string, diag?: Diagnostics): Reply => ({ ok: false, code, error, diag });
 
 function coreFailure(error: unknown, diag?: Diagnostics): Reply {
