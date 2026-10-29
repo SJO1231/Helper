@@ -38,7 +38,7 @@ export interface CaptureResult {
 
 export interface GristRecord<F> { id: string | number; fields: F }
 export interface RecordsPage<F> { records: GristRecord<F>[]; total: number }
-export interface ColumnInfo { id: string; fields: { label: string; type: KeyType; index: boolean } }
+export interface ColumnInfo { id: string; fields: { label: string; type: KeyType; index: boolean; primary?: boolean } }
 
 export interface DictKey {
   std_key: string;

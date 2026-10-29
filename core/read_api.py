@@ -1,6 +1,6 @@
 """읽기: 표 목록·열·쪽 단위 레코드. db는 gateway다."""
 from core import dict_read
-from core.dict_codec import decode_row
+from core.dict_codec import PRIMARY_KEYS, decode_row
 from core.dictionary import label_index, resolve_label
 from core.errors import BadRequest, NotFound
 from core.sql_query import order_by, where_clause
@@ -42,8 +42,15 @@ def list_columns(db, table):
     if kind == "capture":
         return [{"id": name, "fields": {"label": label, "type": "text", "index": False}}
                 for name, label in CAPTURE_COLUMNS]
-    return [{"id": name, "fields": {"label": name, "type": "text", "index": False}}
-            for name in db.table_columns(table)]
+    # 사전 표의 기본키 열은 뷰어가 편집 불가로 둔다
+    primary = PRIMARY_KEYS.get(table, ())
+    columns = []
+    for name in db.table_columns(table):
+        fields = {"label": name, "type": "text", "index": False}
+        if name in primary:
+            fields["primary"] = True
+        columns.append({"id": name, "fields": fields})
+    return columns
 
 
 def list_records(db, table, sort=None, filters=None, limit=DEFAULT_LIMIT, offset=0):

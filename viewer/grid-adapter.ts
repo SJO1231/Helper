@@ -3,6 +3,7 @@ import {
   ColumnApiModule,
   InfiniteRowModelModule,
   ModuleRegistry,
+  TextEditorModule,
   TextFilterModule,
   createGrid,
   themeQuartz,
@@ -14,10 +15,11 @@ import type { ColumnInfo, KeyType } from '../shared/types';
 import type { CodeMeanings } from './code-labels';
 import { createColumnMemory, layoutOf } from './column-state';
 import type { ColumnStorage } from './column-state';
+import type { CellEditRequest } from './dict-edit';
 import { formatCell } from './format';
 import type { PagedSource, RowFilter } from './paged-source';
 
-ModuleRegistry.registerModules([ColumnApiModule, InfiniteRowModelModule, TextFilterModule]);
+ModuleRegistry.registerModules([ColumnApiModule, InfiniteRowModelModule, TextEditorModule, TextFilterModule]);
 
 const PAGE_SIZE = 500;
 const ROW_HEIGHT = 32;
@@ -43,6 +45,8 @@ export interface GridHooks {
 export interface GridExtras {
   columnMemory?: { table: string; storage?: ColumnStorage };
   codeMeanings?: CodeMeanings;
+  // 사전 테이블에서만 준다. 주면 기본키가 아닌 열이 편집 가능해지고, 칸 고침은 이 함수로 간다.
+  edit?: { kind: string; onEdit(event: CellEditRequest): void };
 }
 
 interface SortItem { colId: string; sort: string }
@@ -84,12 +88,13 @@ export function buildColumnDefs(
   columns: ColumnInfo[],
   types: Record<string, KeyType>,
   codeMeanings: CodeMeanings = {},
+  kind?: string,
 ): ColDef[] {
   return columns.map((column) => ({
     field: column.id,
     headerName: column.fields.label,
     width: COLUMN_WIDTH,
-    editable: false,
+    editable: kind === 'dict' && !column.fields.primary,
     filter: 'agTextColumnFilter',
     floatingFilter: true,
     filterParams: { filterOptions: ['equals'], maxNumConditions: 1, buttons: ['apply'], closeOnApply: true },
@@ -118,13 +123,16 @@ export function mountGrid(
     if (shouldSaveColumnChange(event)) memory?.save();
   };
   const api = createGrid(element, {
-    columnDefs: buildColumnDefs(columns, types, extras.codeMeanings),
+    columnDefs: buildColumnDefs(columns, types, extras.codeMeanings, extras.edit?.kind),
     theme: themeQuartz,
     rowHeight: ROW_HEIGHT,
     rowModelType: 'infinite',
     cacheBlockSize: PAGE_SIZE,
     rowBuffer: ROW_BUFFER,
     suppressRowHoverHighlight: true,
+    // 값은 코어에 저장된 뒤에만 칸에 반영한다(dict-edit.ts).
+    readOnlyEdit: true,
+    onCellEditRequest: (event) => extras.edit?.onEdit(event as unknown as CellEditRequest),
     datasource: createDatasource(source, hooks),
     onColumnResized: remember,
     onColumnMoved: remember,
@@ -140,7 +148,7 @@ export function mountGrid(
       // 같은 목록 객체로 열 정의만 갈아 끼운다. 자료 공급(코어)은 다시 부르지 않는다.
       // 열 정의를 갈아 끼워도 폭·순서·숨김은 그대로 둔다.
       const layout = layoutOf(api.getColumnState());
-      api.setGridOption('columnDefs', buildColumnDefs(columns, types, extras.codeMeanings));
+      api.setGridOption('columnDefs', buildColumnDefs(columns, types, extras.codeMeanings, extras.edit?.kind));
       api.applyColumnState({ state: layout, applyOrder: true });
     },
     columnCount: () => api.getColumns()?.length ?? 0,
