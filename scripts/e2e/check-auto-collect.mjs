@@ -64,7 +64,8 @@ export async function checkAutoCollect(s, core) {
   const afterFirst = await core.total('g2b_capture');
   const autoAfterFirst = (await readAutoCount(s.page)) ?? 0;
   await clickSiteSearch(s, buttonId);
-  const secondRan = await waitFor(async () => ((await readAutoCount(s.page)) ?? 0) > autoAfterFirst, SETTLE_MS * 2, 500);
+  const autoNow = async () => (await readAutoCount(s.page)) ?? 0;
+  const secondRan = await waitFor(async () => (await autoNow()) > autoAfterFirst, SETTLE_MS * 2, 500);
   const secondDelta = (await core.total('g2b_capture')) - afterFirst;
   await setAutoCollect(s, false);
 

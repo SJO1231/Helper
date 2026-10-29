@@ -24,7 +24,6 @@ export interface ScreenChange { menuNo: string; scrnNo: string; menuCangVal: str
 
 const MODES: [ExtractMode, string][] = [['visible', '보이는 것만'], ['hidden', '숨김 포함'], ['all', '전체']];
 const TOAST_MS = 4000;
-const TRUNCATED_NOTE = '직링크 목록 잘림';
 const EMPTY_DIAG: Diagnostics = {
   forms: 0, grids: 0, droppedEmptyRef: 0, droppedSameDataList: 0, failedGrids: 0,
   droppedParam: 0, unknownKeys: 0, core: 'ok',
@@ -143,7 +142,7 @@ export function createRemote(deps: RemoteDeps) {
       restored: state.restored,
       autoCollected: state.autoCollected,
     })];
-    if (state.screenListTruncated) parts.push(TRUNCATED_NOTE);
+    if (state.screenListTruncated) parts.push('직링크 목록 잘림');
     diagnostics.textContent = parts.filter(Boolean).join(' · ');
   }
 
@@ -252,7 +251,6 @@ export function createRemote(deps: RemoteDeps) {
   }));
 
   const { shiftYear, search, clickExcel, applyRowCount } = createSiteActions({ send, say, noteFailure, watchSettle });
-
   root.querySelector('[data-action="open-viewer"]')!.addEventListener('click', async () => {
     const reply = await send({ kind: 'open-viewer' });
     if (!reply.ok) noteFailure(reply);

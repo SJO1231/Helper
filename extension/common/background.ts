@@ -167,7 +167,8 @@ export function createHandlers(deps: BackgroundDeps) {
         name: String(fields.name ?? ''),
       }));
       // 목록이 한도를 넘으면 잘렸다고 알려, 직링크에 없는 화면이 있음을 리모컨이 보이게 한다.
-      return page.total > SCREEN_LIST_LIMIT ? { ok: true as const, data, truncated: true } : { ok: true as const, data };
+      const truncated = page.total > SCREEN_LIST_LIMIT;
+      return truncated ? { ok: true as const, data, truncated } : { ok: true as const, data };
     });
   }
 

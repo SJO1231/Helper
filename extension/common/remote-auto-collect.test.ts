@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'vitest';
+import type { Handler } from './remote-test-kit';
 import { change, mount, routing, screenRow, settle } from './remote-test-kit';
+
+// menuNo마다 stage가 다른 화면 사전 답을 주는 핸들러
+const byMenu = (stages: Record<string, string | null>): Handler => (m) => (
+  m.kind === 'screen-info' ? { ok: true, data: screenRow(stages[m.menuNo]) } : routing('bid')(m));
 
 describe('auto collect', () => {
   const collects = (t: ReturnType<typeof mount>) => t.sent.filter((m) => m.kind === 'collect').length;
@@ -92,7 +97,8 @@ describe('auto collect', () => {
     expect(watches()).toBe(0);
   });
   test('a failed 조회 does not ask MAIN to watch', async () => {
-    const t = mount((m) => (m.kind === 'click-search' ? { ok: true, data: { ok: false, reason: 'x' } } : routing('bid')(m)));
+    const failed = { ok: true, data: { ok: false, reason: 'x' } };
+    const t = mount((m) => (m.kind === 'click-search' ? failed : routing('bid')(m)));
     turnOn(t);
     const watches = spyPosts(t);
     t.q('[data-action="search"]').click();
@@ -110,7 +116,7 @@ describe('auto collect', () => {
   });
   test('settled before screen.changed: the stage is judged on the new screen after its lookup', async () => {
     const stages: Record<string, string | null> = { M1: null, M2: 'bid' };
-    const t = mount((m) => (m.kind === 'screen-info' ? { ok: true, data: screenRow(stages[m.menuNo]) } : routing('bid')(m)));
+    const t = mount(byMenu(stages));
     await t.remote.handleScreenChange(change); // M1은 stage 없음
     turnOn(t);
     await t.remote.handleActionSettled('M2');
@@ -118,7 +124,7 @@ describe('auto collect', () => {
   });
   test('settled on a screen without stage after the old one had one → no collect', async () => {
     const stages: Record<string, string | null> = { M1: 'bid', M2: null };
-    const t = mount((m) => (m.kind === 'screen-info' ? { ok: true, data: screenRow(stages[m.menuNo]) } : routing('bid')(m)));
+    const t = mount(byMenu(stages));
     await t.remote.handleScreenChange(change);
     turnOn(t);
     await t.remote.handleActionSettled('M2');

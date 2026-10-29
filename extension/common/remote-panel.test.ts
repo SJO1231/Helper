@@ -1,42 +1,8 @@
 import { Window } from 'happy-dom';
 import { describe, expect, test } from 'vitest';
+import { SIZE, mount, settle } from './remote-panel-test-kit';
 import { createRemote } from './remote';
-import type { PanelState, PanelStore } from './remote-panel';
 import { clampPosition } from './remote-panel';
-
-const SIZE = { width: 260, height: 100 };
-const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
-
-function memoryStore(initial?: Partial<PanelState>) {
-  const saved: PanelState[] = [];
-  const store: PanelStore = {
-    load: async () => initial,
-    save: (state) => void saved.push(state),
-  };
-  return { store, saved };
-}
-
-async function mount(initial?: Partial<PanelState>, slowLoad = false) {
-  const win = new Window({ url: 'https://example.invalid/', width: 1000, height: 700 }) as any;
-  const { store, saved } = memoryStore(initial);
-  let finishLoad: () => void = () => undefined;
-  if (slowLoad) {
-    store.load = () => new Promise((resolve) => (finishLoad = () => resolve(initial)));
-  }
-  const send = async () => ({ ok: true, data: null }) as any;
-  const remote = createRemote({ doc: win.document, send, panelStore: store });
-  const q = (selector: string) => remote.root.querySelector(selector) as any;
-  // happy-dom은 배치를 계산하지 않아 크기와 위치를 style에서 읽어 주는 가짜 상자를 붙인다.
-  for (const node of [q('.bar'), q('.bubble')]) {
-    node.getBoundingClientRect = () => ({
-      left: parseFloat(node.style.left) || 0, top: parseFloat(node.style.top) || 0, ...SIZE,
-    });
-  }
-  await settle();
-  const fire = (target: any, type: string, x: number, y: number) =>
-    target.dispatchEvent(new win.MouseEvent(type, { bubbles: true, composed: true, clientX: x, clientY: y }));
-  return { win, remote, q, saved, fire, finishLoad: () => finishLoad() };
-}
 
 describe('clampPosition', () => {
   test('keeps the box inside the view', () => {
@@ -224,100 +190,5 @@ describe('remote panel close', () => {
     t.win.document.body.appendChild(t.win.document.createElement('div'));
     await settle();
     expect(hostOf(t)).not.toBeNull();
-  });
-});
-
-describe('remote panel shortcuts', () => {
-  const press = (t: any, init: Record<string, unknown>, target?: any) => {
-    const event = new t.win.KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
-    (target ?? t.win.document.body).dispatchEvent(event);
-    return event;
-  };
-  const altG = { key: 'g', code: 'KeyG', altKey: true };
-
-  test('Alt+G folds and unfolds the panel', async () => {
-    const t = await mount();
-    expect(press(t, altG).defaultPrevented).toBe(true);
-    expect(t.q('.bar').hidden).toBe(true);
-    expect(t.saved.at(-1)).toMatchObject({ collapsed: true });
-    press(t, altG);
-    expect(t.q('.bar').hidden).toBe(false);
-  });
-  test('Alt+G works while an input has focus', async () => {
-    const t = await mount();
-    const input = t.win.document.createElement('input');
-    t.win.document.body.appendChild(input);
-    input.focus();
-    expect(press(t, altG, input).defaultPrevented).toBe(true);
-    expect(t.q('.bar').hidden).toBe(true);
-  });
-  test('Alt+G is received in the capture phase even if the page stops propagation', async () => {
-    const t = await mount();
-    t.win.document.body.addEventListener('keydown', (e: any) => e.stopPropagation());
-    press(t, altG);
-    expect(t.q('.bar').hidden).toBe(true);
-  });
-  test('a held Alt+G (repeat) toggles and saves only once', async () => {
-    const t = await mount();
-    press(t, altG);
-    const count = t.saved.length;
-    press(t, { ...altG, repeat: true });
-    expect(t.q('.bar').hidden).toBe(true);
-    expect(t.saved.length).toBe(count);
-  });
-  test('the close button tells how to bring the panel back', async () => {
-    const t = await mount();
-    expect(t.q('[data-action="close"]').title).toBe('종료 (Alt+G로 다시 열기)');
-  });
-  test('folding blurs a focused element inside the panel', async () => {
-    const t = await mount();
-    const button = t.q('[data-action="collapse"]');
-    button.focus();
-    expect(t.remote.root.activeElement).toBe(button);
-    press(t, altG);
-    expect(t.remote.root.activeElement).toBeNull();
-  });
-  test('keys other than Alt+G are left alone', async () => {
-    const t = await mount();
-    const others = [{ key: 'g', code: 'KeyG' }, { ...altG, ctrlKey: true }, { key: 'h', code: 'KeyH', altKey: true }];
-    for (const init of others) {
-      expect(press(t, init).defaultPrevented).toBe(false);
-    }
-    expect(t.q('.bar').hidden).toBe(false);
-  });
-  test('Alt+G after closing attaches the panel again, and only one handler runs', async () => {
-    const t = await mount();
-    t.q('[data-action="close"]').click();
-    press(t, altG);
-    expect(t.win.document.getElementById('helper-remote')).not.toBeNull();
-    expect(t.q('.bar').hidden).toBe(false);
-    press(t, altG);
-    expect(t.q('.bar').hidden).toBe(true);
-  });
-  test('Alt+Shift+G puts the panel back to the default place and saves it', async () => {
-    const t = await mount();
-    t.fire(t.q('.title'), 'pointerdown', 10, 10);
-    t.fire(t.win.document, 'pointermove', 110, 60);
-    t.fire(t.win.document, 'pointerup', 110, 60);
-    expect(press(t, { ...altG, shiftKey: true, key: 'G' }).defaultPrevented).toBe(true);
-    for (const node of [t.q('.bar'), t.q('.bubble')]) {
-      expect(node.style.left).toBe('');
-      expect(node.style.top).toBe('');
-    }
-    expect(t.saved.at(-1)).toEqual({ collapsed: false });
-    expect(t.q('.bar').hidden).toBe(false);
-  });
-});
-
-describe('auto collect switch storage', () => {
-  test('toggling saves autoCollect and a saved true is restored', async () => {
-    const t = await mount();
-    const box = t.q('[data-role="auto-collect"]');
-    expect(box.checked).toBe(false);
-    box.checked = true;
-    box.dispatchEvent(new t.win.Event('change'));
-    expect(t.saved.at(-1)).toMatchObject({ autoCollect: true });
-    const again = await mount({ collapsed: false, autoCollect: true });
-    expect(again.q('[data-role="auto-collect"]').checked).toBe(true);
   });
 });
