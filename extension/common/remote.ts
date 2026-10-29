@@ -1,7 +1,7 @@
 /// <reference types="chrome" />
-import type { Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
+import type { CaptureResult, Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
-import type { CaptureReply, Reply } from './background';
+import type { Reply } from './background';
 import {
   AUTO_TOAST_PREFIX, announceAutoCollect, createAutoCollectToggle, requestSettleWatch, shouldAutoCollect,
 } from './auto-collect';
@@ -217,7 +217,7 @@ export function createRemote(deps: RemoteDeps) {
     }
     const reply = await send({ kind: 'collect', mode: currentMode() });
     if (!reply.ok) return auto ? undefined : noteFailure(reply);
-    const { result, diag } = reply.data as { result: CaptureReply; diag: Diagnostics };
+    const { result, diag } = reply.data as { result: CaptureResult; diag: Diagnostics };
     state.diag = diag;
     if (auto && result.status === 'rejected') return; // 코어가 거절한 수집은 한 일이 아니다
     if (result.restored) state.restored++;

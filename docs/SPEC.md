@@ -5,8 +5,8 @@
 ## 1. 목적
 나라장터 업무 화면을 브라우저 확장이 K-V-L(키·값·라벨)로 읽고, 사전으로 이름을 바로잡아, 로컬 SQLite에 모으고,
 엑셀처럼 표로 보고(사전은 편집) CSV·Excel로 내보낸다. DB는 로컬 코어 하나만 만지고, 확장과 뷰어는 코어 HTTP만 부른다.
-컬럼은 화면이 아니라 사전이 정한다. 1단계는 공개 화면에서 "스냅샷 → 사전 → 저장 → 보기 → 내보내기"가 끝까지
-도는 것이다. 공개 화면은 시험대이고, 회사 업무 화면은 회사 PC에서 제품을 쓰는 동안 그 PC의 DB에만 쌓인다.
+컬럼은 화면이 아니라 사전이 정한다. 1단계는 공개 화면에서 "스냅샷 → 사전 → 저장 → 보기 → 내보내기"가 끝까지 도는 것이다.
+공개 화면은 시험대이고, 회사 업무 화면은 회사 PC에서 쓰는 동안 그 PC의 DB에만 쌓인다.
 
 ## 2. 용어
 | 용어 | 뜻 |
@@ -32,8 +32,7 @@
 | `shared/` | 메시지·사전 JSON 스키마와 TS 타입, `seed/*.json` |
 | `scripts/` | 빌드·설치·검증·`e2e:public`·`bench:viewer`·공개 화면 probe |
 
-- `sqlite3`를 import하는 파일은 `core/gateway.py` 하나뿐이다.
-- extension·viewer는 core 내부를 import하지 않는다. 서로 나누는 것은 `shared/`만이다.
+- `sqlite3`는 `core/gateway.py`만 import한다. extension·viewer는 core 내부를 import하지 않고 `shared/`만 나눈다.
 - 화면 코드·업무키·표 이름은 `dict_*` 데이터다. 화면 내용이 DB 구조를 바꾸는 길은 없다(바뀌는 것은 사전 승격뿐).
 - 확장은 수집 자료를 `chrome.storage`에 두지 않는다(토큰·설정만). 설치 대상은 Chrome, e2e·bench는 Playwright Chromium.
 - 코드 규칙은 AGENTS.md "만드는 규칙"(한 파일 한 일·300줄, 120자, 이름·주석, 폴더 밖 수정은 먼저 묻기)을 따른다.
@@ -45,7 +44,7 @@
   끝내 못 띄우면 `{"type":"request","method","path","headers","body"}`를 호스트가 gateway로 처리해 `{"status","body"}`.
 - HTTP: `127.0.0.1:<port>`. 모든 요청에 `Authorization: Bearer <token>`, 없거나 틀리면 401. 뷰어도 확장의 토큰을 쓴다.
 - 오류는 HTTP 상태와 `{"error":"<문장>"}`. 요청의 `X-Schema-Version`이 코어와 다르면 409.
-- 쓰기 요청은 `X-Request-Id` 헤더가 있어야 한다. 같은 ID가 다시 오면 저장해 둔 응답을 그대로 준다.
+- 쓰기 요청은 `X-Request-Id` 헤더가 있어야 한다. 같은 ID가 다시 오면 저장해 둔 응답을 주고, 내용이 다르면 409.
 
 ### 4.2 경로 (Grist records 꼴)
 | 경로 | 요청 | 응답 |
@@ -62,20 +61,20 @@
 - 정렬은 `dict_key.type`대로: number·money·percent는 쉼표 등을 뗀 수, date·datetime은 숫자만 남긴 글자로 비교한다.
 - 1단계에 쓰기가 되는 곳: `g2b_capture`에 POST(수집), `dict_*`에 POST·PATCH·PUT. 나머지 쓰기는 405.
 - `{t}`의 `columns` 라벨은 `dict_label` 우선순위(6절)를 적용한 결과다.
-- `g2b_capture`는 읽기 전용 목록이다(라벨 수집 이력, raw 제외, sort가 없으면 최신 먼저). 쓰기는 수집 POST뿐이다.
+- `g2b_capture`는 읽기 전용 목록(수집 이력, raw 제외, sort 없으면 최신 먼저)이고 쓰기는 수집 POST뿐이다.
 
 ### 4.3 수집
 `POST /api/tables/g2b_capture/records`, 레코드 하나 = 수집 1회.
 - 요청 fields: `site`, `menu_no`, `scrn_no`, `url`, `mode`, `raw`.
 - raw: `{"state","param","pointInfo":[{"k","v","l","visible"}],"tables":[{"id","dataList","visible","columns","rows"}]}`
   `state`는 `history.state.data`에서 `param`을 뺀 스칼라, `columns`는 `[{"k","l"}]`.
-- 응답 fields: `status`(same/new/changed/rejected), `record_id`, `stage`, `changed`(바뀐 표준키), `unknown_keys`, `reason`.
-- 화면 사전에 stage가 없거나 업무키 값이 비면 `rejected`이고 아무 테이블도 바뀌지 않는다.
+- 응답 fields: `status`(same/new/changed/rejected), `record_id`, `stage`, `changed`, `unknown_keys`, `reason`, `restored`.
+- 사전에 stage가 없거나 업무키 값이 비면 `rejected`, 아무 테이블도 안 바뀐다.
 
 ### 4.4 화면 자동 등록
 확장은 `history.state.data`의 menuNo가 바뀔 때마다 `PUT /api/tables/dict_screen/records?noupdate=true`를 보낸다.
 `require`는 `{site, menu_no}`, `fields`는 `{scrn_no, menu_cang_val, name}`(name은 menuNm). 이미 있으면 그대로.
-실패하면 진단 줄에 "코어 꺼짐"만 띄우고 쌓아 두지 않는다.
+실패하면 진단 줄에 "코어 꺼짐"만 띄운다.
 
 ## 5. DB 테이블·컬럼 (A안, 2026-10-28 승인)
 SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교는 DECISIONS.md.
@@ -102,9 +101,8 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 ### 5.1 쓰기 한 번의 순서 (한 트랜잭션)
 1. request_log에 같은 request_id가 있으면 저장된 응답을 돌려준다(지문이 다르면 409).
 2. 화면 사전으로 stage·업무키를 정하고 record_id를 만든다. 없으면 rejected. alias로 K를 표준키로 바꾼다.
-3. raw_hash가 이미 있으면 same으로 끝(메인 captured_at만 갱신). 없으면 capture 1행.
-4. 메인 upsert. 확인창 없이 덮어쓰되 화면 값이 빈 칸은 DB 값을 지우지 않는다. 바뀐 표준키를 응답 changed에 넣고,
-   확장은 "바뀐 칸 n개" 알림을 띄운다.
+3. raw_hash가 있고 메인 행도 있으면 same으로 끝(captured_at만 갱신). 없으면 capture 1행(메인만 없으면 capture 재사용).
+4. 메인 upsert. 확인창 없이 덮어쓰되 빈 칸은 DB 값을 지우지 않는다. 바뀐 표준키는 응답 changed에, 확장은 "바뀐 칸 n개"를 알린다.
 5. 물품·child는 그 record의 그 table_code 행을 지우고 다시 넣는다. 화면 표가 비어 있으면 그대로 둔다.
 6. store_version +1, request_log 기록.
 
@@ -145,8 +143,7 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 - 같은 dataList 그리드는 하나만(스냅샷·수집 공통): `options.dataList`가 같으면 보이는 것, 둘 다 같으면 문서 순서 첫 것.
 - 그리드: `getColumnCount`·`getColumnID(i)`가 K, `getHeaderID(i)`→`getHeaderValue(hid)`가 L, `getAllJSON()`이 V.
   `getHeaderIDArr()`는 쓰지 않는다. `getAllJSON()`이 실패하는 그리드(예: 개찰결과 `gridGangwon`)는 건너뛰고 진단 줄 수에 넣는다.
-- 폼: K는 `getRef()`에서 `data:`를 뗀 `<dataMap>.<키>`, V는 `getValue()` 원값(`input.value` 아님).
-  모든 값은 원문 글자 그대로 보낸다. 서식을 풀거나 숫자로 바꾸지 않는다.
+- 폼: K는 `getRef()`에서 `data:`를 뗀 `<dataMap>.<키>`, V는 `getValue()` 원값(`input.value` 아님). 값은 서식을 풀거나 숫자로 바꾸지 않고 원문 그대로 보낸다.
 - 라벨: `label[for]` → 바로 앞 칸 `th` → 같은 행 `th` → `title` 속성 차례로, 처음 찾은 것을 쓴다.
 - param: `history.state.data.param`의 스칼라는 K `param.<키>`, 객체는 한 단계만 `param.<객체>.<키>`로 편다.
   더 깊은 것과 배열은 버리고 진단 줄의 수에 넣는다.
@@ -159,8 +156,7 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
   select에 없는 값이면 option을 더하고 컴포넌트 `addItem` 뒤 `setValue`(글자 값만 먹는다)를 부르고, 쪽 목록 `setPageSize`로 쪽 크기를 맞춘다(S3 실측).
 - 조회·엑셀 버튼: 리모컨이 화면 버튼을 글자로 찾아 누른다(못 찾으면 실패 알림). 직링크: '업무' 탭 select는 dict_screen 행, '이동'은 com.gfnOpenMenuMove.
 - 패널 위치·접힘·자동수집 스위치는 `remotePanel`에 저장. 자동수집(기본 꺼짐)은 사용자·리모컨(조회류) 버튼 뒤 로딩이 끝나면 stage 있는 화면만 1회 수집.
-- 뷰어 열 폭·순서·숨김: `localStorage`에 테이블별로 저장한다(정렬·필터는 저장하지 않는다).
-- 코드 열 뜻 표시: 화면에만 보인다. 정렬·필터·내보내기는 원값이다.
+- 뷰어: 열 폭·순서·숨김은 테이블별 `localStorage`(정렬·필터는 저장 안 함). 코드 열 뜻은 화면에만, 정렬·필터·내보내기는 원값.
 
 ## 8. 1단계 끝 기준
 아래 명령을 돌려 모든 문장이 참이면 1단계가 끝난다. 실패·미실행·대상 0건은 참이 아니다.
@@ -193,13 +189,12 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 - 뷰어 페이지 이동 시작부터 첫 쪽 행이 그려질 때까지 1초 안이다.
 - 정렬과 필터가 각각 300ms 안에 끝난다(코어 왕복 포함).
 - 열 타입 변경이 500ms 안에 끝난다(bench가 뷰어의 열 정의를 바꿔 다시 그리기까지. 저장 안 함, 코어 제외).
-- 마우스 휠로 세로 끝까지·가로 끝까지 훑는 동안 프레임 간격의 90% 이상이 17ms(60Hz 한 프레임 16.7ms + 측정 오차) 안이다.
+- 마우스 휠로 세로 끝·가로 끝까지 훑는 동안 프레임 간격의 90% 이상이 17ms(60Hz 한 프레임 + 오차) 안이다.
 
 ## 9. 하지 않는 것
-- 사전규격 단계·테이블. 절차상 제외다. 공개 사전규격 화면은 수집 흐름 시험에만 쓴다.
-- 목록 행 수집(목록 화면은 스냅샷만), 화면 사전을 파일로 내보내거나 가져오기.
+- 사전규격 단계·테이블(절차상 제외, 공개 사전규격 화면은 수집 흐름 시험에만 쓴다). 목록 행 수집(목록은 스냅샷만).
 - 자동 순회(쪽 넘김)·탭 순회. 연계기관 공고가 첫 쪽에 없을 때 쪽 넘김으로 찾기도 안 한다("나중"에서 옮김).
-- 공개 화면 값을 fixture에 넣기(fixture는 구조만), 공개 시험 화면의 stage를 제품 seed에 넣기.
+- 공개 화면 값을 fixture에 넣기(구조만), 공개 시험 화면의 stage를 제품 seed에 넣기, 화면 사전 파일 내보내기·가져오기.
 - 사용자 열 편집·자체 그리드 편집기(사전 편집은 라이브러리 기본 편집기로 허용).
 - 2단계 이후 기능: 확장 없이 뷰어 열기, 팝업 닫기·간단 스크립트·메모·일정·테마, 템플릿, 엑셀 연동, 트레이,
   `dict_relation`·사용자 표의 내용, memo·schedule 테이블.
