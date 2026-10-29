@@ -12,7 +12,7 @@ function setup(patch: CoreClient['patchRecords'], kinds: Record<string, string> 
     },
   } as unknown as CoreClient;
   const statuses: [string, boolean][] = [];
-  const updated: [string, string][] = [];
+  const updated: Record<string, string>[] = [];
   const handler = createCellEditHandler(client, 'dict_label', (text, isError = false) => {
     statuses.push([text, isError]);
   }, kinds);
@@ -20,7 +20,7 @@ function setup(patch: CoreClient['patchRecords'], kinds: Record<string, string> 
     data: { [ROW_ID_FIELD]: '7', label: '라벨A', other: 'x' },
     colDef: { field: 'label' },
     newValue: '라벨B',
-    node: { setDataValue: (field: string, value: string) => void updated.push([field, value]) },
+    node: { updateData: (data: Record<string, string>) => void updated.push(data) },
   };
   return { handler, event, calls, statuses, updated };
 }
@@ -35,7 +35,7 @@ describe('dict cell edit', () => {
   test('success puts the new value in the cell and reports it saved', async () => {
     const { handler, event, statuses, updated } = setup(async () => [7]);
     await handler(event);
-    expect(updated).toEqual([['label', '라벨B']]);
+    expect(updated).toEqual([{ [ROW_ID_FIELD]: '7', label: '라벨B', other: 'x' }]);
     expect(statuses).toEqual([['저장됨', false]]);
   });
 
@@ -80,7 +80,7 @@ describe('dict cell edit', () => {
     const { handler, event, calls, updated } = setup(async () => [7], { stages: 'json' });
     await handler({ ...event, colDef: { field: 'stages' }, newValue: '["bid"]' });
     expect(calls[0].records).toEqual([{ id: 7, fields: { stages: ['bid'] } }]);
-    expect(updated).toEqual([['stages', '["bid"]']]);
+    expect(updated.map((row) => row.stages)).toEqual(['["bid"]']);
   });
 
   test('broken json sends nothing and reports it', async () => {

@@ -9,7 +9,7 @@ export interface CellEditRequest {
   data: Record<string, string>;
   colDef: { field?: string };
   newValue: string | null | undefined;
-  node: { setDataValue(field: string, value: string): void };
+  node: { updateData(data: Record<string, string>): void };
 }
 
 export type ReportStatus = (text: string, isError?: boolean) => void;
@@ -60,8 +60,9 @@ export function createCellEditHandler(
       report(describeFailure(error), true);
       return;
     }
-    // PATCH 응답에는 값이 없고 id뿐이라, 보낸 값을 그 칸에만 둔다.
-    event.node.setDataValue(field, converted.shown);
+    // PATCH 응답에는 값이 없고 id뿐이라, 보낸 값을 행 자료에 둔다.
+    // readOnlyEdit에서는 setDataValue가 값을 안 바꾸고 cellEditRequest를 다시 내서 PATCH가 되풀이된다.
+    event.node.updateData({ ...event.data, [field]: converted.shown });
     report('저장됨');
   };
 }
