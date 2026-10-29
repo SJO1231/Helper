@@ -77,7 +77,8 @@ export interface DictChild {
 
 export interface SeedFile<Row> { rows: Row[] }
 
-export interface UnknownKey { k: string; l: string }
+// source: 폼 칸(form)인지 그리드 열(grid, 하위 표)인지. 하위 표 키는 메인 단계 열로 올리지 않는다.
+export interface UnknownKey { k: string; l: string; source?: 'form' | 'grid' }
 export interface Diagnostics {
   forms: number;
   grids: number;

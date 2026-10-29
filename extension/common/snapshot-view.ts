@@ -47,7 +47,7 @@ function heading(doc: Document, text: string): HTMLElement {
 function unknownKeyList(doc: Document, keys: UnknownKey[]): HTMLElement {
   const list = doc.createElement('ul');
   list.dataset.role = 'unknown-keys';
-  for (const { k, l } of keys) {
+  for (const { k, l, source } of keys) {
     const item = doc.createElement('li');
     item.append(`${l} · ${k} `);
     const promote = doc.createElement('button');
@@ -55,6 +55,7 @@ function unknownKeyList(doc: Document, keys: UnknownKey[]): HTMLElement {
     promote.dataset.action = 'promote-key';
     promote.dataset.k = k;
     promote.dataset.l = l;
+    if (source) promote.dataset.source = source;
     promote.textContent = '사전에 올리기';
     item.appendChild(promote);
     list.appendChild(item);

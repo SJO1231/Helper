@@ -260,8 +260,8 @@ export function createRemote(deps: RemoteDeps) {
     void applyRowCount(Number(rowInput.value));
   });
   async function promoteKey(target: HTMLElement): Promise<void> {
-    const { k, l } = target.dataset;
-    const reply = await send({ kind: 'promote-key', k, l, menuNo: state.menuNo });
+    const { k, l, source } = target.dataset;
+    const reply = await send({ kind: 'promote-key', k, l, source, menuNo: state.menuNo });
     if (!reply.ok) return noteFailure(reply);
     target.replaceWith('올림');
     if (state.diag) state.diag = { ...state.diag, unknownKeys: Math.max(0, state.diag.unknownKeys - 1) };

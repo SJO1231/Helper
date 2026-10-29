@@ -150,7 +150,8 @@ export function createHandlers(deps: BackgroundDeps) {
       const filter = { site: [SITE], menu_no: [String(m.menuNo)] };
       const page = await core.getRecords('dict_screen', { filter, limit: 1 });
       const stage = page.records[0] ? normalizeScreen(page.records[0].fields).stage : null;
-      const stdKey = await promoteKey(core, String(m.k), String(m.l), stage);
+      const source = m.source === undefined ? undefined : String(m.source);
+      const stdKey = await promoteKey(core, String(m.k), String(m.l), stage, source);
       return { ok: true as const, data: { stdKey } };
     });
   }

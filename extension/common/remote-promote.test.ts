@@ -34,6 +34,17 @@ describe('promote unknown keys', () => {
     expect(t.q('[data-role="snapshot"] li').textContent).toContain('올림');
     expect(t.q('[data-role="diagnostics"]').textContent).toMatch(/미등록 키 3/);
   });
+  test('the button carries the key source (form or grid) to promote-key', async () => {
+    const t = mount((m) => (m.kind === 'snapshot'
+      ? { ok: true, data: { raw, diag, labels, unknownKeyList: [{ k: 'g1', l: 'LG', source: 'grid' }] } }
+      : routing('bid')(m)));
+    await t.remote.handleScreenChange(change);
+    t.q('[data-action="snapshot"]').click();
+    await settle();
+    t.q('[data-action="promote-key"]').click();
+    await settle();
+    expect(t.sent.find((m) => m.kind === 'promote-key')).toMatchObject({ k: 'g1', source: 'grid' });
+  });
   test('a refusal shows the reason in the toast and keeps the count', async () => {
     const t = mount(withList({ ok: false, code: 'core', error: '표준키 이름으로 쓸 수 없다' }));
     t.q('[data-action="snapshot"]').click();
