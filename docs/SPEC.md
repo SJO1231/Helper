@@ -100,7 +100,7 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
 - 하위 표 승격: `dict_child.typed=1`이면 `g2b_<stage>_<alias>` 컬럼형 테이블로 child 행을 옮긴다. 되돌림은 반대.
 
 ### 5.1 쓰기 한 번의 순서 (한 트랜잭션)
-1. request_log에 같은 request_id가 있으면 저장된 응답을 그대로 돌려준다.
+1. request_log에 같은 request_id가 있으면 저장된 응답을 돌려준다(지문이 다르면 409).
 2. 화면 사전으로 stage·업무키를 정하고 record_id를 만든다. 없으면 rejected. alias로 K를 표준키로 바꾼다.
 3. raw_hash가 이미 있으면 same으로 끝(메인 captured_at만 갱신). 없으면 capture 1행.
 4. 메인 upsert. 확인창 없이 덮어쓰되 화면 값이 빈 칸은 DB 값을 지우지 않는다. 바뀐 표준키를 응답 changed에 넣고,

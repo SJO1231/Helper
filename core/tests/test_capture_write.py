@@ -3,7 +3,7 @@ import threading
 
 import pytest
 
-from core.errors import BadRequest
+from core.errors import BadRequest, Conflict
 from core.gateway import Gateway
 from core.tests.support import MENU_NO, capture_fields, count, main_row, point, seed_dictionary, total_rows
 
@@ -57,12 +57,6 @@ def test_same_request_id_returns_same_response_and_one_capture(seeded):
     cap = capture_fields()
     assert w(seeded, cap, "r1") == w(seeded, cap, "r1")
     assert count(seeded, "g2b_capture") == 1 and main_row(seeded)["store_version"] == 1
-
-
-def test_same_request_id_replay_ignores_later_body(seeded):
-    first = w(seeded, capture_fields(key_b="V1"), "r1")
-    assert w(seeded, capture_fields(key_b="V2"), "r1") == first
-    assert count(seeded, "g2b_capture") == 1
 
 
 def test_screen_without_stage_is_rejected_and_writes_nothing(gw):
@@ -224,3 +218,10 @@ def test_same_raw_after_stage_change_still_fills_new_stage_main(seeded):
     res = w(seeded, cap, "r2")
     assert res["stage"] == "contract" and res["record_id"] == "V1"
     assert count(seeded, "g2b_contract") == 1
+
+
+def test_same_request_id_with_different_body_is_conflict(seeded):
+    w(seeded, capture_fields(key_b="V1"), "r1")
+    with pytest.raises(Conflict):
+        w(seeded, capture_fields(key_b="V2"), "r1")
+    assert count(seeded, "g2b_capture") == 1
