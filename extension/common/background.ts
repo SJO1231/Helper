@@ -12,6 +12,7 @@ import { promoteKey, unknownKeyList } from './promote-key';
 
 const SITE = 'g2b';
 const DICT_LIMIT = 5000;
+const SCREEN_LIST_LIMIT = 500;
 
 export type CaptureReply = CaptureResult & { restored?: boolean };
 export type Reply<T = unknown> =
@@ -154,6 +155,28 @@ export function createHandlers(deps: BackgroundDeps) {
     });
   }
 
+  // 직링크 목록의 유일한 출처는 dict_screen 행이다.
+  async function screenList(): Promise<Reply> {
+    return connection.withCore(async (core) => {
+      const page = await core.getRecords('dict_screen', { filter: { site: [SITE] }, limit: SCREEN_LIST_LIMIT });
+      const data = page.records.map(({ fields }) => ({
+        menu_no: String(fields.menu_no ?? ''),
+        menu_cang_val: String(fields.menu_cang_val ?? ''),
+        name: String(fields.name ?? ''),
+      }));
+      return { ok: true as const, data };
+    });
+  }
+
+  async function openScreen(tabId: number, menuNo: string): Promise<Reply> {
+    const found = await connection.withCore((core) =>
+      core.getRecords('dict_screen', { filter: { site: [SITE], menu_no: [menuNo] }, limit: 1 }));
+    const menuCangVal = String(found.records[0]?.fields.menu_cang_val ?? '');
+    if (!found.records[0]) return { ok: true, data: { ok: false, reason: '사전에 없는 화면' } };
+    if (!menuCangVal) return { ok: true, data: { ok: false, reason: '이 화면은 이동 코드가 없음' } };
+    return { ok: true, data: await inPage(tabId, 'openMenu', [menuCangVal]) };
+  }
+
   // 실패해도 쌓아 두지 않는다. 다음 화면 이동 때 새로 시도할 뿐이다.
   async function registerScreen(m: Message): Promise<Reply> {
     return connection.withCore(async (core) => {
@@ -181,6 +204,8 @@ export function createHandlers(deps: BackgroundDeps) {
       case 'snapshot': return snapshot(tabId, message.mode);
       case 'collect': return collect(tabId, sender.tab?.url ?? '', message.mode);
       case 'screen-info': return screenInfo(String(message.menuNo));
+      case 'screen-list': return screenList();
+      case 'open-screen': return openScreen(tabId, String(message.menuNo));
       case 'screen.changed': return registerScreen(message);
       case 'promote-key': return promote(message);
       case 'shift-year': return { ok: true, data: await inPage(tabId, 'shiftYear', [message.delta]) };

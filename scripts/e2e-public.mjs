@@ -9,6 +9,7 @@ import { checkRowCount, checkYearMinus } from './e2e/check-remote.mjs';
 import {
   BID_LIST, ORDER_LIST, checkScreenRegister, countRegistered, openList,
 } from './e2e/check-screen-register.mjs';
+import { checkDirectLink } from './e2e/check-direct-link.mjs';
 import { checkPromoteKey } from './e2e/check-promote-key.mjs';
 import { addScreenLabel, judgeSnapshots, snapshotOnce } from './e2e/check-snapshot.mjs';
 import { finish, judge } from './e2e/report.mjs';
@@ -57,6 +58,8 @@ async function listScreens(s, core) {
     () => checkScreenRegister(s, core, { firstOpenTotal }));
   await judge('미등록 키 승격: 01175 첫 줄을 올리면 dict_key +1, 다음 스냅샷 미등록 수 −1',
     () => checkPromoteKey(s, core));
+  await judge('직링크: 13713에서 01175 선택·이동 → 3초 안에 menuNo 01175, dict_screen 행 수 불변',
+    () => checkDirectLink(s, core));
 }
 
 let stack;

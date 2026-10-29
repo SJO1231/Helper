@@ -1,6 +1,7 @@
 import { installScreenWatch } from '../../common/screen-watch';
 import { collectScreen } from './collect';
 import { readScreenState } from './identify';
+import { openMenu } from './open-menu';
 import { applyRowCount, clickExcel, clickSearch, shiftYear } from './remote-actions';
 import type { ExtractMode } from '../../../shared/types';
 
@@ -12,6 +13,7 @@ import type { ExtractMode } from '../../../shared/types';
   clickSearch: () => clickSearch(window),
   clickExcel: () => clickExcel(window),
   applyRowCount: (n: number) => applyRowCount(window, n),
+  openMenu: (menuCangVal: string) => openMenu(window, menuCangVal),
 };
 
 const watch = installScreenWatch(window, readScreenState, (change) => {

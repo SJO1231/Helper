@@ -2,6 +2,7 @@
 import type { Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
 import type { CaptureReply, Reply } from './background';
+import { createDirectLink } from './direct-link';
 import { formatCaptureResult, formatDiagnostics, formatFailure } from './diagnostics';
 import { attachPanelMotion, chromePanelStore } from './remote-panel';
 import type { PanelStore } from './remote-panel';
@@ -70,6 +71,8 @@ export function createRemote(deps: RemoteDeps) {
   const collectButton = button('collect', '수집');
   const snapshotButton = button('snapshot', '스냅샷');
 
+  const directLink = createDirectLink({ doc, send, say, noteFailure, currentMenuNo: () => state.menuNo });
+
   const bar = el('div', { class: 'bar' });
   const row = (...children: HTMLElement[]) => {
     const line = el('div', { class: 'row' });
@@ -98,7 +101,8 @@ export function createRemote(deps: RemoteDeps) {
   const panes = [
     pane('work',
       row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회'), button('excel', '엑셀')),
-      row(rowSelect, rowInput, button('row-count-apply', '적용'))),
+      row(rowSelect, rowInput, button('row-count-apply', '적용')),
+      row(directLink.select, directLink.goButton)),
     pane('collect', modeSelect, row(collectButton, snapshotButton)),
     pane('viewer', button('open-viewer', '뷰어 열기'), coreStatus),
   ];
@@ -169,7 +173,7 @@ export function createRemote(deps: RemoteDeps) {
     } else {
       noteFailure(changed);
     }
-    await lookUpScreen(change.menuNo);
+    await Promise.all([lookUpScreen(change.menuNo), directLink.refresh()]);
   }
 
   function closeSnapshot(): void {
@@ -255,7 +259,7 @@ export function createRemote(deps: RemoteDeps) {
   });
   render();
 
-  return { root, handleScreenChange };
+  return { root, handleScreenChange, refreshScreenList: directLink.refresh };
 }
 
 // 확장 안의 화면 탭에서만 붙는다. 시험은 createRemote만 쓴다.
@@ -266,6 +270,7 @@ function mountInPage(): void {
       ok: false as const, code: 'extension', error: '확장 연결이 끊김. 화면을 새로 고치세요.',
     }));
   const remote = createRemote({ doc: document, send, panelStore: chromePanelStore() });
+  void remote.refreshScreenList();
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (event.source === window && data?.source === 'helper-page' && data.type === 'screen.changed') {

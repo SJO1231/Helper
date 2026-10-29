@@ -68,3 +68,14 @@ export async function chooseRowCount(s, value) {
   await showTabOf(s.page, '[data-role="row-count"]');
   await s.page.locator(inShadow('[data-role="row-count"]')).selectOption(value);
 }
+
+// 직링크 select에서 화면을 고른다. 그 값이 목록에 없으면 false.
+export async function chooseScreen(s, menuNo) {
+  await showTabOf(s.page, '[data-role="screen-select"]');
+  const select = s.page.locator(inShadow('[data-role="screen-select"]'));
+  const listed = await waitFor(() => select.locator(`option[value="${menuNo}"]`).count(), 10000);
+  if (!listed) return false;
+  await s.pace();
+  await select.selectOption(menuNo);
+  return true;
+}
