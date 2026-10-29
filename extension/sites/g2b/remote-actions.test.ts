@@ -173,7 +173,7 @@ describe('clickSearch', () => {
   test('clicks the visible button whose text is 조회', () => {
     const win = setup('<button id="b1">조회</button><button id="b2">저장</button>');
     const clicks = watchClicks(win, 'b1');
-    expect(clickSearch(win)).toEqual({ ok: true });
+    expect(clickSearch(win)).toEqual({ ok: true, via: 'click' });
     expect(clicks).toEqual(['b1']);
   });
   test('accepts an input button by value and a 검색 label', () => {
@@ -248,7 +248,7 @@ describe('clickExcel', () => {
   test('clicks a visible button whose text has 엑셀', () => {
     const win = setup('<button id="b1">엑셀다운로드</button><button id="b2">저장</button>');
     const clicks = watch(win, 'b1', 'b2');
-    expect(clickExcel(win)).toEqual({ ok: true });
+    expect(clickExcel(win)).toEqual({ ok: true, via: 'click' });
     expect(clicks).toEqual(['b1']);
   });
   test('matches excel in any case on an input button value', () => {
@@ -303,5 +303,50 @@ describe('clickExcel', () => {
   });
   test('no matching button returns ok false', () => {
     expect(clickExcel(setup('<button id="b1">조회</button>')).ok).toBe(false);
+  });
+});
+
+describe('wsClick via clickExcel and clickSearch', () => {
+  function withComponent(win: FakeWindow, id: string, component: unknown, registeredId = id) {
+    win.WebSquare = { util: { getComponentById: (got: string) => (got === registeredId ? component : null) } };
+    const clicks: string[] = [];
+    win.document.getElementById(id)!.addEventListener('click', () => clicks.push(id));
+    return clicks;
+  }
+  test('uses the component trigger and does not click', () => {
+    const win = setup('<button id="b1">엑셀다운로드</button><button id="s1">조회</button>');
+    const triggers: string[] = [];
+    const clicks = withComponent(win, 'b1', { trigger: (name: string) => triggers.push(name) });
+    expect(clickExcel(win)).toEqual({ ok: true, via: 'trigger' });
+    expect(triggers).toEqual(['onclick']);
+    expect(clicks).toEqual([]);
+  });
+  test('search also goes through the component trigger', () => {
+    const win = setup('<button id="s1">조회</button>');
+    const triggers: string[] = [];
+    const clicks = withComponent(win, 's1', { trigger: (name: string) => triggers.push(name) });
+    expect(clickSearch(win)).toEqual({ ok: true, via: 'trigger' });
+    expect(triggers).toEqual(['onclick']);
+    expect(clicks).toEqual([]);
+  });
+  test('falls back to click when no component is found', () => {
+    const win = setup('<button id="b1">엑셀다운로드</button>');
+    const clicks = withComponent(win, 'b1', { trigger: () => {} }, 'other');
+    expect(clickExcel(win)).toEqual({ ok: true, via: 'click' });
+    expect(clicks).toEqual(['b1']);
+    const plain = setup('<button id="b1">엑셀다운로드</button>');
+    const plainClicks = withComponent(plain, 'b1', null);
+    expect(clickExcel(plain).via).toBe('click');
+    expect(plainClicks).toEqual(['b1']);
+  });
+  test('falls back to click when trigger throws', () => {
+    const win = setup('<button id="b1">엑셀다운로드</button>');
+    const clicks = withComponent(win, 'b1', {
+      trigger: () => {
+        throw new Error('boom');
+      },
+    });
+    expect(clickExcel(win)).toEqual({ ok: true, via: 'click' });
+    expect(clicks).toEqual(['b1']);
   });
 });

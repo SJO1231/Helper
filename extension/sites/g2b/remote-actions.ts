@@ -6,7 +6,7 @@ const POSITION_FOLLOWING = 4;
 
 export const ROW_COUNT_CHOICES = [10, 30, 50, 100, 250, 500, 1000];
 
-export interface ActionResult { ok: boolean; reason?: string }
+export interface ActionResult { ok: boolean; reason?: string; via?: 'trigger' | 'click' }
 
 function visibleBodyComponents(
   win: Window,
@@ -84,12 +84,31 @@ function findSearchButton(win: Window): Element | null {
   return null;
 }
 
+// 합성 click()에는 엑셀 확인창이 뜨지 않았다. v4.2처럼 WebSquare 컴포넌트가 있으면 trigger를 먼저 쓴다.
+function wsClick(el: Element): 'trigger' | 'click' {
+  try {
+    const ws = (el.ownerDocument.defaultView as any)?.WebSquare;
+    const component = el.id ? ws?.util?.getComponentById(el.id) : null;
+    if (typeof component?.trigger === 'function') {
+      component.trigger('onclick');
+      return 'trigger';
+    }
+    if (typeof component?.fireEvent === 'function') {
+      component.fireEvent('onclick');
+      return 'trigger';
+    }
+  } catch {
+    // 컴포넌트 경로가 실패하면 아래 click으로 대체한다.
+  }
+  (el as HTMLElement).click();
+  return 'click';
+}
+
 // 조회 버튼을 찾아 누른다. 없으면 보이는 첫 입력 칸에 Enter를 보낸다(v4.2 doSearch).
 export function clickSearch(win: Window): ActionResult {
   const button = findSearchButton(win);
   if (button) {
-    (button as HTMLElement).click();
-    return { ok: true };
+    return { ok: true, via: wsClick(button) };
   }
   const input = visibleBodyElements(win, 'input')[0];
   if (!input) return { ok: false, reason: '보이는 조회 버튼이나 입력 칸을 찾지 못함' };
@@ -125,8 +144,7 @@ function findExcelButton(win: Window): Element | null {
 export function clickExcel(win: Window): ActionResult {
   const button = findExcelButton(win);
   if (!button) return { ok: false, reason: '보이는 엑셀 버튼을 찾지 못함' };
-  (button as HTMLElement).click();
-  return { ok: true };
+  return { ok: true, via: wsClick(button) };
 }
 
 const isNumericSelect = (el: Element): boolean => {

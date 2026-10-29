@@ -6,6 +6,9 @@ import { assignTestScreens } from './e2e/assign.mjs';
 import { checkCollect } from './e2e/check-collect.mjs';
 import { checkExport } from './e2e/check-export.mjs';
 import { checkRowCount, checkYearMinus } from './e2e/check-remote.mjs';
+import { checkExcelButton, checkSearchButton } from './e2e/check-remote-buttons.mjs';
+import { checkPanelMemory } from './e2e/check-remote-panel.mjs';
+import { checkViewerColumnWidth } from './e2e/check-viewer-width.mjs';
 import {
   BID_LIST, ORDER_LIST, checkScreenRegister, countRegistered, openList,
 } from './e2e/check-screen-register.mjs';
@@ -44,6 +47,8 @@ async function listScreens(s, core) {
   const snaps = [await trySnapshot(s, core, label)];
   await judge('입찰공고목록 −1년: 기간 (해−1)년 1월 1일~12월 31일, 조회 요청 0건', () => checkYearMinus(s));
   await judge('입찰공고목록 조회건수 100: 보이는 그리드 쪽 크기 100', () => checkRowCount(s));
+  await judge('입찰공고목록 리모컨 조회: 2초 안에 조회 요청 1건 이상, 토스트가 실패 문구 아님', () => checkSearchButton(s));
+  await checkExcelButton(s); // 기준 이름이 관측 결과(다운로드 시작/찾지 못함 알림)를 담아 report를 직접 부른다
   await openList(s, core, ORDER_LIST);
   snaps.push(await trySnapshot(s, core, label));
   await clickRadio(s, 1);
@@ -72,6 +77,9 @@ try {
   await listScreens(s, core);
   await judge('상세 3개 각 10번 수집 → 메인 각 1행, capture 3행', () => checkCollect(s, core));
   await judge('뷰어 CSV·xlsx 첫 행 = g2b_bid columns 라벨', () => checkExport(stack, core));
+  await judge('뷰어 첫 열 폭 +60px 끌고 새로 고쳐도 유지(±4px)', () => checkViewerColumnWidth(stack));
+  // 새로 고침이 화면 상태를 지우므로 사이트 화면이 더 필요 없는 맨 끝에 둔다.
+  await judge('리모컨 끌기+접기 → 새로 고침 뒤 접힌 버블이 옮긴 자리(±8px)', () => checkPanelMemory(s));
 } catch (error) {
   console.error(error);
   await judge('e2e 진행', async () => ({ pass: false }));
