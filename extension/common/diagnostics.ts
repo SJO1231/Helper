@@ -1,7 +1,7 @@
 import type { Diagnostics } from '../../shared/types';
 import type { CaptureReply } from './background';
 
-export interface DiagExtra { registeredScreens?: number; restored?: number }
+export interface DiagExtra { registeredScreens?: number; restored?: number; autoCollected?: number }
 
 // 진단 줄: 읽은 폼·그리드 수, 뺀 수, 미등록 키 수, 새로 등록한 화면, 되살림, 코어 연결 상태.
 export function formatDiagnostics(d: Diagnostics, extra: DiagExtra = {}): string {
@@ -15,6 +15,7 @@ export function formatDiagnostics(d: Diagnostics, extra: DiagExtra = {}): string
     `미등록 키 ${d.unknownKeys}`,
     `새로 등록한 화면 ${extra.registeredScreens ?? 0}`,
     `되살림 ${extra.restored ?? 0}건`,
+    `자동수집 ${extra.autoCollected ?? 0}회`,
     d.core === 'ok' ? '코어 연결' : '코어 꺼짐',
   ].join(' · ');
 }

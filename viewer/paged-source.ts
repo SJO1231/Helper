@@ -13,7 +13,23 @@ export interface PagedSource {
 
 interface Page { rows: Record<string, string>[]; total: number }
 
-export function createPagedSource(client: CoreClient, table: string, pageSize = 500): PagedSource {
+// 사전 행의 JSON 칸(배열·객체)은 편집기가 보여 줄 수 있게 JSON 글자로 싣는다.
+function toRow(record: { id: number | string; fields: Record<string, unknown> }, rowIdField?: string) {
+  if (!rowIdField) return record.fields as Record<string, string>;
+  const row: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(record.fields)) {
+    row[name] = value !== null && typeof value === 'object' ? JSON.stringify(value) : value;
+  }
+  return { ...row, [rowIdField]: String(record.id) } as Record<string, string>;
+}
+
+// rowIdField를 주면 레코드 id를 그 이름의 값으로 행에 싣는다(사전 편집이 어느 행인지 알아야 해서).
+export function createPagedSource(
+  client: CoreClient,
+  table: string,
+  pageSize = 500,
+  rowIdField?: string,
+): PagedSource {
   let sort: string | null = null;
   let filter: RowFilter | null = null;
   let pages = new Map<number, Promise<Page>>();
@@ -29,7 +45,7 @@ export function createPagedSource(client: CoreClient, table: string, pageSize = 
         limit: pageSize,
         offset: index * pageSize,
       })
-      .then((reply) => ({ rows: reply.records.map((r) => r.fields), total: reply.total }));
+      .then((reply) => ({ rows: reply.records.map((r) => toRow(r, rowIdField)), total: reply.total }));
     request.catch(() => {
       if (mine === generation) pages.delete(index);
     });

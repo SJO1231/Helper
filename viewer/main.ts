@@ -1,5 +1,6 @@
 import { CoreOfflineError, createCoreClient } from '../shared/core-client';
 import { loadCodeMeanings } from './code-labels';
+import { createCellEditHandler, ROW_ID_FIELD } from './dict-edit';
 import { getConnectionFromBackground } from './connection';
 import { mountGrid } from './grid-adapter';
 import { createPagedSource } from './paged-source';
@@ -39,11 +40,14 @@ async function start() {
 
   const columns = await client.listColumns(table);
   const codeMeanings = await loadCodeMeanings(client, columns);
-  const source = createPagedSource(client, table);
+  const isDict = choices.find((t) => t.id === table)?.kind === 'dict';
+  const source = createPagedSource(client, table, undefined, isDict ? ROW_ID_FIELD : undefined);
+  const kinds = Object.fromEntries(columns.map((c) => [c.id, c.fields.type]));
+  const edit = isDict ? { kind: 'dict', onEdit: createCellEditHandler(client, table, showStatus, kinds) } : undefined;
   const grid = mountGrid(document.getElementById('grid') as HTMLElement, columns, source, {
     onTotal: (total) => showStatus(`${total.toLocaleString()}행`),
     onError: (error) => showStatus(describeFailure(error), true),
-  }, { columnMemory: { table, storage: columnStorage() }, codeMeanings });
+  }, { columnMemory: { table, storage: columnStorage() }, codeMeanings, edit });
   wireToolbar({ client, table, columns, grid, currentQuery: () => source.currentQuery(), showStatus });
 
   // bench가 열 타입 변경 시간을 재려고 쓴다. 평소 화면에는 내놓지 않는다.

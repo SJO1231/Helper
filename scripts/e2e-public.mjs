@@ -3,12 +3,15 @@
 // 실행: npm run e2e:public [-- --headed]
 import { clickRadio, clickSearch, closePopups, createSession } from './probe/browser-steps.mjs';
 import { assignTestScreens } from './e2e/assign.mjs';
+import { checkAutoCollect } from './e2e/check-auto-collect.mjs';
 import { checkCollect } from './e2e/check-collect.mjs';
 import { checkExport } from './e2e/check-export.mjs';
 import { checkRowCount, checkYearMinus } from './e2e/check-remote.mjs';
 import {
   BID_LIST, ORDER_LIST, checkScreenRegister, countRegistered, openList,
 } from './e2e/check-screen-register.mjs';
+import { checkDirectLink } from './e2e/check-direct-link.mjs';
+import { checkPromoteKey } from './e2e/check-promote-key.mjs';
 import { addScreenLabel, judgeSnapshots, snapshotOnce } from './e2e/check-snapshot.mjs';
 import { finish, judge } from './e2e/report.mjs';
 import { openSite, startStack } from './e2e/setup.mjs';
@@ -54,6 +57,10 @@ async function listScreens(s, core) {
   await judge('진단 줄에 빈 ref 제외 수·미등록 키 수가 숫자', async () => judged.diag);
   await judge('입찰공고목록 두 번 열면 dict_screen (g2b, 01175) 1행',
     () => checkScreenRegister(s, core, { firstOpenTotal }));
+  await judge('미등록 키 승격: 01175 첫 줄을 올리면 dict_key +1, 다음 스냅샷 미등록 수 −1',
+    () => checkPromoteKey(s, core));
+  await judge('직링크: 13713에서 01175 선택·이동 → 3초 안에 menuNo 01175, dict_screen 행 수 불변',
+    () => checkDirectLink(s, core));
 }
 
 let stack;
@@ -71,6 +78,8 @@ try {
   await closePopups(page);
   await listScreens(s, core);
   await judge('상세 3개 각 10번 수집 → 메인 각 1행, capture 3행', () => checkCollect(s, core));
+  await judge('자동수집: 꺼짐=실제 클릭 뒤 capture 불변 / 켜짐=+1, 한 번 더=메인 행 불변(capture 0~1) / 수집 버튼 0회',
+    () => checkAutoCollect(s, core));
   await judge('뷰어 CSV·xlsx 첫 행 = g2b_bid columns 라벨', () => checkExport(stack, core));
 } catch (error) {
   console.error(error);

@@ -111,3 +111,23 @@ def test_label_change_rebuilds_public_view_column_names(seeded):
     assert "SiteA" in names and "keyA" not in names
     seeded.add_records("dict_label", [{"fields": {"scope": "user", "scope_id": "", "key": "keyA", "label": "UserA"}}])
     assert "UserA" not in [r["name"] for r in seeded.rows('PRAGMA table_info("v_bid")')]
+
+
+def test_dict_columns_mark_only_primary_key_columns(seeded):
+    primary = {c["id"] for c in seeded.list_columns("dict_alias") if c["fields"].get("primary")}
+    assert primary == {"site", "screen_code", "source_key"}
+    other = seeded.list_columns("dict_key")
+    assert [c["id"] for c in other if c["fields"].get("primary")] == ["std_key"]
+
+
+def test_non_dict_columns_have_no_primary_field(seeded):
+    assert all("primary" not in c["fields"] for c in seeded.list_columns("g2b_capture"))
+
+
+def test_dict_columns_report_flag_json_and_text_kinds(seeded):
+    kinds = {c["id"]: c["fields"]["type"] for c in seeded.list_columns("dict_key")}
+    assert kinds["as_column"] == "flag" and kinds["index"] == "flag"
+    assert kinds["stages"] == "json" and kinds["display"] == "json"
+    assert kinds["std_key"] == "text"
+    screen = {c["id"]: c["fields"]["type"] for c in seeded.list_columns("dict_screen")}
+    assert screen["key_fields"] == "json" and screen["options"] == "json" and screen["menu_no"] == "text"

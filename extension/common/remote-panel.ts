@@ -1,5 +1,5 @@
 /// <reference types="chrome" />
-export interface PanelState { left?: number; top?: number; collapsed: boolean; tab?: string }
+export interface PanelState { left?: number; top?: number; collapsed: boolean; tab?: string; autoCollect?: boolean }
 export interface PanelStore {
   load: () => Promise<Partial<PanelState> | undefined>;
   save: (state: PanelState) => void;
@@ -43,10 +43,12 @@ interface Parts {
   // 탭 버튼과 칸은 data-tab·data-pane 이름이 짝이다. 첫 탭이 기본이다.
   tabs: { buttons: HTMLElement[]; panes: HTMLElement[] };
   store?: PanelStore;
+  // 자동수집 스위치. 값은 같은 remotePanel에 저장하고, 바뀌거나 복원될 때마다 알린다.
+  autoCollect?: { box: HTMLInputElement; onChange: (on: boolean) => void };
 }
 
 export function attachPanelMotion(parts: Parts) {
-  const { doc, bar, bubble, handle, collapseButton, closeButton, host, tabs, store } = parts;
+  const { doc, bar, bubble, handle, collapseButton, closeButton, host, tabs, store, autoCollect } = parts;
   const view = () => ({ width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
   const state: PanelState = { collapsed: false };
   let dragMoved = false;
@@ -144,6 +146,12 @@ export function attachPanelMotion(parts: Parts) {
       save();
     });
   }
+  autoCollect?.box.addEventListener('change', () => {
+    userActed = true;
+    state.autoCollect = autoCollect.box.checked;
+    save();
+    autoCollect.onChange(state.autoCollect);
+  });
   // 종료는 저장된 위치·접힘을 건드리지 않고 이 페이지가 살아 있는 동안만 떼어 둔다.
   closeButton.addEventListener('click', () => {
     closed = true;
@@ -184,6 +192,11 @@ export function attachPanelMotion(parts: Parts) {
     if (!saved || userActed) return;
     if (typeof saved.collapsed === 'boolean') state.collapsed = saved.collapsed;
     if (typeof saved.tab === 'string' && tabNames.includes(saved.tab)) state.tab = saved.tab;
+    if (saved.autoCollect === true && autoCollect) {
+      state.autoCollect = true;
+      autoCollect.box.checked = true;
+      autoCollect.onChange(true);
+    }
     if (isNumber(saved.left) && isNumber(saved.top)) {
       state.left = saved.left;
       state.top = saved.top;

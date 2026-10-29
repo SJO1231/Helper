@@ -8,7 +8,7 @@ function hasWebSquare(win: Window): boolean {
   }
 }
 
-function childFrames(win: Window): Window[] {
+export function childFrames(win: Window): Window[] {
   const children: Window[] = [];
   try {
     for (let i = 0; i < win.frames.length; i++) children.push(win.frames[i]);

@@ -2,7 +2,7 @@ export const SCHEMA_VERSION = 1;
 
 export type Stage = 'receipt' | 'bid' | 'contract';
 export type ExtractMode = 'visible' | 'hidden' | 'all';
-export type KeyType = 'text' | 'number' | 'money' | 'percent' | 'date' | 'datetime' | 'bool' | 'code';
+export type KeyType = 'text' | 'number' | 'money' | 'percent' | 'date' | 'datetime' | 'bool' | 'code' | 'flag' | 'json';
 export type LabelScope = 'user' | 'screen' | 'site' | 'system';
 
 export interface PointField { k: string; v: string; l: string; visible: boolean }
@@ -38,7 +38,7 @@ export interface CaptureResult {
 
 export interface GristRecord<F> { id: string | number; fields: F }
 export interface RecordsPage<F> { records: GristRecord<F>[]; total: number }
-export interface ColumnInfo { id: string; fields: { label: string; type: KeyType; index: boolean } }
+export interface ColumnInfo { id: string; fields: { label: string; type: KeyType; index: boolean; primary?: boolean } }
 
 export interface DictKey {
   std_key: string;
@@ -77,6 +77,8 @@ export interface DictChild {
 
 export interface SeedFile<Row> { rows: Row[] }
 
+// source: 폼 칸(form)인지 그리드 열(grid, 하위 표)인지. 하위 표 키는 메인 단계 열로 올리지 않는다.
+export interface UnknownKey { k: string; l: string; source?: 'form' | 'grid' }
 export interface Diagnostics {
   forms: number;
   grids: number;

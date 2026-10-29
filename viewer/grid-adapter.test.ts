@@ -115,8 +115,18 @@ describe('buildColumnDefs', () => {
     expect(show('1234')).toBe('1234');
   });
 
-  test('columns are never editable', () => {
-    expect(buildColumnDefs(cols, {}).every((d) => d.editable === false)).toBe(true);
+  test('only non-primary columns of a dict table are editable', () => {
+    const dictCols: ColumnInfo[] = [
+      { id: 'keyA', fields: { label: 'A', type: 'text', index: false, primary: true } },
+      { id: 'keyB', fields: { label: 'B', type: 'text', index: false } },
+    ];
+    expect(buildColumnDefs(dictCols, {}, {}, 'dict').map((d) => d.editable)).toEqual([false, true]);
+  });
+
+  test('every column of other kinds stays read-only', () => {
+    for (const kind of ['main', 'capture', 'typed', 'item', undefined]) {
+      expect(buildColumnDefs(cols, {}, {}, kind).every((d) => d.editable === false)).toBe(true);
+    }
   });
 });
 

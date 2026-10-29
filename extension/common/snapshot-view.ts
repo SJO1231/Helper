@@ -1,9 +1,10 @@
-import type { Diagnostics, RawCapture, RawTable } from '../../shared/types';
+import type { Diagnostics, RawCapture, RawTable, UnknownKey } from '../../shared/types';
 
 export interface SnapshotData {
   raw: RawCapture;
   diag: Diagnostics;
   labels: Record<string, string>;
+  unknownKeyList?: UnknownKey[];
 }
 
 function cell(doc: Document, tag: 'th' | 'td', text: string): HTMLElement {
@@ -43,9 +44,33 @@ function heading(doc: Document, text: string): HTMLElement {
   return el;
 }
 
-// 읽기 전용 표 모음. 입력칸이나 편집 가능한 칸을 만들지 않는다.
+function unknownKeyList(doc: Document, keys: UnknownKey[]): HTMLElement {
+  const list = doc.createElement('ul');
+  list.dataset.role = 'unknown-keys';
+  for (const { k, l, source } of keys) {
+    const item = doc.createElement('li');
+    item.append(`${l} · ${k} `);
+    const promote = doc.createElement('button');
+    promote.type = 'button';
+    promote.dataset.action = 'promote-key';
+    promote.dataset.k = k;
+    promote.dataset.l = l;
+    if (source) promote.dataset.source = source;
+    promote.textContent = '사전에 올리기';
+    item.appendChild(promote);
+    list.appendChild(item);
+  }
+  return list;
+}
+
+// 표는 읽기 전용이다. 편집 칸은 없고, 미등록 키 줄의 버튼만 사람이 눌러 사전에 올린다.
 export function renderSnapshot(doc: Document, data: SnapshotData): HTMLElement {
   const root = doc.createElement('div');
+  const unknown = data.unknownKeyList ?? [];
+  if (unknown.length > 0) {
+    root.appendChild(heading(doc, `미등록 키 ${unknown.length}개`));
+    root.appendChild(unknownKeyList(doc, unknown));
+  }
   if (data.raw.pointInfo.length > 0) {
     root.appendChild(heading(doc, `폼 ${data.raw.pointInfo.length}칸`));
     root.appendChild(formTable(doc, data.raw, data.labels));

@@ -7,14 +7,16 @@ import type {
 import { createConnection } from './connection';
 import type { Connection } from './connection';
 import { createNativeClient } from './host';
-import { countUnknownKeys, makeDictionaryView, resolveColumn } from './dictionary';
+import { listUnknownKeys, makeDictionaryView, resolveColumn } from './dictionary';
+import { promoteKey, unknownKeyList } from './promote-key';
 
 const SITE = 'g2b';
 const DICT_LIMIT = 5000;
+const SCREEN_LIST_LIMIT = 500;
 
 export type CaptureReply = CaptureResult & { restored?: boolean };
 export type Reply<T = unknown> =
-  | { ok: true; data: T }
+  | { ok: true; data: T; truncated?: boolean }
   | { ok: false; error: string; code: string; diag?: Diagnostics };
 export interface Sender { tab?: { id?: number; url?: string }; url?: string }
 export type PageOutcome = { ok: true; data: unknown } | { ok: false; error: string };
@@ -110,9 +112,10 @@ export function createHandlers(deps: BackgroundDeps) {
     try {
       return await connection.withCore(async (core) => {
         const view = await loadDictionary(core);
-        const unknownKeys = countUnknownKeys(allKeys(raw), screen.menuNo, view.aliases, view.stdKeys);
+        const unknown = listUnknownKeys(allKeys(raw), screen.menuNo, view.aliases, view.stdKeys);
         const labels = screenLabels(raw, screen.menuNo, view);
-        return { ok: true as const, data: { raw, diag: { ...diag, unknownKeys }, labels } };
+        const data = { raw, diag: { ...diag, unknownKeys: unknown.length }, labels };
+        return { ok: true as const, data: { ...data, unknownKeyList: unknownKeyList(raw, unknown) } };
       });
     } catch (error) {
       if (!(error instanceof CoreOfflineError)) throw error;
@@ -139,6 +142,43 @@ export function createHandlers(deps: BackgroundDeps) {
       const row = page.records[0]?.fields;
       return { ok: true as const, data: row ? normalizeScreen(row) : null };
     });
+  }
+
+  // 사람이 버튼을 눌렀을 때만 온다. 코어가 이름을 거절하면 그 이유가 그대로 올라간다.
+  async function promote(m: Message): Promise<Reply> {
+    return connection.withCore(async (core) => {
+      const filter = { site: [SITE], menu_no: [String(m.menuNo)] };
+      const page = await core.getRecords('dict_screen', { filter, limit: 1 });
+      const stage = page.records[0] ? normalizeScreen(page.records[0].fields).stage : null;
+      const source = m.source === undefined ? undefined : String(m.source);
+      const stdKey = await promoteKey(core, String(m.k), String(m.l), stage, source);
+      return { ok: true as const, data: { stdKey } };
+    });
+  }
+
+  // 직링크 목록의 유일한 출처는 dict_screen 행이다.
+  async function screenList(): Promise<Reply> {
+    return connection.withCore(async (core) => {
+      const query = { filter: { site: [SITE] }, sort: 'name', limit: SCREEN_LIST_LIMIT };
+      const page = await core.getRecords('dict_screen', query);
+      const data = page.records.map(({ fields }) => ({
+        menu_no: String(fields.menu_no ?? ''),
+        menu_cang_val: String(fields.menu_cang_val ?? ''),
+        name: String(fields.name ?? ''),
+      }));
+      // 목록이 한도를 넘으면 잘렸다고 알려, 직링크에 없는 화면이 있음을 리모컨이 보이게 한다.
+      const truncated = page.total > SCREEN_LIST_LIMIT;
+      return truncated ? { ok: true as const, data, truncated } : { ok: true as const, data };
+    });
+  }
+
+  async function openScreen(tabId: number, menuNo: string): Promise<Reply> {
+    const found = await connection.withCore((core) =>
+      core.getRecords('dict_screen', { filter: { site: [SITE], menu_no: [menuNo] }, limit: 1 }));
+    const menuCangVal = String(found.records[0]?.fields.menu_cang_val ?? '');
+    if (!found.records[0]) return { ok: true, data: { ok: false, reason: '사전에 없는 화면' } };
+    if (!menuCangVal) return { ok: true, data: { ok: false, reason: '이 화면은 이동 코드가 없음' } };
+    return { ok: true, data: await inPage(tabId, 'openMenu', [menuCangVal]) };
   }
 
   // 실패해도 쌓아 두지 않는다. 다음 화면 이동 때 새로 시도할 뿐이다.
@@ -168,7 +208,10 @@ export function createHandlers(deps: BackgroundDeps) {
       case 'snapshot': return snapshot(tabId, message.mode);
       case 'collect': return collect(tabId, sender.tab?.url ?? '', message.mode);
       case 'screen-info': return screenInfo(String(message.menuNo));
+      case 'screen-list': return screenList();
+      case 'open-screen': return openScreen(tabId, String(message.menuNo));
       case 'screen.changed': return registerScreen(message);
+      case 'promote-key': return promote(message);
       case 'shift-year': return { ok: true, data: await inPage(tabId, 'shiftYear', [message.delta]) };
       case 'click-search': return { ok: true, data: await inPage(tabId, 'clickSearch', []) };
       case 'click-excel': return { ok: true, data: await inPage(tabId, 'clickExcel', []) };
