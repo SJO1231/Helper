@@ -3,6 +3,8 @@ import json
 
 from core.errors import Conflict
 
+KEEP_REQUESTS = 1000
+
 
 def once(db, request_id, fingerprint, produce):
     """produce()는 (응답, 기록할지)를 돌려준다. 거절·변화 없음은 기록하지 않아 다시 보내면 다시 판단한다."""
@@ -18,5 +20,11 @@ def once(db, request_id, fingerprint, produce):
         if remember:
             db.run("INSERT INTO request_log (request_id, fingerprint, response) VALUES (?, ?, ?)",
                    (request_id, fingerprint, json.dumps(response, ensure_ascii=False)))
+            _trim_request_log(db)
         return response
 
+
+
+def _trim_request_log(db):
+    db.run("DELETE FROM request_log WHERE rowid NOT IN (SELECT rowid FROM request_log ORDER BY rowid DESC LIMIT ?)",
+           (KEEP_REQUESTS,))

@@ -225,3 +225,11 @@ def test_same_request_id_with_different_body_is_conflict(seeded):
     with pytest.raises(Conflict):
         w(seeded, capture_fields(key_b="V2"), "r1")
     assert count(seeded, "g2b_capture") == 1
+
+
+def test_request_log_keeps_only_latest_rows(seeded, monkeypatch):
+    monkeypatch.setattr("core.request_once.KEEP_REQUESTS", 3)
+    for number in range(5):
+        w(seeded, capture_fields(key_b=f"V{number}"), f"r{number}")
+    ids = [r["request_id"] for r in seeded.rows("SELECT request_id FROM request_log ORDER BY rowid")]
+    assert ids == ["r2", "r3", "r4"]
