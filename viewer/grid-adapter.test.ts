@@ -146,7 +146,10 @@ describe('column change saving', () => {
       setItem: (k: string, v: string) => void (stored[k] = v),
       removeItem: (k: string) => void delete stored[k],
     };
-    const defaults: SavedColumn[] = [{ colId: 'keyA', width: 120, hide: false }, { colId: 'keyB', width: 120, hide: false }];
+    const defaults: SavedColumn[] = [
+      { colId: 'keyA', width: 120, hide: false },
+      { colId: 'keyB', width: 120, hide: false },
+    ];
     let state: SavedColumn[] = defaults.map((c) => ({ ...c }));
     let memory: ReturnType<typeof createColumnMemory>;
     const fire = (source: string) => shouldSaveColumnChange({ source }) && memory.save();

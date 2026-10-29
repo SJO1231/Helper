@@ -13,6 +13,10 @@ class NotFound(CoreError):
     status = 404
 
 
+class Conflict(CoreError):
+    status = 409
+
+
 class NotWritable(CoreError):
     status = 405
 

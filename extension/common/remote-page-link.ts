@@ -1,6 +1,8 @@
+import type { ScreenChange } from './screen-watch';
+
 // MAIN world(page.js)가 postMessage로 보내는 알림을 리모컨에 이어 준다.
 interface PageListener {
-  handleScreenChange(change: any): Promise<void>;
+  handleScreenChange(change: ScreenChange): Promise<void>;
   handleActionSettled(menuNo: string | null): Promise<void>;
   announceAutoCollect(): void;
 }

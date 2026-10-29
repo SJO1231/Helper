@@ -25,7 +25,7 @@ describe('extension icons', () => {
     expect(whites.length).toBeGreaterThan(0);
   });
   test('manifest lists every icon size', () => {
-    const m = buildManifest({ key: 'k', hasViewer: false });
+    const m = buildManifest({ key: 'k' });
     const expected = Object.fromEntries((ICON_SIZES as number[]).map((s) => [s, `icons/icon-${s}.png`]));
     expect(m.icons).toEqual(expected);
     expect(m.action.default_icon).toEqual(expected);

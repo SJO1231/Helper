@@ -5,7 +5,7 @@ const LOOPBACK = 'http://127.0.0.1/*';
 
 const ICON_FILES = Object.fromEntries(ICON_SIZES.map((size) => [size, `icons/icon-${size}.png`]));
 
-export function buildManifest({ key, hasViewer }) {
+export function buildManifest({ key }) {
   const manifest = {
     manifest_version: 3,
     name: 'Helper',
@@ -25,8 +25,5 @@ export function buildManifest({ key, hasViewer }) {
     ],
     content_security_policy: { extension_pages: "script-src 'self'; object-src 'self'" },
   };
-  if (hasViewer) {
-    manifest.web_accessible_resources = [{ resources: ['viewer.html', 'viewer.js'], matches: [G2B] }];
-  }
   return manifest;
 }

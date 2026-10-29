@@ -1,8 +1,12 @@
 /// <reference types="chrome" />
 export interface PanelState { left?: number; top?: number; collapsed: boolean; tab?: string; autoCollect?: boolean }
+export type PanelField = keyof PanelState;
 export interface PanelStore {
   load: () => Promise<Partial<PanelState> | undefined>;
-  save: (state: PanelState) => void;
+  // fields만 저장된 값에 합친다. 다른 탭이 바꾼 나머지 필드는 덮지 않는다.
+  save: (state: PanelState, fields: PanelField[]) => void;
+  // 다른 탭이 저장값을 바꾸면 알린다.
+  subscribe?: (listener: (saved: Partial<PanelState>) => void) => void;
 }
 interface Point { left: number; top: number }
 interface Size { width: number; height: number }
@@ -15,17 +19,42 @@ export function clampPosition(pos: Point, size: Size, view: Size): Point {
   return { left: limit(pos.left, view.width - size.width), top: limit(pos.top, view.height - size.height) };
 }
 
+export function mergePanelState(current: Partial<PanelState> | undefined, state: PanelState, fields: PanelField[]) {
+  const merged: Record<string, unknown> = { ...current };
+  for (const field of fields) {
+    if (state[field] === undefined) delete merged[field];
+    else merged[field] = state[field];
+  }
+  return merged as Partial<PanelState>;
+}
+
 // 저장소가 없으면(시험·확장 밖) 저장을 건너뛴다.
 export function chromePanelStore(): PanelStore | undefined {
   const area = typeof chrome !== 'undefined' ? chrome.storage?.local : undefined;
   if (!area) return undefined;
   return {
     async load() {
-      const saved = await area.get(STORAGE_KEY);
-      return saved[STORAGE_KEY] as Partial<PanelState> | undefined;
+      try {
+        const saved = await area.get(STORAGE_KEY);
+        return saved[STORAGE_KEY] as Partial<PanelState> | undefined;
+      } catch {
+        return undefined;
+      }
     },
-    save(state) {
-      void area.set({ [STORAGE_KEY]: state }).catch(() => undefined);
+    save(state, fields) {
+      // 저장 직전에 다시 읽어, 이 패널이 바꾼 필드만 합친다.
+      void area.get(STORAGE_KEY)
+        .then((saved) => {
+          const current = saved[STORAGE_KEY] as Partial<PanelState> | undefined;
+          return area.set({ [STORAGE_KEY]: mergePanelState(current, state, fields) });
+        })
+        .catch(() => undefined);
+    },
+    subscribe(listener) {
+      chrome.storage.onChanged?.addListener((changes, areaName) => {
+        const next = changes[STORAGE_KEY]?.newValue;
+        if (areaName === 'local' && next && typeof next === 'object') listener(next as Partial<PanelState>);
+      });
     },
   };
 }
@@ -84,7 +113,7 @@ export function attachPanelMotion(parts: Parts) {
     state.left = clamped.left;
     state.top = clamped.top;
   }
-  const save = () => store?.save({ ...state });
+  const save = (...fields: PanelField[]) => store?.save({ ...state }, fields);
 
   function startDrag(event: MouseEvent, target: HTMLElement): void {
     if (event.button !== 0) return;
@@ -111,7 +140,7 @@ export function attachPanelMotion(parts: Parts) {
       doc.removeEventListener('pointermove', move as EventListener);
       doc.removeEventListener('pointerup', stop);
       doc.removeEventListener('pointercancel', stop);
-      if (dragMoved) save();
+      if (dragMoved) save('left', 'top');
     };
     doc.addEventListener('pointermove', move as EventListener);
     doc.addEventListener('pointerup', stop);
@@ -130,7 +159,7 @@ export function attachPanelMotion(parts: Parts) {
     if (collapsed) ((bar.getRootNode() as ShadowRoot).activeElement as HTMLElement | null)?.blur();
     state.collapsed = collapsed;
     apply();
-    save();
+    save('collapsed');
   }
   collapseButton.addEventListener('click', () => setCollapsed(true));
   bubble.addEventListener('click', () => {
@@ -143,14 +172,21 @@ export function attachPanelMotion(parts: Parts) {
       userActed = true;
       state.tab = button.dataset.tab;
       apply();
-      save();
+      save('tab');
     });
   }
   autoCollect?.box.addEventListener('change', () => {
     userActed = true;
     state.autoCollect = autoCollect.box.checked;
-    save();
+    save('autoCollect');
     autoCollect.onChange(state.autoCollect);
+  });
+  store?.subscribe?.((saved) => {
+    if (!autoCollect || typeof saved.autoCollect !== 'boolean') return;
+    if (saved.autoCollect === Boolean(state.autoCollect)) return;
+    state.autoCollect = saved.autoCollect;
+    autoCollect.box.checked = saved.autoCollect;
+    autoCollect.onChange(saved.autoCollect);
   });
   // 종료는 저장된 위치·접힘을 건드리지 않고 이 페이지가 살아 있는 동안만 떼어 둔다.
   closeButton.addEventListener('click', () => {
@@ -167,7 +203,7 @@ export function attachPanelMotion(parts: Parts) {
       node.style.top = '';
       node.style.right = '';
     }
-    save();
+    save('left', 'top');
   }
 
   // 문서 하나에 한 번만 붙인다. 패널을 다시 붙여도 이 함수는 다시 불리지 않는다.
