@@ -2,11 +2,11 @@ import { createHandlers } from './background';
 import { createConnection } from './connection';
 import type { ConnectionInfo, Diagnostics } from '../../shared/types';
 
-export const ORIGIN = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop/';
+const ORIGIN = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop/';
 export const TAB = { tab: { id: 7, url: 'https://example.invalid/' }, url: 'https://example.invalid/' };
 export const EXT_PAGE = { url: ORIGIN + 'viewer.html' };
 
-export const baseDiag: Diagnostics = {
+const baseDiag: Diagnostics = {
   forms: 1, grids: 1, droppedEmptyRef: 2, droppedSameDataList: 1, failedGrids: 0,
   droppedParam: 0, unknownKeys: 0, core: 'ok',
 };
@@ -22,7 +22,7 @@ export const rawCapture = {
 const screen = { menuNo: 'M0001', scrnNo: 'S0001', menuNm: 'N1' };
 export const collected = { raw: rawCapture, diag: baseDiag, screen };
 
-export interface Sent { method: string; path: string; headers: Record<string, string>; body: any }
+interface Sent { method: string; path: string; headers: Record<string, string>; body: any }
 
 export function setup(opts: {
   tokens?: string[];

@@ -1,7 +1,8 @@
 /// <reference types="chrome" />
-import type { Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
+import type { CaptureResult, Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
+import type { ScreenChange } from './screen-watch';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
-import type { CaptureReply, Reply } from './background';
+import type { Reply } from './background';
 import {
   AUTO_TOAST_PREFIX, announceAutoCollect, createAutoCollectToggle, requestSettleWatch, shouldAutoCollect,
 } from './auto-collect';
@@ -20,7 +21,6 @@ export interface RemoteDeps {
   send: (message: Record<string, unknown>) => Promise<Reply<any>>;
   panelStore?: PanelStore;
 }
-export interface ScreenChange { menuNo: string; scrnNo: string; menuCangVal: string; menuNm: string }
 
 const MODES: [ExtractMode, string][] = [['visible', '보이는 것만'], ['hidden', '숨김 포함'], ['all', '전체']];
 const TOAST_MS = 4000;
@@ -173,13 +173,14 @@ export function createRemote(deps: RemoteDeps) {
   const currentMode = () => modeSelect.value as ExtractMode;
 
   // 화면을 연달아 바꾸면 늦게 온 옛 화면의 답이 지금 화면을 덮을 수 있어 순번이 맞는 답만 쓴다.
-  async function lookUpScreen(menuNo: string): Promise<void> {
+  async function lookUpScreen(menuNo: string): Promise<Reply> {
     const seq = ++state.lookupSeq;
     const info = await send({ kind: 'screen-info', menuNo });
-    if (seq !== state.lookupSeq) return;
+    if (seq !== state.lookupSeq) return info;
     state.screen = info.ok ? info.data : null;
     state.screenKnown = info.ok;
     render();
+    return info;
   }
 
   async function handleScreenChange(change: ScreenChange): Promise<void> {
@@ -210,12 +211,13 @@ export function createRemote(deps: RemoteDeps) {
   // 자동일 때는 실패와 거절을 조용히 넘기고, 저장 결과 토스트에만 접두어를 붙인다.
   async function collectOnce(auto: boolean): Promise<void> {
     if (!state.screenKnown && state.menuNo !== null) {
-      await lookUpScreen(state.menuNo);
+      const info = await lookUpScreen(state.menuNo);
+      if (!info.ok) return auto ? undefined : noteFailure(info);
       if (!state.screen?.stage) return auto ? undefined : say('이 화면은 단계가 정해지지 않아 수집할 수 없음');
     }
     const reply = await send({ kind: 'collect', mode: currentMode() });
     if (!reply.ok) return auto ? undefined : noteFailure(reply);
-    const { result, diag } = reply.data as { result: CaptureReply; diag: Diagnostics };
+    const { result, diag } = reply.data as { result: CaptureResult; diag: Diagnostics };
     state.diag = diag;
     if (auto && result.status === 'rejected') return; // 코어가 거절한 수집은 한 일이 아니다
     if (result.restored) state.restored++;

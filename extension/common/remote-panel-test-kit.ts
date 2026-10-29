@@ -1,23 +1,38 @@
 import { Window } from 'happy-dom';
 import { createRemote } from './remote';
+import { mergePanelState } from './remote-panel';
 import type { PanelState, PanelStore } from './remote-panel';
 
 
 export const SIZE = { width: 260, height: 100 };
 export const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-export function memoryStore(initial?: Partial<PanelState>) {
+type Listener = (next: Partial<PanelState>) => void;
+export interface SharedPanelStorage {
+  data?: Partial<PanelState>;
+  watchers: Array<{ owner: object; listener: Listener }>;
+}
+
+// shared를 같이 쓰는 두 저장소는 서로 다른 탭이 한 chrome.storage를 쓰는 것과 같다(onChanged는 다른 탭에만 간다).
+function memoryStore(initial?: Partial<PanelState>, shared: SharedPanelStorage = { watchers: [] }) {
   const saved: PanelState[] = [];
+  const owner = {};
+  shared.data ??= initial;
   const store: PanelStore = {
-    load: async () => initial,
-    save: (state) => void saved.push(state),
+    load: async () => shared.data,
+    save: (state, fields) => {
+      saved.push(state);
+      shared.data = mergePanelState(shared.data, state, fields);
+      for (const watcher of shared.watchers) if (watcher.owner !== owner) watcher.listener(shared.data);
+    },
+    subscribe: (listener) => void shared.watchers.push({ owner, listener }),
   };
   return { store, saved };
 }
 
-export async function mount(initial?: Partial<PanelState>, slowLoad = false) {
+export async function mount(initial?: Partial<PanelState>, slowLoad = false, shared?: SharedPanelStorage) {
   const win = new Window({ url: 'https://example.invalid/', width: 1000, height: 700 }) as any;
-  const { store, saved } = memoryStore(initial);
+  const { store, saved } = memoryStore(initial, shared);
   let finishLoad: () => void = () => undefined;
   if (slowLoad) {
     store.load = () => new Promise((resolve) => (finishLoad = () => resolve(initial)));

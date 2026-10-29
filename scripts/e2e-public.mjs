@@ -5,6 +5,7 @@ import { clickRadio, clickSearch, closePopups, createSession } from './probe/bro
 import { assignTestScreens } from './e2e/assign.mjs';
 import { checkAutoCollect } from './e2e/check-auto-collect.mjs';
 import { checkCollect } from './e2e/check-collect.mjs';
+import { checkDictEdit } from './e2e/check-dict-edit.mjs';
 import { checkExport } from './e2e/check-export.mjs';
 import { checkRowCount, checkYearMinus } from './e2e/check-remote.mjs';
 import {
@@ -81,6 +82,8 @@ try {
   await judge('자동수집: 꺼짐=실제 클릭 뒤 capture 불변 / 켜짐=+1, 한 번 더=메인 행 불변(capture 0~1) / 수집 버튼 0회',
     () => checkAutoCollect(s, core));
   await judge('뷰어 CSV·xlsx 첫 행 = g2b_bid columns 라벨', () => checkExport(stack, core));
+  await judge('뷰어 사전 편집: 칸 고치면 PATCH 1회·칸 반영, 깨진 JSON은 PATCH 0회, 기본키는 편집 불가',
+    () => checkDictEdit(stack, core));
 } catch (error) {
   console.error(error);
   await judge('e2e 진행', async () => ({ pass: false }));

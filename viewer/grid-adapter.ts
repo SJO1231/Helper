@@ -19,7 +19,7 @@ import type { CellEditRequest } from './dict-edit';
 import { formatCell } from './format';
 import type { PagedSource, RowFilter } from './paged-source';
 
-ModuleRegistry.registerModules([ColumnApiModule, InfiniteRowModelModule, TextEditorModule, TextFilterModule]);
+ModuleRegistry.registerModules([ColumnApiModule, InfiniteRowModelModule, TextFilterModule]);
 
 const PAGE_SIZE = 500;
 const ROW_HEIGHT = 32;
@@ -122,6 +122,8 @@ export function mountGrid(
   const remember = (event: ColumnChangeEvent) => {
     if (shouldSaveColumnChange(event)) memory?.save();
   };
+  // 편집기 모듈은 사전 테이블에서만 올린다. 늘 올리면 편집 안 하는 메인 테이블의 세로 휠 프레임이 느려졌다(bench).
+  if (extras.edit) ModuleRegistry.registerModules([TextEditorModule]);
   const api = createGrid(element, {
     columnDefs: buildColumnDefs(columns, types, extras.codeMeanings, extras.edit?.kind),
     theme: themeQuartz,
@@ -131,8 +133,9 @@ export function mountGrid(
     rowBuffer: ROW_BUFFER,
     suppressRowHoverHighlight: true,
     // 값은 코어에 저장된 뒤에만 칸에 반영한다(dict-edit.ts).
-    readOnlyEdit: true,
-    onCellEditRequest: (event) => extras.edit?.onEdit(event as unknown as CellEditRequest),
+    ...(extras.edit
+      ? { readOnlyEdit: true, onCellEditRequest: (event) => extras.edit?.onEdit(event as unknown as CellEditRequest) }
+      : {}),
     datasource: createDatasource(source, hooks),
     onColumnResized: remember,
     onColumnMoved: remember,

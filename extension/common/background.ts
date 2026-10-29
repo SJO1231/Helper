@@ -2,7 +2,7 @@
 import { CoreError, CoreOfflineError } from '../../shared/core-client';
 import type { CoreClient } from '../../shared/core-client';
 import type {
-  CaptureResult, ConnectionInfo, DictAlias, DictKey, DictLabel, DictScreen, Diagnostics, ExtractMode, RawCapture,
+  ConnectionInfo, DictAlias, DictKey, DictLabel, DictScreen, Diagnostics, ExtractMode, RawCapture,
 } from '../../shared/types';
 import { createConnection } from './connection';
 import type { Connection } from './connection';
@@ -14,7 +14,6 @@ const SITE = 'g2b';
 const DICT_LIMIT = 5000;
 const SCREEN_LIST_LIMIT = 500;
 
-export type CaptureReply = CaptureResult & { restored?: boolean };
 export type Reply<T = unknown> =
   | { ok: true; data: T; truncated?: boolean }
   | { ok: false; error: string; code: string; diag?: Diagnostics };
@@ -29,7 +28,7 @@ interface CollectedScreen {
 }
 type Message = { kind: string } & Record<string, any>;
 
-const PAGE_ERROR_CODES = ['loading', 'no-screen', 'screen-changed'];
+const PAGE_ERROR_CODES = ['loading', 'no-screen', 'screen-changed', 'not-ready', 'no-result'];
 const failure = (code: string, error: string, diag?: Diagnostics): Reply => ({ ok: false, code, error, diag });
 
 function coreFailure(error: unknown, diag?: Diagnostics): Reply {

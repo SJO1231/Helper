@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { mount } from './remote-panel-test-kit';
+import type { SharedPanelStorage } from './remote-panel-test-kit';
 
 describe('remote panel shortcuts', () => {
   const press = (t: any, init: Record<string, unknown>, target?: any) => {
@@ -93,5 +94,32 @@ describe('auto collect switch storage', () => {
     expect(t.saved.at(-1)).toMatchObject({ autoCollect: true });
     const again = await mount({ collapsed: false, autoCollect: true });
     expect(again.q('[data-role="auto-collect"]').checked).toBe(true);
+  });
+});
+
+describe('two panels sharing one storage', () => {
+  const toggle = (t: any, on: boolean) => {
+    const box = t.q('[data-role="auto-collect"]');
+    box.checked = on;
+    box.dispatchEvent(new t.win.Event('change'));
+  };
+  const sharedStorage = (): SharedPanelStorage => ({ watchers: [] });
+
+  test('folding one panel does not erase autoCollect another panel turned on', async () => {
+    const shared = sharedStorage();
+    const first = await mount(undefined, false, shared);
+    const second = await mount(undefined, false, shared);
+    toggle(second, true);
+    first.q('[data-action="collapse"]').click();
+    expect(shared.data).toMatchObject({ collapsed: true, autoCollect: true });
+  });
+  test('an autoCollect change from another tab moves the switch', async () => {
+    const shared = sharedStorage();
+    const first = await mount(undefined, false, shared);
+    const second = await mount(undefined, false, shared);
+    toggle(second, true);
+    expect(first.q('[data-role="auto-collect"]').checked).toBe(true);
+    toggle(second, false);
+    expect(first.q('[data-role="auto-collect"]').checked).toBe(false);
   });
 });

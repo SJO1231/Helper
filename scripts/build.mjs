@@ -50,6 +50,6 @@ if (hasViewer) {
   await copyFile(viewerHtml, path.join(output, 'viewer.html'));
 }
 await writeIcons(path.join(output, 'icons'));
-const manifest = buildManifest({ key: identity.key, hasViewer });
+const manifest = buildManifest({ key: identity.key });
 await writeFile(path.join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n', 'utf8');
 console.log(`Built extension: dist/extension (viewer: ${hasViewer})`);

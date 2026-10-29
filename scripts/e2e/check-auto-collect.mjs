@@ -4,7 +4,7 @@ import { ROOT } from '../probe/browser-steps.mjs';
 import { ORDER_LIST, openList } from './check-screen-register.mjs';
 import { readMenuNo } from './page-reads.mjs';
 import {
-  readAutoCount, readCollectPresses, readShadowText, setAutoCollect, waitFor, watchCollectPresses,
+  pressRemote, readAutoCount, readCollectPresses, readShadowText, setAutoCollect, waitFor, watchCollectPresses,
 } from './remote-ui.mjs';
 
 const SETTLE_MS = 5000;
@@ -70,15 +70,21 @@ export async function checkAutoCollect(s, core) {
   const secondRan = await waitFor(async () => (await autoNow()) > autoAfterFirst, SETTLE_MS * 2, 500);
   const secondDelta = (await core.total('g2b_capture')) - afterFirst;
   const secondMainDelta = (await core.total(`g2b_${LIST_SCREEN.stage}`)) - mainAfterFirst;
+
+  // 리모컨 '조회'(사용자가 아니라 확장이 누른 버튼)도 같은 길로 한 번 자동수집돼야 한다.
+  const autoBeforeRemote = await autoNow();
+  await pressRemote(s, 'search');
+  const remoteRan = await waitFor(async () => (await autoNow()) > autoBeforeRemote, SETTLE_MS * 2, 500);
+  const remoteMainDelta = (await core.total(`g2b_${LIST_SCREEN.stage}`)) - mainAfterFirst;
   await setAutoCollect(s, false);
 
   const presses = await readCollectPresses(s.page);
   const pass = offDelta === 0 && offAuto === 0 && Boolean(firstRan) && firstToast.startsWith('자동 ')
     && onDelta === 1 && Boolean(secondRan) && (secondDelta === 0 || secondDelta === 1)
-    && secondMainDelta === 0 && presses === 0;
+    && secondMainDelta === 0 && Boolean(remoteRan) && remoteMainDelta === 0 && presses === 0;
   return {
     pass, 화면: menuNo, 꺼짐_capture변화: offDelta, 꺼짐_자동수집: offAuto, 켜짐_자동수집됨: Boolean(firstRan),
     켜짐_capture변화: onDelta, 한번더_자동수집됨: Boolean(secondRan), 한번더_capture변화: secondDelta, 한번더_메인행변화: secondMainDelta,
-    수집버튼_누른횟수: presses,
+    리모컨조회_자동수집됨: Boolean(remoteRan), 리모컨조회_메인행변화: remoteMainDelta, 수집버튼_누른횟수: presses,
   };
 }

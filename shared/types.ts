@@ -34,6 +34,7 @@ export interface CaptureResult {
   changed: string[];
   unknown_keys: number;
   reason?: string;
+  restored?: boolean;
 }
 
 export interface GristRecord<F> { id: string | number; fields: F }

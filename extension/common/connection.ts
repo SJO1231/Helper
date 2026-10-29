@@ -23,11 +23,10 @@ function parseHello(reply: unknown): ConnectionInfo {
 }
 
 export function createConnection(deps: ConnectionDeps) {
-  async function getConnection(refresh = false): Promise<ConnectionInfo> {
-    if (!refresh) {
-      const saved = await deps.store.get();
-      if (saved) return saved;
-    }
+  // 동시에 부르면 진행 중인 hello 하나를 같이 기다린다.
+  let pendingHello: Promise<ConnectionInfo> | undefined;
+
+  async function sayHello(): Promise<ConnectionInfo> {
     let info: ConnectionInfo;
     try {
       info = parseHello(await deps.host.request({ type: 'hello' }));
@@ -37,6 +36,17 @@ export function createConnection(deps: ConnectionDeps) {
     }
     await deps.store.set(info);
     return info;
+  }
+
+  async function getConnection(refresh = false): Promise<ConnectionInfo> {
+    if (!refresh) {
+      const saved = await deps.store.get();
+      if (saved) return saved;
+    }
+    pendingHello ??= sayHello().finally(() => {
+      pendingHello = undefined;
+    });
+    return pendingHello;
   }
 
   // 토큰이 바뀌었거나(401) 서비스가 다시 떴을 때(연결 실패) 새 hello로 한 번만 다시 붙는다.
