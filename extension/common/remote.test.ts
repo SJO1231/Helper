@@ -123,6 +123,17 @@ describe('screen lookup when the core was off', () => {
     expect(t.sent.filter((m) => m.kind === 'collect')).toHaveLength(0);
     expect(t.q('[data-action="collect"]').disabled).toBe(true);
   });
+  test('a lookup that fails because the core is off says so instead of "no stage"', async () => {
+    const t = mount((m) => {
+      if (m.kind !== 'screen-info') return routing('bid')(m);
+      return { ok: false, code: 'offline', error: 'x' };
+    });
+    await t.remote.handleScreenChange(change);
+    t.q('[data-action="collect"]').click();
+    await settle();
+    expect(t.q('[data-role="toast"]').textContent).toBe('코어 꺼짐');
+    expect(t.sent.filter((m) => m.kind === 'collect')).toHaveLength(0);
+  });
   test('a late lookup for an old screen does not overwrite the current one', async () => {
     const pending: Record<string, (v: unknown) => void> = {};
     const t = mount((m) => {

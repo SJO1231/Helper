@@ -173,13 +173,14 @@ export function createRemote(deps: RemoteDeps) {
   const currentMode = () => modeSelect.value as ExtractMode;
 
   // 화면을 연달아 바꾸면 늦게 온 옛 화면의 답이 지금 화면을 덮을 수 있어 순번이 맞는 답만 쓴다.
-  async function lookUpScreen(menuNo: string): Promise<void> {
+  async function lookUpScreen(menuNo: string): Promise<Reply> {
     const seq = ++state.lookupSeq;
     const info = await send({ kind: 'screen-info', menuNo });
-    if (seq !== state.lookupSeq) return;
+    if (seq !== state.lookupSeq) return info;
     state.screen = info.ok ? info.data : null;
     state.screenKnown = info.ok;
     render();
+    return info;
   }
 
   async function handleScreenChange(change: ScreenChange): Promise<void> {
@@ -210,7 +211,8 @@ export function createRemote(deps: RemoteDeps) {
   // 자동일 때는 실패와 거절을 조용히 넘기고, 저장 결과 토스트에만 접두어를 붙인다.
   async function collectOnce(auto: boolean): Promise<void> {
     if (!state.screenKnown && state.menuNo !== null) {
-      await lookUpScreen(state.menuNo);
+      const info = await lookUpScreen(state.menuNo);
+      if (!info.ok) return auto ? undefined : noteFailure(info);
       if (!state.screen?.stage) return auto ? undefined : say('이 화면은 단계가 정해지지 않아 수집할 수 없음');
     }
     const reply = await send({ kind: 'collect', mode: currentMode() });
