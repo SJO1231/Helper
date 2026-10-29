@@ -61,20 +61,24 @@ export async function checkAutoCollect(s, core) {
   const firstToast = await readShadowText(s.page, 'toast');
   const onDelta = (await core.total('g2b_capture')) - beforeOn;
 
+  // 목록 화면은 조회마다 내용이 달라 capture가 changed로 1행 늘 수 있다. 같은 업무키라 메인 행은 늘지 않아야 한다.
   const afterFirst = await core.total('g2b_capture');
+  const mainAfterFirst = await core.total(`g2b_${LIST_SCREEN.stage}`);
   const autoAfterFirst = (await readAutoCount(s.page)) ?? 0;
   await clickSiteSearch(s, buttonId);
   const autoNow = async () => (await readAutoCount(s.page)) ?? 0;
   const secondRan = await waitFor(async () => (await autoNow()) > autoAfterFirst, SETTLE_MS * 2, 500);
   const secondDelta = (await core.total('g2b_capture')) - afterFirst;
+  const secondMainDelta = (await core.total(`g2b_${LIST_SCREEN.stage}`)) - mainAfterFirst;
   await setAutoCollect(s, false);
 
   const presses = await readCollectPresses(s.page);
   const pass = offDelta === 0 && offAuto === 0 && Boolean(firstRan) && firstToast.startsWith('자동 ')
-    && onDelta === 1 && Boolean(secondRan) && secondDelta === 0 && presses === 0;
+    && onDelta === 1 && Boolean(secondRan) && (secondDelta === 0 || secondDelta === 1)
+    && secondMainDelta === 0 && presses === 0;
   return {
     pass, 화면: menuNo, 꺼짐_capture변화: offDelta, 꺼짐_자동수집: offAuto, 켜짐_자동수집됨: Boolean(firstRan),
-    켜짐_capture변화: onDelta, 한번더_자동수집됨: Boolean(secondRan), 한번더_capture변화: secondDelta,
+    켜짐_capture변화: onDelta, 한번더_자동수집됨: Boolean(secondRan), 한번더_capture변화: secondDelta, 한번더_메인행변화: secondMainDelta,
     수집버튼_누른횟수: presses,
   };
 }

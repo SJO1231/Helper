@@ -78,7 +78,7 @@ try {
   await closePopups(page);
   await listScreens(s, core);
   await judge('상세 3개 각 10번 수집 → 메인 각 1행, capture 3행', () => checkCollect(s, core));
-  await judge('자동수집: 꺼짐=실제 클릭 뒤 capture 불변 / 켜짐=+1 또는 same, 한 번 더=불변 / 수집 버튼 0회',
+  await judge('자동수집: 꺼짐=실제 클릭 뒤 capture 불변 / 켜짐=+1, 한 번 더=메인 행 불변(capture 0~1) / 수집 버튼 0회',
     () => checkAutoCollect(s, core));
   await judge('뷰어 CSV·xlsx 첫 행 = g2b_bid columns 라벨', () => checkExport(stack, core));
 } catch (error) {
