@@ -158,7 +158,7 @@ SQLite 파일 하나. 접두어 `g2b_`가 사이트다. 다른 안과의 비교�
   바꾼다. 기간 칸은 값이 YYYYMMDD인 보이는 `input`이다. 조회 버튼은 누르지 않는다. 조회건수: 10·30·50·100·250·500·1000 또는 직접 입력한 값을 쪽 크기로 넣는다.
   select에 없는 값이면 option을 더하고 컴포넌트 `addItem` 뒤 `setValue`(글자 값만 먹는다)를 부르고, 쪽 목록 `setPageSize`로 쪽 크기를 맞춘다(S3 실측).
 - 조회·엑셀 버튼: 리모컨이 화면의 버튼(a·button·input 버튼·role=button)을 글자로 찾아 누른다. 못 찾으면 실패 알림. 직링크: '업무' 탭 select는 dict_screen 행(name·menu_cang_val)에서 만들고 '이동'은 com.gfnOpenMenuMove(menu_cang_val)로 간다.
-- 패널 위치·접힘: `chrome.storage.local`의 `remotePanel`에 저장하고 다시 붙을 때 복원한다.
+- 패널 위치·접힘·자동수집 스위치: `remotePanel`(chrome.storage.local)에 저장·복원. 자동수집(기본 꺼짐)은 켜져 있고 사용자의 신뢰된 클릭 뒤 로딩 표시가 뜨고 끝나면 stage 있는 화면만 1회 수집.
 - 뷰어 열 폭·순서·숨김: `localStorage`에 테이블별로 저장한다(정렬·필터는 저장하지 않는다).
 - 코드 열 뜻 표시: 화면에만 보인다. 정렬·필터·내보내기는 원값이다.
 

@@ -2,6 +2,7 @@
 import type { Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
 import type { CaptureReply, Reply } from './background';
+import { AUTO_TOAST_PREFIX, announceAutoCollect, createAutoCollectToggle, shouldAutoCollect } from './auto-collect';
 import { createDirectLink } from './direct-link';
 import { formatCaptureResult, formatDiagnostics, formatFailure } from './diagnostics';
 import { attachPanelMotion, chromePanelStore } from './remote-panel';
@@ -34,6 +35,7 @@ export function createRemote(deps: RemoteDeps) {
     diag: null as Diagnostics | null,
     registeredScreens: 0,
     restored: 0,
+    autoCollected: 0,
     busy: false,
   };
   const host = doc.createElement('div');
@@ -70,6 +72,7 @@ export function createRemote(deps: RemoteDeps) {
   const diagnostics = el('div', { 'data-role': 'diagnostics' });
   const collectButton = button('collect', '수집');
   const snapshotButton = button('snapshot', '스냅샷');
+  const autoToggle = createAutoCollectToggle(doc);
 
   const directLink = createDirectLink({ doc, send, say, noteFailure, currentMenuNo: () => state.menuNo });
 
@@ -103,7 +106,7 @@ export function createRemote(deps: RemoteDeps) {
       row(button('year-minus', '−1년'), button('year-plus', '+1년'), button('search', '조회'), button('excel', '엑셀')),
       row(rowSelect, rowInput, button('row-count-apply', '적용')),
       row(directLink.select, directLink.goButton)),
-    pane('collect', modeSelect, row(collectButton, snapshotButton)),
+    pane('collect', modeSelect, row(collectButton, snapshotButton), row(autoToggle.label)),
     pane('viewer', button('open-viewer', '뷰어 열기'), coreStatus),
   ];
   bar.append(title, tabBar, ...panes, toast, diagnostics);
@@ -111,6 +114,7 @@ export function createRemote(deps: RemoteDeps) {
   motion = attachPanelMotion({
     doc, bar, bubble, handle: title, collapseButton, closeButton, host,
     tabs: { buttons: tabButtons, panes }, store: panelStore,
+    autoCollect: { box: autoToggle.box, onChange: (on) => announceAutoCollect(doc.defaultView, on) },
   });
 
   function render(): void {
@@ -122,6 +126,7 @@ export function createRemote(deps: RemoteDeps) {
       diagnostics.textContent = formatDiagnostics(state.diag, {
         registeredScreens: state.registeredScreens,
         restored: state.restored,
+        autoCollected: state.autoCollected,
       });
     }
   }
@@ -187,18 +192,31 @@ export function createRemote(deps: RemoteDeps) {
     root.appendChild(panel);
   }
 
-  collectButton.addEventListener('click', () => guarded(async () => {
+  // 자동일 때는 실패와 거절을 조용히 넘기고, 저장 결과 토스트에만 접두어를 붙인다.
+  async function collectOnce(auto: boolean): Promise<void> {
     if (!state.screenKnown && state.menuNo !== null) {
       await lookUpScreen(state.menuNo);
-      if (!state.screen?.stage) return say('이 화면은 단계가 정해지지 않아 수집할 수 없음');
+      if (!state.screen?.stage) return auto ? undefined : say('이 화면은 단계가 정해지지 않아 수집할 수 없음');
     }
     const reply = await send({ kind: 'collect', mode: currentMode() });
-    if (!reply.ok) return noteFailure(reply);
+    if (!reply.ok) return auto ? undefined : noteFailure(reply);
     const { result, diag } = reply.data as { result: CaptureReply; diag: Diagnostics };
     state.diag = diag;
     if (result.restored) state.restored++;
-    say(formatCaptureResult(result));
-  }));
+    if (auto) state.autoCollected++;
+    say((auto ? AUTO_TOAST_PREFIX : '') + formatCaptureResult(result));
+  }
+
+  collectButton.addEventListener('click', () => guarded(() => collectOnce(false)));
+
+  // MAIN world가 사용자의 버튼 동작이 끝났다고 알리면 1회 수집한다.
+  async function handleActionSettled(): Promise<void> {
+    const ready = shouldAutoCollect({
+      on: autoToggle.box.checked, busy: state.busy, menuNo: state.menuNo,
+      screenKnown: state.screenKnown, stage: state.screen?.stage,
+    });
+    if (ready) await guarded(() => collectOnce(true));
+  }
 
   snapshotButton.addEventListener('click', () => guarded(async () => {
     const reply = await send({ kind: 'snapshot', mode: currentMode() });
@@ -207,30 +225,19 @@ export function createRemote(deps: RemoteDeps) {
     openSnapshot(reply.data);
   }));
 
-  async function shiftYear(delta: -1 | 1): Promise<void> {
-    const reply = await send({ kind: 'shift-year', delta });
+  // 화면 버튼을 대신 누르는 동작들은 모두 같은 답 꼴({ok, reason})이다.
+  async function siteAction(message: Record<string, unknown>, done: (data: any) => string, failed: string) {
+    const reply = await send(message);
     if (!reply.ok) return noteFailure(reply);
-    const { ok, year, reason } = reply.data as { ok: boolean; year?: number; reason?: string };
-    say(ok ? `${year}년 1월 1일 ~ 12월 31일` : (reason ?? '기간을 바꾸지 못함'));
+    const data = reply.data as { ok: boolean; reason?: string };
+    say(data.ok ? done(data) : (data.reason ?? failed));
   }
-  async function search(): Promise<void> {
-    const reply = await send({ kind: 'click-search' });
-    if (!reply.ok) return noteFailure(reply);
-    const { ok, reason } = reply.data as { ok: boolean; reason?: string };
-    say(ok ? '조회를 눌렀음' : (reason ?? '조회를 누르지 못함'));
-  }
-  async function clickExcel(): Promise<void> {
-    const reply = await send({ kind: 'click-excel' });
-    if (!reply.ok) return noteFailure(reply);
-    const { ok, reason } = reply.data as { ok: boolean; reason?: string };
-    say(ok ? '엑셀을 눌렀음' : (reason ?? '엑셀을 누르지 못함'));
-  }
-  async function applyRowCount(n: number): Promise<void> {
-    const reply = await send({ kind: 'row-count', n });
-    if (!reply.ok) return noteFailure(reply);
-    const { ok, reason } = reply.data as { ok: boolean; reason?: string };
-    say(ok ? `조회건수 ${n}` : (reason ?? '조회건수를 바꾸지 못함'));
-  }
+  const shiftYear = (delta: -1 | 1) => siteAction(
+    { kind: 'shift-year', delta }, (d) => `${d.year}년 1월 1일 ~ 12월 31일`, '기간을 바꾸지 못함');
+  const search = () => siteAction({ kind: 'click-search' }, () => '조회를 눌렀음', '조회를 누르지 못함');
+  const clickExcel = () => siteAction({ kind: 'click-excel' }, () => '엑셀을 눌렀음', '엑셀을 누르지 못함');
+  const applyRowCount = (n: number) => siteAction(
+    { kind: 'row-count', n }, () => `조회건수 ${n}`, '조회건수를 바꾸지 못함');
 
   root.querySelector('[data-action="open-viewer"]')!.addEventListener('click', async () => {
     const reply = await send({ kind: 'open-viewer' });
@@ -259,7 +266,10 @@ export function createRemote(deps: RemoteDeps) {
   });
   render();
 
-  return { root, handleScreenChange, refreshScreenList: directLink.refresh };
+  return {
+    root, handleScreenChange, handleActionSettled, refreshScreenList: directLink.refresh,
+    announceAutoCollect: () => announceAutoCollect(doc.defaultView, autoToggle.box.checked),
+  };
 }
 
 // 확장 안의 화면 탭에서만 붙는다. 시험은 createRemote만 쓴다.
@@ -275,6 +285,10 @@ function mountInPage(): void {
     const data = event.data;
     if (event.source === window && data?.source === 'helper-page' && data.type === 'screen.changed') {
       void remote.handleScreenChange(data.change);
+      remote.announceAutoCollect(); // page.js가 늦게 떴어도 스위치 값을 받게 한다
+    }
+    if (event.source === window && data?.source === 'helper-page' && data.type === 'action.settled') {
+      void remote.handleActionSettled();
     }
   });
   // page.js가 먼저 떠서 보낸 첫 화면 알림을 놓쳤을 수 있으니 한 번 다시 묻는다.

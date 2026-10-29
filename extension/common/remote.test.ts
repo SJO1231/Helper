@@ -393,3 +393,58 @@ describe('direct link row', () => {
     expect(t.q('[data-action="open-screen"]').disabled).toBe(true);
   });
 });
+
+describe('auto collect', () => {
+  const collects = (t: ReturnType<typeof mount>) => t.sent.filter((m) => m.kind === 'collect').length;
+  const turnOn = (t: ReturnType<typeof mount>) => {
+    t.q('[data-role="auto-collect"]').checked = true;
+    t.q('[data-role="auto-collect"]').dispatchEvent(new t.win.Event('change'));
+  };
+  test('default off, and action.settled does not collect', async () => {
+    const t = mount(routing('bid'));
+    await t.remote.handleScreenChange(change);
+    expect(t.q('[data-role="auto-collect"]').checked).toBe(false);
+    await t.remote.handleActionSettled();
+    expect(collects(t)).toBe(0);
+  });
+  test('on + stage → one collect with 자동 prefix', async () => {
+    const t = mount(routing('bid'));
+    await t.remote.handleScreenChange(change);
+    turnOn(t);
+    await t.remote.handleActionSettled();
+    expect(collects(t)).toBe(1);
+    expect(t.q('[data-role="toast"]').textContent.startsWith('자동 ')).toBe(true);
+    expect(t.q('[data-role="diagnostics"]').textContent).toContain('자동수집 1회');
+  });
+  test('on + no stage → no collect, no toast', async () => {
+    const t = mount(routing(null));
+    await t.remote.handleScreenChange(change);
+    turnOn(t);
+    await t.remote.handleActionSettled();
+    expect(collects(t)).toBe(0);
+    expect(t.q('[data-role="toast"]').textContent).toBe('');
+  });
+  test('on + busy → skipped', async () => {
+    const t = mount(routing('bid'));
+    await t.remote.handleScreenChange(change);
+    turnOn(t);
+    const first = t.remote.handleActionSettled();
+    await t.remote.handleActionSettled();
+    await first;
+    expect(collects(t)).toBe(1);
+  });
+  test('on + core off → silent', async () => {
+    const t = mount((m) => (m.kind === 'collect' ? { ok: false, code: 'offline', error: 'x' } : routing('bid')(m)));
+    await t.remote.handleScreenChange(change);
+    turnOn(t);
+    await t.remote.handleActionSettled();
+    expect(t.q('[data-role="toast"]').textContent).toBe('');
+  });
+  test('remote 조회 button clicks the site button synthetically, so it is not an auto-collect trigger', () => {
+    // MAIN world 쪽 isTrusted 검사로 막는다(action-watch.test.ts). 리모컨은 action.settled 없이 조회만 보낸다.
+    const t = mount(routing('bid'));
+    turnOn(t);
+    t.q('[data-action="search"]').click();
+    expect(collects(t)).toBe(0);
+  });
+});

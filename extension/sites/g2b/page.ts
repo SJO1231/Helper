@@ -1,4 +1,5 @@
 import { installScreenWatch } from '../../common/screen-watch';
+import { installActionWatch } from './action-watch';
 import { collectScreen } from './collect';
 import { readScreenState } from './identify';
 import { openMenu } from './open-menu';
@@ -20,7 +21,14 @@ const watch = installScreenWatch(window, readScreenState, (change) => {
   window.postMessage({ source: 'helper-page', type: 'screen.changed', change }, '*');
 });
 
+// 사용자가 버튼을 눌러 로딩이 끝나면 알린다. 켜기·끄기는 리모컨이 보낸다(기본 꺼짐).
+const actions = installActionWatch(window, () => {
+  window.postMessage({ source: 'helper-page', type: 'action.settled' }, '*');
+});
+
 window.addEventListener('message', (event) => {
   const data = event.data;
-  if (event.source === window && data?.source === 'helper-remote' && data.type === 'ping') watch.announce();
+  if (event.source !== window || data?.source !== 'helper-remote') return;
+  if (data.type === 'ping') watch.announce();
+  if (data.type === 'auto-collect') actions.setEnabled(data.on === true);
 });

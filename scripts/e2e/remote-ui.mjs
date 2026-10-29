@@ -79,3 +79,27 @@ export async function chooseScreen(s, menuNo) {
   await select.selectOption(menuNo);
   return true;
 }
+
+// 자동수집 스위치(수집 탭)를 켜고 끈다. 실제 체크박스를 눌러 remotePanel 저장까지 탄다.
+export async function setAutoCollect(s, on) {
+  await s.pace();
+  await showTabOf(s.page, '[data-role="auto-collect"]');
+  await s.page.locator(inShadow('[data-role="auto-collect"]')).setChecked(on);
+}
+
+// 리모컨 '수집' 버튼이 눌린 횟수를 세는 감시를 건다. 사람 또는 스크립트가 누르면 올라간다.
+export function watchCollectPresses(pageObj) {
+  return pageObj.evaluate(() => {
+    const button = document.getElementById('helper-remote').shadowRoot.querySelector('[data-action="collect"]');
+    window.__collectPresses = 0;
+    button.addEventListener('click', () => void window.__collectPresses++, true);
+  });
+}
+
+export const readCollectPresses = (pageObj) => pageObj.evaluate(() => window.__collectPresses ?? -1);
+
+export async function readAutoCount(pageObj) {
+  const text = await readShadowText(pageObj, 'diagnostics');
+  const found = /자동수집 (\d+)회/.exec(text);
+  return found ? Number(found[1]) : null;
+}

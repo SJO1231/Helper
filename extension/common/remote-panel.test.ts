@@ -308,3 +308,16 @@ describe('remote panel shortcuts', () => {
     expect(t.q('.bar').hidden).toBe(false);
   });
 });
+
+describe('auto collect switch storage', () => {
+  test('toggling saves autoCollect and a saved true is restored', async () => {
+    const t = await mount();
+    const box = t.q('[data-role="auto-collect"]');
+    expect(box.checked).toBe(false);
+    box.checked = true;
+    box.dispatchEvent(new t.win.Event('change'));
+    expect(t.saved.at(-1)).toMatchObject({ autoCollect: true });
+    const again = await mount({ collapsed: false, autoCollect: true });
+    expect(again.q('[data-role="auto-collect"]').checked).toBe(true);
+  });
+});
