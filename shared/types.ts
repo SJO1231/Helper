@@ -77,6 +77,7 @@ export interface DictChild {
 
 export interface SeedFile<Row> { rows: Row[] }
 
+export interface UnknownKey { k: string; l: string }
 export interface Diagnostics {
   forms: number;
   grids: number;

@@ -7,7 +7,8 @@ import type {
 import { createConnection } from './connection';
 import type { Connection } from './connection';
 import { createNativeClient } from './host';
-import { countUnknownKeys, makeDictionaryView, resolveColumn } from './dictionary';
+import { listUnknownKeys, makeDictionaryView, resolveColumn } from './dictionary';
+import { promoteKey, unknownKeyList } from './promote-key';
 
 const SITE = 'g2b';
 const DICT_LIMIT = 5000;
@@ -110,9 +111,10 @@ export function createHandlers(deps: BackgroundDeps) {
     try {
       return await connection.withCore(async (core) => {
         const view = await loadDictionary(core);
-        const unknownKeys = countUnknownKeys(allKeys(raw), screen.menuNo, view.aliases, view.stdKeys);
+        const unknown = listUnknownKeys(allKeys(raw), screen.menuNo, view.aliases, view.stdKeys);
         const labels = screenLabels(raw, screen.menuNo, view);
-        return { ok: true as const, data: { raw, diag: { ...diag, unknownKeys }, labels } };
+        const data = { raw, diag: { ...diag, unknownKeys: unknown.length }, labels };
+        return { ok: true as const, data: { ...data, unknownKeyList: unknownKeyList(raw, unknown) } };
       });
     } catch (error) {
       if (!(error instanceof CoreOfflineError)) throw error;
@@ -138,6 +140,17 @@ export function createHandlers(deps: BackgroundDeps) {
       const page = await core.getRecords('dict_screen', { filter: { site: [SITE], menu_no: [menuNo] }, limit: 1 });
       const row = page.records[0]?.fields;
       return { ok: true as const, data: row ? normalizeScreen(row) : null };
+    });
+  }
+
+  // 사람이 버튼을 눌렀을 때만 온다. 코어가 이름을 거절하면 그 이유가 그대로 올라간다.
+  async function promote(m: Message): Promise<Reply> {
+    return connection.withCore(async (core) => {
+      const filter = { site: [SITE], menu_no: [String(m.menuNo)] };
+      const page = await core.getRecords('dict_screen', { filter, limit: 1 });
+      const stage = page.records[0] ? normalizeScreen(page.records[0].fields).stage : null;
+      const stdKey = await promoteKey(core, String(m.k), String(m.l), stage);
+      return { ok: true as const, data: { stdKey } };
     });
   }
 
@@ -169,6 +182,7 @@ export function createHandlers(deps: BackgroundDeps) {
       case 'collect': return collect(tabId, sender.tab?.url ?? '', message.mode);
       case 'screen-info': return screenInfo(String(message.menuNo));
       case 'screen.changed': return registerScreen(message);
+      case 'promote-key': return promote(message);
       case 'shift-year': return { ok: true, data: await inPage(tabId, 'shiftYear', [message.delta]) };
       case 'click-search': return { ok: true, data: await inPage(tabId, 'clickSearch', []) };
       case 'click-excel': return { ok: true, data: await inPage(tabId, 'clickExcel', []) };

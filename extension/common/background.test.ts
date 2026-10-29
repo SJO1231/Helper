@@ -199,6 +199,12 @@ describe('snapshot', () => {
     expect(reply.data.labels['dmA.other']).toBe('L2');
     expect(reply.data.diag.unknownKeys).toBe(2); // dmA.other, colA
   });
+  test('unknownKeyList matches the unknown keys with their screen labels', async () => {
+    const t = setup({ tables });
+    const reply: any = await t.handlers.handle({ kind: 'snapshot', mode: 'visible' }, TAB);
+    expect(reply.data.unknownKeyList).toEqual([{ k: 'dmA.other', l: 'L2' }, { k: 'colA', l: 'LA' }]);
+    expect(reply.data.unknownKeyList.length).toBe(reply.data.diag.unknownKeys);
+  });
   test('snapshot sends no write request', async () => {
     const t = setup({ tables });
     await t.handlers.handle({ kind: 'snapshot', mode: 'visible' }, TAB);
@@ -210,6 +216,33 @@ describe('snapshot', () => {
     expect(reply.ok).toBe(true);
     expect(reply.data.diag.core).toBe('offline');
     expect(reply.data.labels['dmA.other']).toBe('L2');
+  });
+});
+
+describe('promote-key', () => {
+  const promote = { kind: 'promote-key', k: 'dmA.other', l: 'L2', menuNo: 'M1' };
+  test('PUTs one dict_key row with noupdate, tail name, text type, as_column 0', async () => {
+    const t = setup({ tables: { dict_screen: [{ site: 'g2b', menu_no: 'M1', stage: 'bid', key_fields: '[]' }] } });
+    const reply: any = await t.handlers.handle(promote, TAB);
+    expect(reply.ok).toBe(true);
+    const puts = writes(t.sent);
+    expect(puts).toHaveLength(1);
+    expect(puts[0].method).toBe('PUT');
+    expect(puts[0].path).toBe('/api/tables/dict_key/records?noupdate=true');
+    expect(puts[0].body.records).toEqual([{
+      require: { std_key: 'other' },
+      fields: { std_key: 'other', label: 'L2', stages: ['bid'], type: 'text', as_column: 0 },
+    }]);
+  });
+  test('a screen without a stage gives empty stages', async () => {
+    const t = setup({ tables: { dict_screen: [{ site: 'g2b', menu_no: 'M1', stage: '', key_fields: '[]' }] } });
+    await t.handlers.handle(promote, TAB);
+    expect(writes(t.sent)[0].body.records[0].fields.stages).toEqual([]);
+  });
+  test('a core refusal comes back as a failure with its reason', async () => {
+    const t = setup({ fetchStatus: (call) => (call.method === 'PUT' ? 400 : 200) });
+    const reply: any = await t.handlers.handle(promote, TAB);
+    expect(reply).toMatchObject({ ok: false, code: 'core', error: 'E' });
   });
 });
 

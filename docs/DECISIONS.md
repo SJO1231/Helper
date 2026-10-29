@@ -86,3 +86,4 @@ DB 구조 3안 비교. A를 승인했다.
 2026-10-29 실측(사용자, 공개 입찰공고목록): 조회 뒤 엑셀다운로드를 손으로 누르면 확인창이 뜬다. 합성 click()으로는 뜨지 않았다(PR 18 e2e). v4.2(wsClick)처럼 WebSquare 컴포넌트 trigger("onclick")를 먼저 쓴다.
 2026-10-29 B1: 백업·복원 명령줄(core.backup). 복원은 코어 꺼진 상태 전제, schema_version 다르면 거절, 복원 전 현재 DB 보존.
 2026-10-29 B2: 뷰어에서 dict_* 편집(AG Grid 기본 편집기, 칸마다 PATCH 1회, 기본키 열 제외, 행 추가·삭제 없음).
+2026-10-29 ③: 스냅샷 창에서 미등록 키를 dict_key로 올림(PUT noupdate, std_key = K 마지막 이름, as_column 0, 열 생성·alias는 안 함).

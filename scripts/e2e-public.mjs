@@ -9,6 +9,7 @@ import { checkRowCount, checkYearMinus } from './e2e/check-remote.mjs';
 import {
   BID_LIST, ORDER_LIST, checkScreenRegister, countRegistered, openList,
 } from './e2e/check-screen-register.mjs';
+import { checkPromoteKey } from './e2e/check-promote-key.mjs';
 import { addScreenLabel, judgeSnapshots, snapshotOnce } from './e2e/check-snapshot.mjs';
 import { finish, judge } from './e2e/report.mjs';
 import { openSite, startStack } from './e2e/setup.mjs';
@@ -54,6 +55,8 @@ async function listScreens(s, core) {
   await judge('진단 줄에 빈 ref 제외 수·미등록 키 수가 숫자', async () => judged.diag);
   await judge('입찰공고목록 두 번 열면 dict_screen (g2b, 01175) 1행',
     () => checkScreenRegister(s, core, { firstOpenTotal }));
+  await judge('미등록 키 승격: 01175 첫 줄을 올리면 dict_key +1, 다음 스냅샷 미등록 수 −1',
+    () => checkPromoteKey(s, core));
 }
 
 let stack;

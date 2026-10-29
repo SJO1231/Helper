@@ -240,8 +240,18 @@ export function createRemote(deps: RemoteDeps) {
   root.querySelector('[data-action="row-count-apply"]')!.addEventListener('click', () => {
     void applyRowCount(Number(rowInput.value));
   });
+  async function promoteKey(target: HTMLElement): Promise<void> {
+    const { k, l } = target.dataset;
+    const reply = await send({ kind: 'promote-key', k, l, menuNo: state.menuNo });
+    if (!reply.ok) return noteFailure(reply);
+    target.replaceWith('올림');
+    if (state.diag) state.diag = { ...state.diag, unknownKeys: Math.max(0, state.diag.unknownKeys - 1) };
+  }
+
   root.addEventListener('click', (event) => {
-    if ((event.target as HTMLElement).dataset?.action === 'close-snapshot') closeSnapshot();
+    const target = event.target as HTMLElement;
+    if (target.dataset?.action === 'close-snapshot') closeSnapshot();
+    if (target.dataset?.action === 'promote-key') void guarded(() => promoteKey(target));
   });
   render();
 
