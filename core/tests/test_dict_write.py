@@ -122,3 +122,12 @@ def test_dict_columns_mark_only_primary_key_columns(seeded):
 
 def test_non_dict_columns_have_no_primary_field(seeded):
     assert all("primary" not in c["fields"] for c in seeded.list_columns("g2b_capture"))
+
+
+def test_dict_columns_report_flag_json_and_text_kinds(seeded):
+    kinds = {c["id"]: c["fields"]["type"] for c in seeded.list_columns("dict_key")}
+    assert kinds["as_column"] == "flag" and kinds["index"] == "flag"
+    assert kinds["stages"] == "json" and kinds["display"] == "json"
+    assert kinds["std_key"] == "text"
+    screen = {c["id"]: c["fields"]["type"] for c in seeded.list_columns("dict_screen")}
+    assert screen["key_fields"] == "json" and screen["options"] == "json" and screen["menu_no"] == "text"

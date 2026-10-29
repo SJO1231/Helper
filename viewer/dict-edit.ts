@@ -9,7 +9,7 @@ export interface CellEditRequest {
   data: Record<string, string>;
   colDef: { field?: string };
   newValue: string | null | undefined;
-  node: { updateData(data: Record<string, string>): void };
+  node: { setDataValue(field: string, value: string): void };
 }
 
 export type ReportStatus = (text: string, isError?: boolean) => void;
@@ -19,20 +19,49 @@ function describeFailure(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-export function createCellEditHandler(client: CoreClient, table: string, report: ReportStatus) {
+type Converted = { ok: true; value: unknown; shown: string } | { ok: false; reason: string };
+
+// 격자 편집기는 글자만 주므로, 코어가 받는 형(0/1·JSON·null)으로 바꿔 보낸다.
+function convertEdited(kind: string | undefined, text: string): Converted {
+  if (text.trim() === '') return { ok: true, value: null, shown: '' };
+  if (kind === 'flag') {
+    const flag = text.trim();
+    if (flag !== '0' && flag !== '1') return { ok: false, reason: '0 또는 1만 쓸 수 있다' };
+    return { ok: true, value: Number(flag), shown: flag };
+  }
+  if (kind === 'json') {
+    try {
+      const parsed: unknown = JSON.parse(text);
+      return { ok: true, value: parsed, shown: JSON.stringify(parsed) };
+    } catch {
+      return { ok: false, reason: 'JSON 형식이 아니다' };
+    }
+  }
+  return { ok: true, value: text, shown: text };
+}
+
+export function createCellEditHandler(
+  client: CoreClient,
+  table: string,
+  report: ReportStatus,
+  kinds: Record<string, string> = {},
+) {
   return async (event: CellEditRequest): Promise<void> => {
     const field = event.colDef.field;
-    const value = event.newValue ?? '';
-    if (!field || value === event.data[field]) return;
+    const text = event.newValue ?? '';
+    if (!field || text === String(event.data[field] ?? '')) return;
+    const converted = convertEdited(kinds[field], text);
+    if (!converted.ok) return report(converted.reason, true);
     try {
-      await client.patchRecords(table, [{ id: Number(event.data[ROW_ID_FIELD]), fields: { [field]: value } }]);
+      const record = { id: Number(event.data[ROW_ID_FIELD]), fields: { [field]: converted.value } };
+      await client.patchRecords(table, [record]);
     } catch (error) {
       // 격자는 값을 바꾸지 않았으므로 칸은 원래 값 그대로다.
       report(describeFailure(error), true);
       return;
     }
-    // PATCH 응답에는 값이 없고 id뿐이라, 보낸 값을 그대로 칸에 둔다.
-    event.node.updateData({ ...event.data, [field]: value });
+    // PATCH 응답에는 값이 없고 id뿐이라, 보낸 값을 그 칸에만 둔다.
+    event.node.setDataValue(field, converted.shown);
     report('저장됨');
   };
 }

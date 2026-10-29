@@ -2,7 +2,7 @@ export const SCHEMA_VERSION = 1;
 
 export type Stage = 'receipt' | 'bid' | 'contract';
 export type ExtractMode = 'visible' | 'hidden' | 'all';
-export type KeyType = 'text' | 'number' | 'money' | 'percent' | 'date' | 'datetime' | 'bool' | 'code';
+export type KeyType = 'text' | 'number' | 'money' | 'percent' | 'date' | 'datetime' | 'bool' | 'code' | 'flag' | 'json';
 export type LabelScope = 'user' | 'screen' | 'site' | 'system';
 
 export interface PointField { k: string; v: string; l: string; visible: boolean }

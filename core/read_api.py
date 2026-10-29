@@ -1,6 +1,7 @@
 """읽기: 표 목록·열·쪽 단위 레코드. db는 gateway다."""
 from core import dict_read
-from core.dict_codec import PRIMARY_KEYS, decode_row
+from core.dict_codec import JSON_FIELDS, PRIMARY_KEYS, decode_row
+from core.dict_rules import FLAGS
 from core.dictionary import label_index, resolve_label
 from core.errors import BadRequest, NotFound
 from core.sql_query import order_by, where_clause
@@ -31,6 +32,13 @@ def require_table(db, table):
     return kind, stage, alias
 
 
+def dict_column_kind(table, name):
+    """사전 열의 편집 값 형: 0/1 칸은 flag, JSON 칸은 json, 나머지는 text."""
+    if name in FLAGS:
+        return "flag"
+    return "json" if name in JSON_FIELDS.get(table, ()) else "text"
+
+
 def list_columns(db, table):
     kind, stage, alias = require_table(db, table)
     if kind in ("main", "item", "typed"):
@@ -46,7 +54,7 @@ def list_columns(db, table):
     primary = PRIMARY_KEYS.get(table, ())
     columns = []
     for name in db.table_columns(table):
-        fields = {"label": name, "type": "text", "index": False}
+        fields = {"label": name, "type": dict_column_kind(table, name), "index": False}
         if name in primary:
             fields["primary"] = True
         columns.append({"id": name, "fields": fields})

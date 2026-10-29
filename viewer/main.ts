@@ -42,7 +42,8 @@ async function start() {
   const codeMeanings = await loadCodeMeanings(client, columns);
   const isDict = choices.find((t) => t.id === table)?.kind === 'dict';
   const source = createPagedSource(client, table, undefined, isDict ? ROW_ID_FIELD : undefined);
-  const edit = isDict ? { kind: 'dict', onEdit: createCellEditHandler(client, table, showStatus) } : undefined;
+  const kinds = Object.fromEntries(columns.map((c) => [c.id, c.fields.type]));
+  const edit = isDict ? { kind: 'dict', onEdit: createCellEditHandler(client, table, showStatus, kinds) } : undefined;
   const grid = mountGrid(document.getElementById('grid') as HTMLElement, columns, source, {
     onTotal: (total) => showStatus(`${total.toLocaleString()}행`),
     onError: (error) => showStatus(describeFailure(error), true),
