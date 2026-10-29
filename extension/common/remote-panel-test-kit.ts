@@ -14,7 +14,7 @@ export interface SharedPanelStorage {
 }
 
 // shared를 같이 쓰는 두 저장소는 서로 다른 탭이 한 chrome.storage를 쓰는 것과 같다(onChanged는 다른 탭에만 간다).
-export function memoryStore(initial?: Partial<PanelState>, shared: SharedPanelStorage = { watchers: [] }) {
+function memoryStore(initial?: Partial<PanelState>, shared: SharedPanelStorage = { watchers: [] }) {
   const saved: PanelState[] = [];
   const owner = {};
   shared.data ??= initial;

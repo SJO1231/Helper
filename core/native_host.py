@@ -90,7 +90,6 @@ def spawn_service():
 class NativeHost:
     def __init__(self, is_alive=port_open, start_service=spawn_service, wait_seconds=5.0):
         self.is_alive, self.start_service, self.wait_seconds = is_alive, start_service, wait_seconds
-        self._spawned = None
         self._gateway = None
 
     def handle(self, message):
@@ -108,7 +107,7 @@ class NativeHost:
     def _hello(self):
         info = self._live_info()
         if info is None:
-            self._spawned = self.start_service()
+            self.start_service()
             deadline = time.monotonic() + self.wait_seconds
             while info is None and time.monotonic() < deadline:
                 time.sleep(0.05)
@@ -123,11 +122,6 @@ class NativeHost:
         status, body = handle(self._gateway, message.get("method", ""), message.get("path", ""),
                               message.get("headers") or {}, message.get("body"))
         return {"status": status, "body": body}
-
-    def stop_spawned_service(self):
-        if self._spawned is not None:
-            self._spawned.terminate()
-            self._spawned.wait(timeout=5)
 
     def close(self):
         if self._gateway is not None:

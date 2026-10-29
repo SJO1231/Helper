@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import cases from '../../shared/fixtures/dictionary-cases.json';
-import type { DictAlias, DictKey, DictLabel, DictScreen } from '../../shared/types';
+import type { DictAlias, DictKey, DictLabel } from '../../shared/types';
 import {
-  countUnknownKeys, isUnregisteredScreen, listUnknownKeys, makeDictionaryView, resolveColumn, resolveLabel,
+  listUnknownKeys, makeDictionaryView, resolveColumn, resolveLabel,
   resolveStdKey, resolveType,
 } from './dictionary';
 
@@ -31,14 +31,8 @@ describe('resolveLabel', () => {
 
 describe('unknown keys', () => {
   const ks = ['keyB', 'dmZ.nothing', 'dmZ.other', 'dmZ.nothing'];
-  test('countUnknownKeys counts only keys with no std key', () => {
-    expect(countUnknownKeys(['keyB', 'dmZ.nothing', 'dmZ.other'], 'S1', aliases, keys)).toBe(2);
-  });
   test('listUnknownKeys lists each unregistered key once, in order', () => {
     expect(listUnknownKeys(ks, 'S1', aliases, keys)).toEqual(['dmZ.nothing', 'dmZ.other']);
-  });
-  test('count equals the length of the list', () => {
-    expect(countUnknownKeys(ks, 'S1', aliases, keys)).toBe(2);
   });
 });
 
@@ -68,20 +62,5 @@ describe('resolveType and resolveColumn', () => {
     expect(resolveColumn('dmX.keyA', 'S1', 'LS', view)).toMatchObject({
       stdKey: 'stdFromScreen', label: 'LS', type: 'text',
     });
-  });
-});
-
-describe('isUnregisteredScreen', () => {
-  const screen = (menu_no: string, site = 'g2b'): DictScreen => ({
-    site, menu_no, scrn_no: '', menu_cang_val: '', name: '', stage: null, source_route: '', key_fields: [],
-    link: null, options: null,
-  });
-  const screens = [screen('M1'), screen('M2', 'other')];
-  test('true when no dict_screen row has this site and menu_no', () => {
-    expect(isUnregisteredScreen('g2b', 'M9', screens)).toBe(true);
-    expect(isUnregisteredScreen('g2b', 'M2', screens)).toBe(true);
-  });
-  test('false when the row exists even if its stage is empty', () => {
-    expect(isUnregisteredScreen('g2b', 'M1', screens)).toBe(false);
   });
 });

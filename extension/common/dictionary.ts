@@ -1,4 +1,4 @@
-import type { DictAlias, DictKey, DictLabel, DictScreen, KeyType } from '../../shared/types';
+import type { DictAlias, DictKey, DictLabel, KeyType } from '../../shared/types';
 
 // SPEC 6절 해석 순서: K → dict_alias(그 화면 > 전체) → K 또는 마지막 '.' 뒤 이름
 // → 라벨(user>screen>site>system>화면 L) → type.
@@ -48,10 +48,6 @@ export function listUnknownKeys(
   return [...new Set(unknown)];
 }
 
-export function countUnknownKeys(ks: string[], screenCode: string, aliases: DictAlias[], stdKeys: Set<string>): number {
-  return listUnknownKeys(ks, screenCode, aliases, stdKeys).length;
-}
-
 export function resolveType(stdKey: string | null, dictKeys: DictKey[]): KeyType {
   if (stdKey === null) return 'text';
   return dictKeys.find((d) => d.std_key === stdKey)?.type ?? 'text';
@@ -74,8 +70,4 @@ export function resolveColumn(k: string, screenCode: string, screenL: string, vi
   const stdKey = resolveStdKey(k, screenCode, view.aliases, view.stdKeys);
   const label = resolveLabel(stdKey ?? k, screenCode, screenL, view.labels);
   return { k, stdKey, label, type: resolveType(stdKey, view.dictKeys) };
-}
-
-export function isUnregisteredScreen(site: string, menuNo: string, screens: DictScreen[]): boolean {
-  return !screens.some((s) => s.site === site && s.menu_no === menuNo);
 }

@@ -7,7 +7,7 @@ import urllib.request
 import pytest
 
 from core import runtime
-from core.native_host import NativeHost, native_loop, response_frames
+from core.native_host import NativeHost, native_loop, response_frames, spawn_service
 from core.tests.support import ROOT
 
 HELLO = {"type": "hello"}
@@ -155,7 +155,8 @@ def free_port():
 def test_real_hello_spawns_service_that_answers_with_token(home, monkeypatch):
     monkeypatch.setenv("HELPER_PORT", str(free_port()))
     monkeypatch.setenv("PYTHONPATH", str(ROOT))
-    host = NativeHost(wait_seconds=10)
+    spawned = []
+    host = NativeHost(start_service=lambda: spawned.append(spawn_service()) or spawned[-1], wait_seconds=10)
     try:
         info = host.handle(HELLO)
         assert info["schema_version"] == 1 and info["token"]
@@ -165,5 +166,7 @@ def test_real_hello_spawns_service_that_answers_with_token(home, monkeypatch):
             assert response.status == 200
         assert host.handle(HELLO) == info  # 두 번째 hello는 새로 띄우지 않는다
     finally:
-        host.stop_spawned_service()
+        for process in spawned:  # 서비스는 호스트보다 오래 살게 띄우므로 시험이 직접 끈다
+            process.terminate()
+            process.wait(timeout=5)
         host.close()

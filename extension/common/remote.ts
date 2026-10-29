@@ -1,5 +1,6 @@
 /// <reference types="chrome" />
 import type { CaptureResult, Diagnostics, DictScreen, ExtractMode } from '../../shared/types';
+import type { ScreenChange } from './screen-watch';
 import { ROW_COUNT_CHOICES } from '../sites/g2b/remote-actions';
 import type { Reply } from './background';
 import {
@@ -20,7 +21,6 @@ export interface RemoteDeps {
   send: (message: Record<string, unknown>) => Promise<Reply<any>>;
   panelStore?: PanelStore;
 }
-export interface ScreenChange { menuNo: string; scrnNo: string; menuCangVal: string; menuNm: string }
 
 const MODES: [ExtractMode, string][] = [['visible', '보이는 것만'], ['hidden', '숨김 포함'], ['all', '전체']];
 const TOAST_MS = 4000;
