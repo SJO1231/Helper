@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 import pytest
 
@@ -87,3 +88,34 @@ def test_restore_rejects_other_schema_version_and_leaves_db_alone(live_db, capsy
     assert backup.main(["restore", str(made), "--db", str(live_db)]) == 1
     assert rows_in(live_db) == 2
     assert not list((live_db.parent / "backups").glob("helper-before-restore-*"))
+
+
+def test_failed_copy_leaves_db_and_wal_and_no_scratch_file(live_db, capsys, monkeypatch):
+    made, _ = make_backup(live_db, capsys)
+    wal = Path(str(live_db) + "-wal")
+    wal.write_bytes(b"old-log")
+
+    def failing_copy(source, target):
+        Path(target).write_bytes(b"partial")
+        raise PermissionError("denied")
+
+    monkeypatch.setattr(backup.shutil, "copyfile", failing_copy)
+    with pytest.raises(PermissionError):
+        backup._replace_db_file(made, live_db)
+    assert wal.read_bytes() == b"old-log"
+    assert not Path(str(live_db) + ".restoring").exists()
+    assert rows_in(live_db) == 1
+
+
+def test_restore_command_reports_os_error_in_one_line(live_db, capsys, monkeypatch):
+    made, _ = make_backup(live_db, capsys)
+
+    def failing_copy(source, target):
+        raise PermissionError("denied")
+
+    monkeypatch.setattr(backup.shutil, "copyfile", failing_copy)
+    assert backup.main(["restore", str(made), "--db", str(live_db)]) == 1
+    err = capsys.readouterr().err.strip().splitlines()
+    assert len(err) == 1 and err[0].startswith("복원 실패:")
+    assert not Path(str(live_db) + ".restoring").exists()
+

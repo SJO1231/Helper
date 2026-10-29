@@ -48,11 +48,16 @@ def _preserve_current(db_path):
 
 
 def _replace_db_file(backup_file, db_path):
-    for suffix in ("-wal", "-shm"):  # 옛 로그가 새 파일에 붙으면 안 된다
-        Path(str(db_path) + suffix).unlink(missing_ok=True)
+    """복사가 끝난 뒤에만 -wal/-shm을 지우고 바꾼다. 복사가 실패하면 원본과 로그는 그대로다."""
     scratch = Path(str(db_path) + ".restoring")
-    shutil.copyfile(backup_file, scratch)
-    os.replace(scratch, db_path)
+    try:
+        shutil.copyfile(backup_file, scratch)
+        for suffix in ("-wal", "-shm"):  # 옛 로그가 새 파일에 붙으면 안 된다
+            Path(str(db_path) + suffix).unlink(missing_ok=True)
+        os.replace(scratch, db_path)
+    except BaseException:
+        scratch.unlink(missing_ok=True)
+        raise
 
 
 def restore(backup_file, db_path):
@@ -89,7 +94,7 @@ def _run_restore(args):
         return 1
     try:
         kept, integrity = restore(args.backup_file, db_path)
-    except (ValueError, StorageError, FileExistsError) as error:
+    except (ValueError, StorageError, OSError) as error:
         print(f"복원 실패: {error}", file=sys.stderr)
         return 1
     print(f"복원 전 DB 보존: {kept}" if kept else "복원 전 DB가 없어 보존하지 않았다")
